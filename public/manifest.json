@@ -1,0 +1,16 @@
+{
+  "name": "Party Hub",
+  "short_name": "PartyHub",
+  "description": "App para gestionar fiestas y eventos sociales",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0d2e",
+  "theme_color": "#1e1b4b",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}
