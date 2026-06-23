@@ -166,7 +166,7 @@ export default function SideDrawer({ open, onClose }: Props) {
               </span>
               <span className="inline-flex items-center gap-1.5 text-xs font-mono text-gray-600 dark:text-gray-400 uppercase tracking-widest">
                 <Code size={12} strokeWidth={2.5} />
-                Version Beta 1.0.1
+                Version Beta 1.1.2
               </span>
             </div>
           </div>
