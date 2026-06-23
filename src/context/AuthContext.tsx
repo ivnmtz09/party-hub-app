@@ -55,7 +55,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = async () => {
-    await signOut(auth)
+    try {
+      await signOut(auth)
+    } catch {
+      console.warn('signOut fallo, forzando recarga')
+    } finally {
+      window.location.reload()
+    }
   }
 
   return (

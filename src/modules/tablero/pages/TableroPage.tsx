@@ -27,6 +27,7 @@ import StatsChart from '../components/StatsChart'
 import CreateGroupModal from '../components/CreateGroupModal'
 import JoinGroupModal from '../components/JoinGroupModal'
 import GroupSettingsModal from '../components/GroupSettingsModal'
+import { playTapSound } from '../../../utils/audio'
 
 export default function TableroPage() {
   const { user } = useAuth()
@@ -78,6 +79,7 @@ export default function TableroPage() {
 
   const handleRegistrar = async (tipo: 'deposicion' | 'acto_sexual') => {
     if (!user || !activeGroupId || isSubmitting) return
+    playTapSound()
     setIsSubmitting(true)
     setErrorMsg('')
     try {

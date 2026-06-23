@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { LogIn } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import BrandLogo from './BrandLogo'
 
 export default function LoginPage() {
   const { loginWithGoogle } = useAuth()
@@ -21,9 +22,9 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-yellow-300 dark:bg-gray-950 text-black dark:text-white px-6">
-      <h1 className="text-5xl font-black uppercase tracking-widest mb-2">
-        Party Hub
-      </h1>
+      <div className="mb-6">
+        <BrandLogo size="lg" />
+      </div>
       <p className="text-black/70 dark:text-gray-400 mb-10 text-center text-sm font-bold uppercase tracking-wide">
         Gestiona tus fiestas y eventos sociales
       </p>

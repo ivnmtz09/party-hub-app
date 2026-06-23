@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Outlet, NavLink } from 'react-router-dom'
 import { Menu, Gamepad2, LayoutDashboard } from 'lucide-react'
 import SideDrawer from '../components/SideDrawer'
+import BrandLogo from '../components/BrandLogo'
 
 const navItems = [
   { to: '/arcade', label: 'Arcade', icon: Gamepad2 },
@@ -21,9 +22,7 @@ export default function MainLayout() {
           >
             <Menu size={22} strokeWidth={2.5} />
           </button>
-          <h1 className="text-lg font-black uppercase tracking-wider text-black dark:text-gray-900">
-            Party Hub
-          </h1>
+          <BrandLogo size="sm" />
           <div className="w-10" />
         </div>
       </header>
