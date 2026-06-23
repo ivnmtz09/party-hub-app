@@ -3,6 +3,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import MainLayout from '../layouts/MainLayout'
 import ArcadePage from '../modules/arcade/pages/ArcadePage'
+import CardGamePage from '../modules/arcade/pages/CardGamePage'
 import ImpostorGameHub from '../modules/arcade/pages/ImpostorGameHub'
 import TableroPage from '../modules/tablero/pages/TableroPage'
 import LoginPage from '../components/LoginPage'
@@ -54,6 +55,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <ImpostorGameHub />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/arcade/cartas/:deckId',
+    element: (
+      <ProtectedRoute>
+        <CardGamePage />
       </ProtectedRoute>
     ),
   },

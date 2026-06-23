@@ -1,7 +1,17 @@
 import { Link } from 'react-router-dom'
-import { UserX, Hand, Bomb, Search, Play } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+import { UserX, Hand, Bomb, Search, Play, Skull, AlertTriangle } from 'lucide-react'
 
-const games = [
+interface GameEntry {
+  title: string
+  description: string
+  icon: LucideIcon
+  path: string
+  active: boolean
+  turbio?: boolean
+}
+
+const games: GameEntry[] = [
   {
     title: 'El Impostor',
     description: 'Descubre al impostor antes de que sea demasiado tarde',
@@ -13,8 +23,16 @@ const games = [
     title: 'El Dedo en la Llaga',
     description: 'Quien es mas probable...',
     icon: Hand,
-    path: '#',
-    active: false,
+    path: '/arcade/cartas/dedo-en-la-llaga',
+    active: true,
+  },
+  {
+    title: 'Yo Nunca',
+    description: 'Confiesa tus pecados mas oscuros',
+    icon: Skull,
+    path: '/arcade/cartas/yo-nunca',
+    active: true,
+    turbio: true,
   },
   {
     title: 'Bomba de Tiempo',
@@ -43,7 +61,7 @@ export default function ArcadePage() {
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {games.map(({ title, description, icon: Icon, path, active }, i) => (
+        {games.map(({ title, description, icon: Icon, path, active, turbio }, i) => (
           <div
             key={title}
             style={{ animationDelay: `${i * 0.1}s` }}
@@ -63,6 +81,14 @@ export default function ArcadePage() {
               <p className="text-xs font-bold text-gray-500 dark:text-gray-400">
                 {description}
               </p>
+              {turbio && (
+                <div className="flex items-center gap-1 mt-2 border-2 border-red-600 bg-red-100 dark:bg-red-900/40 px-2 py-0.5">
+                  <AlertTriangle size={12} strokeWidth={2.5} className="text-red-600 shrink-0" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-red-600">
+                    CONTENIDO +18
+                  </span>
+                </div>
+              )}
             </div>
 
             {active ? (
