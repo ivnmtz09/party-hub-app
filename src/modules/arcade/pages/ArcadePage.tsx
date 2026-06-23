@@ -21,9 +21,9 @@ const games: GameEntry[] = [
   },
   {
     title: 'El Dedo en la Llaga',
-    description: 'Quien es mas probable...',
+    description: 'Multijugador: quien es mas probable...',
     icon: Hand,
-    path: '/arcade/cartas/dedo-en-la-llaga',
+    path: '/arcade/juego',
     active: true,
   },
   {

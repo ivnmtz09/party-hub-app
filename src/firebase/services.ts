@@ -223,3 +223,161 @@ export async function abandonarGrupo(groupId: string, userId: string): Promise<v
   })
   await deleteDoc(doc(db, 'grupos', groupId, 'miembros', userId))
 }
+
+/* ───── Juego Multijugador ───── */
+
+let generatedCodes = new Set<string>()
+
+function generarCodigoSala(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  for (let attempt = 0; attempt < 50; attempt++) {
+    let codigo = ''
+    for (let i = 0; i < 4; i++) {
+      codigo += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    if (!generatedCodes.has(codigo)) {
+      generatedCodes.add(codigo)
+      return codigo
+    }
+  }
+  return `${Date.now().toString(36).slice(-4).toUpperCase()}`
+}
+
+export interface Player {
+  id: string
+  displayName: string
+  active: boolean
+  score: number
+}
+
+export interface Sala {
+  code: string
+  status: 'LOBBY' | 'CARD' | 'VOTING' | 'RESULTS'
+  players: Player[]
+  currentRound: number
+  currentCard: string
+  deckId: string
+  votes: Record<string, string>
+  hostId: string
+}
+
+export async function crearSala(
+  userId: string,
+  displayName: string,
+  deckId: string,
+): Promise<string> {
+  const code = generarCodigoSala()
+  const salaRef = doc(db, 'rooms', code)
+  await setDoc(salaRef, {
+    code,
+    status: 'LOBBY',
+    players: [{ id: userId, displayName, active: true, score: 0 }],
+    currentRound: 0,
+    currentCard: '',
+    deckId,
+    votes: {},
+    hostId: userId,
+  })
+  return code
+}
+
+export async function unirseSala(
+  codigo: string,
+  userId: string,
+  displayName: string,
+): Promise<void> {
+  const salaRef = doc(db, 'rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) throw new Error('Sala no encontrada')
+
+  const data = snap.data() as Sala
+  if (data.status !== 'LOBBY') throw new Error('La partida ya empezo')
+
+  const exists = data.players.some((p) => p.id === userId)
+  if (!exists) {
+    await updateDoc(salaRef, {
+      players: arrayUnion({ id: userId, displayName, active: true, score: 0 }),
+    })
+  }
+}
+
+export function observarSala(
+  codigo: string,
+  callback: (sala: Sala) => void,
+): () => void {
+  const salaRef = doc(db, 'rooms', codigo)
+  return onSnapshot(salaRef, (snap) => {
+    if (snap.exists()) {
+      callback(snap.data() as Sala)
+    }
+  })
+}
+
+export async function iniciarPartida(codigo: string): Promise<void> {
+  await updateDoc(doc(db, 'rooms', codigo), {
+    status: 'CARD',
+    currentRound: 1,
+    votes: {},
+  })
+}
+
+export async function avanzarFase(
+  codigo: string,
+  status: Sala['status'],
+  card?: string,
+): Promise<void> {
+  const update: Record<string, unknown> = { status }
+  if (card !== undefined) update.currentCard = card
+  if (status === 'CARD') update.votes = {}
+  await updateDoc(doc(db, 'rooms', codigo), update)
+}
+
+export async function emitirVoto(
+  codigo: string,
+  fromPlayerId: string,
+  toPlayerId: string,
+): Promise<void> {
+  await updateDoc(doc(db, 'rooms', codigo), {
+    [`votes.${fromPlayerId}`]: toPlayerId,
+  })
+}
+
+export async function sumarPuntaje(
+  codigo: string,
+  playerId: string,
+): Promise<void> {
+  const salaRef = doc(db, 'rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) return
+  const data = snap.data() as Sala
+  const players = data.players.map((p) =>
+    p.id === playerId ? { ...p, score: p.score + 1 } : p,
+  )
+  await updateDoc(salaRef, { players })
+}
+
+export async function siguienteRonda(codigo: string): Promise<void> {
+  const salaRef = doc(db, 'rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) return
+  const data = snap.data() as Sala
+  await updateDoc(salaRef, {
+    currentRound: (data.currentRound || 0) + 1,
+    status: 'CARD',
+    votes: {},
+  })
+}
+
+export async function abandonarSala(
+  codigo: string,
+  userId: string,
+): Promise<void> {
+  const salaRef = doc(db, 'rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) return
+  const data = snap.data() as Sala
+  const players = data.players.map((p) =>
+    p.id === userId ? { ...p, active: false } : p,
+  )
+  await updateDoc(salaRef, { players })
+}
