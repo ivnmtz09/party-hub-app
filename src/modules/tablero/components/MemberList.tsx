@@ -55,7 +55,7 @@ export default function MemberList({ miembros, adminId }: Props) {
                 {m.deposiciones}
               </p>
               <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-                Depo
+                CAGADAS
               </p>
             </div>
             <div className="text-center">
@@ -63,7 +63,7 @@ export default function MemberList({ miembros, adminId }: Props) {
                 {m.actosSexuales}
               </p>
               <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-                Sexo
+                CULEADAS
               </p>
             </div>
           </div>

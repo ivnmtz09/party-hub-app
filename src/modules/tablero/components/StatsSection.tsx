@@ -44,13 +44,13 @@ export default function StatsSection({ miembros, eventos }: Props) {
             <div className="grid grid-cols-2 gap-2 text-xs font-bold text-gray-600 dark:text-gray-300">
               <div>
                 <span className="text-amber-600 dark:text-amber-400">
-                  Ultima deposicion:
+                  Ultima cagada:
                 </span>{' '}
                 {tiempoDesde(m.ultimaDeposicion)}
               </div>
               <div>
                 <span className="text-pink-600 dark:text-pink-400">
-                  Ultimo acto sexual:
+                  Ultima culeada:
                 </span>{' '}
                 {tiempoDesde(m.ultimoActoSexual)}
               </div>

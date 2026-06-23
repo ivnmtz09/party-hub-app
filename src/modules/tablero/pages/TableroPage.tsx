@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import {
-  ArrowDownFromLine,
-  Heart,
+  Trash2,
+  Flame,
   Loader2,
   Plus,
   LogIn,
@@ -251,19 +251,19 @@ export default function TableroPage() {
         <button
           onClick={() => handleRegistrar('deposicion')}
           disabled={isSubmitting}
-          className="flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-amber-300 dark:bg-amber-500 text-black dark:text-gray-900 font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-orange-800 text-white font-black uppercase tracking-tighter shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <ArrowDownFromLine size={28} strokeWidth={2.5} />
-          <span className="text-sm">Registrar Deposicion</span>
+          <Trash2 size={28} strokeWidth={2.5} />
+          <span className="text-xl">REGISTRAR CAGADA</span>
         </button>
 
         <button
           onClick={() => handleRegistrar('acto_sexual')}
           disabled={isSubmitting}
-          className="flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-pink-300 dark:bg-pink-500 text-black dark:text-gray-900 font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-rose-600 text-white font-black uppercase tracking-tighter shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <Heart size={28} strokeWidth={2.5} />
-          <span className="text-sm">Registrar Acto Sexual</span>
+          <Flame size={28} strokeWidth={2.5} />
+          <span className="text-xl">REGISTRAR CULEADA</span>
         </button>
       </div>
 

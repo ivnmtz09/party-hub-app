@@ -16,8 +16,8 @@ interface Props {
 export default function StatsChart({ miembros }: Props) {
   const data = miembros.map((m) => ({
     name: m.displayName,
-    Deposiciones: m.deposiciones,
-    'Actos Sexuales': m.actosSexuales,
+    CAGADAS: m.deposiciones,
+    CULEADAS: m.actosSexuales,
   }))
 
   if (data.length === 0) return null
@@ -25,7 +25,7 @@ export default function StatsChart({ miembros }: Props) {
   return (
     <div className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-4 shadow-brutal dark:shadow-brutal-dark">
       <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-4">
-        Estadisticas por miembro
+        Cagadas vs Culeadas
       </h3>
       <ResponsiveContainer width="100%" height={Math.max(200, data.length * 60)}>
         <BarChart
@@ -56,15 +56,15 @@ export default function StatsChart({ miembros }: Props) {
             wrapperStyle={{ fontSize: 10, fontWeight: 700 }}
           />
           <Bar
-            dataKey="Deposiciones"
-            fill="#FF0000"
+            dataKey="CAGADAS"
+            fill="#9a3412"
             stroke="#000"
             strokeWidth={2}
             radius={[0, 0, 0, 0]}
           />
           <Bar
-            dataKey="Actos Sexuales"
-            fill="#00FFFF"
+            dataKey="CULEADAS"
+            fill="#be123c"
             stroke="#000"
             strokeWidth={2}
           />
