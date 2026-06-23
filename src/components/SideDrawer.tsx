@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { X, LogOut, Sun, Moon, Code, ExternalLink, HelpCircle, LayoutDashboard, Gamepad2, UserCheck, Hand, Shuffle, ChevronDown } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
+import useLockBodyScroll from '../hooks/useLockBodyScroll'
 
 interface Props {
   open: boolean
@@ -32,6 +33,8 @@ export default function SideDrawer({ open, onClose }: Props) {
   const overlayRef = useRef<HTMLDivElement>(null)
   const [showManual, setShowManual] = useState(false)
 
+  useLockBodyScroll(open)
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -56,7 +59,7 @@ export default function SideDrawer({ open, onClose }: Props) {
         }`}
       >
         <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between p-4 border-b-4 border-black dark:border-white bg-yellow-300 dark:bg-yellow-400">
+          <div className="flex items-center justify-between p-4 border-b-4 border-black dark:border-white bg-yellow-300 dark:bg-yellow-400 shrink-0">
             <h2 className="text-lg font-black uppercase tracking-wider text-black dark:text-gray-900">
               Menu
             </h2>
@@ -68,7 +71,7 @@ export default function SideDrawer({ open, onClose }: Props) {
             </button>
           </div>
 
-          <div className="flex-1 p-4 space-y-6">
+          <div className="flex-1 p-4 space-y-6 overflow-y-auto">
             <div className="flex items-center gap-3 p-3 border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-800">
               <div className="w-10 h-10 bg-yellow-300 dark:bg-yellow-400 border-2 border-black dark:border-white flex items-center justify-center text-sm font-black text-black dark:text-gray-900">
                 {(user?.displayName ?? user?.email ?? '?')
@@ -139,7 +142,7 @@ export default function SideDrawer({ open, onClose }: Props) {
             </button>
           </div>
 
-          <div className="p-4 border-t-4 border-black dark:border-white space-y-3">
+          <div className="p-4 border-t-4 border-black dark:border-white space-y-3 shrink-0">
             <button
               onClick={logout}
               className="w-full flex items-center justify-center gap-3 px-3 py-3 border-2 border-black dark:border-white bg-red-500 text-white font-black uppercase tracking-wider text-sm shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
