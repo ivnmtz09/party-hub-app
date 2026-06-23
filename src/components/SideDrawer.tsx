@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { X, LogOut, Sun, Moon } from 'lucide-react'
+import { X, LogOut, Sun, Moon, Code } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 
@@ -75,7 +75,7 @@ export default function SideDrawer({ open, onClose }: Props) {
             </button>
           </div>
 
-          <div className="p-4 border-t-4 border-black dark:border-white">
+          <div className="p-4 border-t-4 border-black dark:border-white space-y-3">
             <button
               onClick={logout}
               className="w-full flex items-center justify-center gap-3 px-3 py-3 border-2 border-black dark:border-white bg-red-500 text-white font-black uppercase tracking-wider text-sm shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
@@ -83,6 +83,16 @@ export default function SideDrawer({ open, onClose }: Props) {
               <LogOut size={20} strokeWidth={2.5} />
               <span>Cerrar sesion</span>
             </button>
+
+            <div className="border-t-4 border-black dark:border-white p-4 -mx-4 -mb-4 bg-gray-200 dark:bg-gray-800">
+              <span className="block font-black uppercase text-sm text-black dark:text-white mb-1">
+                Creado por: Ivn Mtz
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-xs font-mono text-gray-600 dark:text-gray-400 uppercase tracking-widest">
+                <Code size={12} strokeWidth={2.5} />
+                Version Beta 1.0.1
+              </span>
+            </div>
           </div>
         </div>
       </div>
