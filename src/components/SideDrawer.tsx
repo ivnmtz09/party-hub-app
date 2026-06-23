@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { X, LogOut, Sun, Moon, Code } from 'lucide-react'
+import { X, LogOut, Sun, Moon, Code, ExternalLink } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 
@@ -86,7 +86,16 @@ export default function SideDrawer({ open, onClose }: Props) {
 
             <div className="border-t-4 border-black dark:border-white p-4 -mx-4 -mb-4 bg-gray-200 dark:bg-gray-800">
               <span className="block font-black uppercase text-sm text-black dark:text-white mb-1">
-                Creado por: Ivn Mtz
+                Creado por:{' '}
+                <a
+                  href="https://www.instagram.com/ivjmm.0109/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-black dark:text-white hover:underline underline-offset-2"
+                >
+                  <ExternalLink size={14} strokeWidth={2.5} />
+                  Ivn Mtz
+                </a>
               </span>
               <span className="inline-flex items-center gap-1.5 text-xs font-mono text-gray-600 dark:text-gray-400 uppercase tracking-widest">
                 <Code size={12} strokeWidth={2.5} />
