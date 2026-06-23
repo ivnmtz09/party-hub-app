@@ -27,6 +27,7 @@ import StatsChart from '../components/StatsChart'
 import CreateGroupModal from '../components/CreateGroupModal'
 import JoinGroupModal from '../components/JoinGroupModal'
 import GroupSettingsModal from '../components/GroupSettingsModal'
+import RecentActivity from '../components/RecentActivity'
 import { playTapSound } from '../../../utils/audio'
 
 export default function TableroPage() {
@@ -279,6 +280,13 @@ export default function TableroPage() {
       <section>
         <StatsSection miembros={miembros} eventos={eventos} />
       </section>
+
+      <RecentActivity
+        eventos={eventos}
+        miembros={miembros}
+        userId={user?.uid ?? ''}
+        groupId={activeGroupId ?? ''}
+      />
 
       <CreateGroupModal
         open={showCreateModal}

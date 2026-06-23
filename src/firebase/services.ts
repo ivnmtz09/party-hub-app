@@ -224,6 +224,22 @@ export async function abandonarGrupo(groupId: string, userId: string): Promise<v
   await deleteDoc(doc(db, 'grupos', groupId, 'miembros', userId))
 }
 
+export async function eliminarEvento(groupId: string, eventId: string): Promise<void> {
+  const eventoRef = doc(db, 'grupos', groupId, 'eventos', eventId)
+  const snap = await getDoc(eventoRef)
+  if (!snap.exists()) throw new Error('Evento no encontrado')
+
+  const evento = snap.data() as Evento
+  await deleteDoc(eventoRef)
+
+  const miembroRef = doc(db, 'grupos', groupId, 'miembros', evento.userId)
+  if (evento.tipo === 'deposicion') {
+    await updateDoc(miembroRef, { deposiciones: increment(-1) })
+  } else {
+    await updateDoc(miembroRef, { actosSexuales: increment(-1) })
+  }
+}
+
 /* ───── Juego Multijugador ───── */
 
 let generatedCodes = new Set<string>()
