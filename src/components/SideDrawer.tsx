@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react'
-import { X, LogOut, Sun, Moon, Code, ExternalLink } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { X, LogOut, Sun, Moon, Code, ExternalLink, HelpCircle, LayoutDashboard, Gamepad2, UserCheck, Hand, Shuffle, ChevronDown } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 
@@ -8,10 +8,29 @@ interface Props {
   onClose: () => void
 }
 
+function ManualItem({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
+  return (
+    <div className="flex gap-2 p-2 border-b-2 border-black dark:border-white last:border-b-0">
+      <div className="w-6 h-6 border-2 border-black dark:border-white flex items-center justify-center shrink-0 mt-0.5 bg-white dark:bg-gray-700">
+        <span className="text-[10px]">{icon}</span>
+      </div>
+      <div>
+        <p className="text-[10px] font-black uppercase tracking-wider text-black dark:text-white">
+          {title}
+        </p>
+        <p className="text-[9px] font-bold leading-relaxed text-gray-600 dark:text-gray-400">
+          {desc}
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export default function SideDrawer({ open, onClose }: Props) {
   const { user, logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const overlayRef = useRef<HTMLDivElement>(null)
+  const [showManual, setShowManual] = useState(false)
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -65,6 +84,51 @@ export default function SideDrawer({ open, onClose }: Props) {
                 </p>
               </div>
             </div>
+
+            <button
+              onClick={() => setShowManual(!showManual)}
+              className="w-full flex items-center gap-3 px-3 py-3 border-2 border-black dark:border-white bg-white dark:bg-gray-800 font-black uppercase tracking-wider text-sm text-black dark:text-white shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+            >
+              <HelpCircle size={20} strokeWidth={2.5} />
+              <span className="flex-1 text-left">Como jugar</span>
+              <ChevronDown
+                size={16}
+                strokeWidth={2.5}
+                className={`transition-transform ${showManual ? 'rotate-180' : ''}`}
+              />
+            </button>
+
+            {showManual && (
+              <div className="space-y-2 border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-800 p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                <div className="space-y-1">
+                  <ManualItem
+                    icon={<LayoutDashboard size={16} strokeWidth={2.5} />}
+                    title="El Tablero"
+                    desc="Crea o unete a un grupo con un codigo de 6 caracteres. Dentro del grupo puedes registrar actividades (Cagadas/Culeadas) que se reflejan en tiempo real en las estadisticas y graficas del grupo."
+                  />
+                  <ManualItem
+                    icon={<Gamepad2 size={16} strokeWidth={2.5} />}
+                    title="Modo Arcade"
+                    desc="Centro de juegos grupales sincronizados en tiempo real. Cada juego tiene su propia dinamica y se juega con los miembros de tu grupo."
+                  />
+                  <ManualItem
+                    icon={<UserCheck size={16} strokeWidth={2.5} />}
+                    title="El Impostor"
+                    desc="Juego de roles secretos. Se asigna un rol secreto a cada jugador (Ciudadano o Impostor). Los Ciudadanos deben descubrir al Impostor mediante votacion y debate. El Impostor debe sabotear sin ser descubierto."
+                  />
+                  <ManualItem
+                    icon={<Hand size={16} strokeWidth={2.5} />}
+                    title="El Dedo en la Llaga"
+                    desc="Juego de votacion democratica. Aparece una pregunta como 'Quien es mas probable...' y todos votan por el jugador que creen que mejor encaja. El que mas votos recibe gana la ronda."
+                  />
+                  <ManualItem
+                    icon={<Shuffle size={16} strokeWidth={2.5} />}
+                    title="Yo Nunca"
+                    desc="Dinamica de retos. Se muestra una carta con una accion. Si nunca has hecho esa accion, ganas un punto. Si la has hecho, te toca hacer un reto. Ideal para romper el hielo."
+                  />
+                </div>
+              </div>
+            )}
 
             <button
               onClick={toggleTheme}
