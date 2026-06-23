@@ -32,16 +32,16 @@ export default function MainLayout() {
         <Outlet />
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t-4 border-black dark:border-white flex justify-around items-center h-16 px-4 z-30">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t-4 border-black dark:border-white flex justify-around items-stretch h-16 px-0 z-30">
         {navItems.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}
             className={({ isActive }) =>
-              `flex flex-col items-center gap-0.5 text-xs font-bold uppercase tracking-wider transition-all ${
+              `flex-1 flex flex-col items-center justify-center gap-0.5 text-xs font-black uppercase tracking-wider transition-all border-r-2 border-black dark:border-white last:border-r-0 ${
                 isActive
-                  ? 'text-black dark:text-white'
-                  : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
+                  ? 'bg-yellow-400 dark:bg-indigo-600 text-black dark:text-white shadow-[inset_0_-4px_0_0_rgba(0,0,0,1)] dark:shadow-[inset_0_-4px_0_0_rgba(255,255,255,1)]'
+                  : 'bg-white dark:bg-gray-900 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
               }`
             }
           >

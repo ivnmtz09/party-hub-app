@@ -1,10 +1,12 @@
+import { Crown } from 'lucide-react'
 import type { Miembro } from '../../../firebase/services'
 
 interface Props {
   miembros: Miembro[]
+  adminId?: string
 }
 
-export default function MemberList({ miembros }: Props) {
+export default function MemberList({ miembros, adminId }: Props) {
   if (miembros.length === 0) {
     return (
       <p className="text-gray-500 dark:text-gray-400 text-center py-8 font-bold uppercase tracking-wider">
@@ -21,16 +23,29 @@ export default function MemberList({ miembros }: Props) {
           className="border-2 border-black dark:border-white bg-white dark:bg-gray-800 p-4 flex items-center justify-between shadow-brutal-sm dark:shadow-brutal-sm-dark"
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-yellow-300 dark:bg-yellow-400 border-2 border-black dark:border-white flex items-center justify-center text-sm font-black text-black dark:text-gray-900">
+            <div className="relative w-10 h-10 bg-yellow-300 dark:bg-yellow-400 border-2 border-black dark:border-white flex items-center justify-center text-sm font-black text-black dark:text-gray-900">
               {m.displayName.charAt(0).toUpperCase()}
+              {m.id === adminId && (
+                <div className="absolute -top-2 -right-2">
+                  <Crown size={14} strokeWidth={2.5} className="text-yellow-600 dark:text-yellow-300" />
+                </div>
+              )}
             </div>
             <div>
               <p className="font-black uppercase tracking-wider text-sm text-black dark:text-white">
                 {m.displayName}
               </p>
-              <p className="text-xs font-bold text-gray-500 dark:text-gray-400">
-                {m.email || 'sin email'}
-              </p>
+              <div className="flex items-center gap-2 mt-0.5">
+                {m.id === adminId ? (
+                  <span className="text-[10px] font-black uppercase tracking-widest bg-red-600 text-white px-1.5 py-0.5 border border-black dark:border-white">
+                    ADMIN
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-black uppercase tracking-widest bg-gray-300 dark:bg-gray-600 text-black dark:text-white px-1.5 py-0.5 border border-black dark:border-white">
+                    INVITADO
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
