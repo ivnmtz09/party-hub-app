@@ -1,9 +1,8 @@
 import { useState } from 'react'
-import { Trash2, Flame } from 'lucide-react'
+import { Trash2, Flame, Check, X } from 'lucide-react'
 import type { Timestamp } from 'firebase/firestore'
 import type { Evento, Miembro } from '../../../firebase/services'
 import { eliminarEvento } from '../../../firebase/services'
-import DeleteConfirmationModal from './DeleteConfirmationModal'
 
 function tiempoRelativo(ts: Timestamp | null): string {
   if (!ts) return ''
@@ -26,24 +25,23 @@ interface Props {
 }
 
 export default function RecentActivity({ eventos, miembros, userId, groupId }: Props) {
-  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
-  const [loadingDelete, setLoadingDelete] = useState(false)
+  const [confirmingId, setConfirmingId] = useState<string | null>(null)
+  const [loadingId, setLoadingId] = useState<string | null>(null)
 
   const recientes = eventos.slice(0, 5)
 
   const getMemberName = (uid: string): string =>
     miembros.find((m) => m.id === uid)?.displayName ?? uid
 
-  const handleDelete = async () => {
-    if (!pendingDeleteId) return
-    setLoadingDelete(true)
+  const handleDelete = async (eventId: string) => {
+    setLoadingId(eventId)
     try {
-      await eliminarEvento(groupId, pendingDeleteId)
+      await eliminarEvento(groupId, eventId)
     } catch {
       /* error silencioso */
     } finally {
-      setLoadingDelete(false)
-      setPendingDeleteId(null)
+      setLoadingId(null)
+      setConfirmingId(null)
     }
   }
 
@@ -63,6 +61,8 @@ export default function RecentActivity({ eventos, miembros, userId, groupId }: P
         <div className="space-y-2">
           {recientes.map((ev) => {
             const isOwn = ev.userId === userId
+            const isConfirming = confirmingId === ev.id
+            const isLoading = loadingId === ev.id
             const icono =
               ev.tipo === 'deposicion' ? (
                 <Trash2 size={16} strokeWidth={2.5} className="text-orange-500" />
@@ -89,26 +89,43 @@ export default function RecentActivity({ eventos, miembros, userId, groupId }: P
                   </p>
                 </div>
 
-                {isOwn && (
+                {isOwn && !isConfirming && (
                   <button
-                    onClick={() => setPendingDeleteId(ev.id!)}
-                    className="p-2 border-2 border-black bg-red-500 text-white hover:bg-red-600 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none shrink-0"
+                    onClick={() => setConfirmingId(ev.id!)}
+                    className="p-2 border-2 border-black bg-red-500 text-white hover:bg-red-600 transition-opacity shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
                   >
-                    <Trash2 size={14} strokeWidth={2.5} />
+                    {isLoading ? (
+                      <span className="text-[10px] font-black">...</span>
+                    ) : (
+                      <Trash2 size={14} strokeWidth={2.5} />
+                    )}
                   </button>
+                )}
+
+                {isOwn && isConfirming && (
+                  <div className="flex gap-1.5 transition-opacity shrink-0">
+                    <button
+                      onClick={() => setConfirmingId(null)}
+                      className="flex items-center gap-1 px-2 py-2 border-2 border-black bg-gray-300 dark:bg-gray-600 text-black dark:text-white font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all min-w-[44px] min-h-[44px]"
+                    >
+                      <X size={12} strokeWidth={2.5} />
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={() => handleDelete(ev.id!)}
+                      disabled={isLoading}
+                      className="flex items-center gap-1 px-2 py-2 border-2 border-black bg-red-500 text-white font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 min-w-[44px] min-h-[44px]"
+                    >
+                      <Check size={12} strokeWidth={2.5} />
+                      {isLoading ? '...' : 'Confirmar'}
+                    </button>
+                  </div>
                 )}
               </div>
             )
           })}
         </div>
       )}
-
-      <DeleteConfirmationModal
-        open={pendingDeleteId !== null}
-        onClose={() => setPendingDeleteId(null)}
-        onConfirm={handleDelete}
-        loading={loadingDelete}
-      />
     </section>
   )
 }
