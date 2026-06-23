@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { useGame } from '../context/GameContext'
 import { categoryMap } from '../data/words'
+import ArcadeHeader from '../components/ArcadeHeader'
 
 type GameMode = 'local' | 'online'
 
@@ -68,6 +69,7 @@ export default function ImpostorSetupPage() {
 
   return (
     <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white">
+      <ArcadeHeader />
       <div className="w-full max-w-md mx-auto p-4 space-y-5">
         <button
           onClick={() => navigate('/arcade')}
