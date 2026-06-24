@@ -28,7 +28,7 @@ export default function RoleRevealPage() {
       setFlipped(true)
     } else if (!isLastPlayer) {
       setFlipped(false)
-      setCurrentIndex((i) => i + 1)
+      setTimeout(() => setCurrentIndex((i) => i + 1), 500)
     } else {
       nextPhase()
     }

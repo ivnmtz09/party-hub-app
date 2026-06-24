@@ -117,7 +117,7 @@ export default function SideDrawer({ open, onClose }: Props) {
                   <ManualItem
                     icon={<UserCheck size={16} strokeWidth={2.5} />}
                     title="El Impostor"
-                    desc="Juego de roles secretos. Se asigna un rol secreto a cada jugador (Ciudadano o Impostor). Los Ciudadanos deben descubrir al Impostor mediante votacion y debate. El Impostor debe sabotear sin ser descubierto."
+                    desc="Juego de roles secretos. Se asigna un rol secreto a cada jugador (CIVIL o Impostor). Los CIVILES deben descubrir al Impostor mediante votacion y debate. El Impostor debe sabotear sin ser descubierto."
                   />
                   <ManualItem
                     icon={<Hand size={16} strokeWidth={2.5} />}

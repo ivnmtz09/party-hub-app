@@ -397,3 +397,24 @@ export async function abandonarSala(
   )
   await updateDoc(salaRef, { players })
 }
+
+/* ───── El Impostor (persistencia local) ───── */
+
+export interface ImpostorSession {
+  playerNames: string[]
+  roles: Array<{ name: string; isImpostor: boolean }>
+  createdAt: Timestamp
+}
+
+export async function guardarPartidaImpostor(data: Omit<ImpostorSession, 'createdAt'>): Promise<void> {
+  await setDoc(doc(db, 'impostor_sessions', 'latest'), {
+    ...data,
+    createdAt: serverTimestamp(),
+  })
+}
+
+export async function cargarPartidaImpostor(): Promise<ImpostorSession | null> {
+  const snap = await getDoc(doc(db, 'impostor_sessions', 'latest'))
+  if (!snap.exists()) return null
+  return snap.data() as ImpostorSession
+}

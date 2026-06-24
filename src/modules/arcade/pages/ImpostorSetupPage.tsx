@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { cargarPartidaImpostor } from '../../../firebase/services'
 import {
   Users,
   UserPlus,
@@ -10,6 +11,7 @@ import {
   Wifi,
   Plus,
   Minus,
+  HelpCircle,
 } from 'lucide-react'
 import { useGame } from '../context/GameContext'
 import { categoryMap } from '../data/words'
@@ -31,6 +33,15 @@ export default function ImpostorSetupPage() {
     new Set([categoryMap[0]!.name]),
   )
   const [impostorCount, setImpostorCount] = useState(1)
+  const [includeHint, setIncludeHint] = useState(true)
+
+  useEffect(() => {
+    cargarPartidaImpostor().then((saved) => {
+      if (saved && saved.playerNames.length > 0) {
+        setNames(saved.playerNames)
+      }
+    })
+  }, [])
 
   const addName = () => {
     const trimmed = inputName.trim()
@@ -62,6 +73,7 @@ export default function ImpostorSetupPage() {
       playerNames: names,
       impostorCount,
       categories: Array.from(selectedCategories),
+      includeHint,
     })
   }
 
@@ -253,6 +265,34 @@ export default function ImpostorSetupPage() {
                   )
                 })}
               </div>
+            </div>
+
+            <div className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-4 shadow-brutal dark:shadow-brutal-dark animate-fade-in-up flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 border-2 border-black dark:border-white bg-cyan-300 dark:bg-cyan-500 flex items-center justify-center">
+                  <HelpCircle size={20} strokeWidth={2.5} className="text-black dark:text-gray-900" />
+                </div>
+                <div>
+                  <p className="font-black uppercase tracking-wider text-sm">Incluir pista</p>
+                  <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400">
+                    El impostor vera la categoria
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIncludeHint(!includeHint)}
+                className={`w-14 h-8 rounded-full border-2 border-black dark:border-white transition-colors duration-200 ${
+                  includeHint
+                    ? 'bg-emerald-400 dark:bg-emerald-500'
+                    : 'bg-gray-200 dark:bg-gray-700'
+                }`}
+              >
+                <div
+                  className={`w-5 h-5 rounded-full border-2 border-black dark:border-white bg-white transition-transform duration-200 ${
+                    includeHint ? 'translate-x-7' : 'translate-x-0.5'
+                  }`}
+                />
+              </button>
             </div>
 
             <button

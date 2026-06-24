@@ -19,6 +19,7 @@ export interface GameConfig {
   playerNames: string[]
   impostorCount: number
   categories: string[]
+  includeHint: boolean
 }
 
 export interface GameState {

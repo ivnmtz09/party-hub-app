@@ -1,10 +1,20 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Trophy, Frown, RotateCcw, Home } from 'lucide-react'
 import { useGame } from '../context/GameContext'
+import { guardarPartidaImpostor } from '../../../firebase/services'
 
 export default function ResultsPage() {
   const navigate = useNavigate()
   const { state, resetGame } = useGame()
+
+  useEffect(() => {
+    if (!state) return
+    guardarPartidaImpostor({
+      playerNames: state.config.playerNames,
+      roles: state.players.map((p) => ({ name: p.name, isImpostor: p.isImpostor })),
+    })
+  }, [state])
 
   if (!state || state.phase !== 'Result') {
     return (

@@ -14,7 +14,7 @@ function shuffle<T>(array: T[]): T[] {
 }
 
 function assignRoles(config: GameConfig, words: Word[]): PlayerRole[] {
-  const { playerNames, impostorCount, categories } = config
+  const { playerNames, impostorCount, categories, includeHint } = config
 
   const filtered = words.filter((w) => categories.includes(w.categoria))
   if (filtered.length === 0) throw new Error('No words for selected categories')
@@ -29,7 +29,7 @@ function assignRoles(config: GameConfig, words: Word[]): PlayerRole[] {
     name,
     isImpostor: impostorNames.has(name),
     assignedWord: selected.palabra,
-    hint: selected.pista,
+    hint: includeHint ? selected.categoria : '',
     ejemplo: selected.ejemplo,
   }))
 }

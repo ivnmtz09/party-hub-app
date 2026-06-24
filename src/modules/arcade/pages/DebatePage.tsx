@@ -107,7 +107,7 @@ export default function DebatePage() {
         </div>
 
         <p className="text-xs font-bold text-gray-500 dark:text-gray-400 text-center max-w-xs">
-          Discutan y defiendan sus posturas. Los ciudadanos deben encontrar al impostor.
+          Discutan y defiendan sus posturas. Los civiles deben encontrar al impostor.
         </p>
       </div>
 
