@@ -37,11 +37,19 @@ function pickRandomIndex(exclude: Set<number>, total: number): number {
 
 export default function BombaPage() {
   const [phase, setPhase] = useState<GamePhase>('setup')
-  const [names, setNames] = useState<string[]>([])
+  const [names, setNames] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem('bomba_players')
+      return stored ? (JSON.parse(stored) as string[]) : []
+    } catch {
+      return []
+    }
+  })
   const [inputName, setInputName] = useState('')
   const [penitenceMode, setPenitenceMode] = useState<PenitenceMode>('aleatoria')
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0)
   const [currentQuestion, setCurrentQuestion] = useState('')
+  const [turnCount, setTurnCount] = useState(1)
   const [totalTime, setTotalTime] = useState(0)
   const [timeLeft, setTimeLeft] = useState(0)
   const [penitencia, setPenitencia] = useState('')
@@ -55,6 +63,12 @@ export default function BombaPage() {
       if (timerRef.current) clearInterval(timerRef.current)
     }
   }, [])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('bomba_players', JSON.stringify(names))
+    } catch { /* no storage */ }
+  }, [names])
 
   const addName = () => {
     const trimmed = inputName.trim()
@@ -72,17 +86,22 @@ export default function BombaPage() {
     if (names.length < 2) return
 
     const qIdx = pickRandomIndex(usedQuestions, preguntas.length)
-    const randomTime = Math.floor(Math.random() * 31) + 15
+    const initialTime = 25
     const newUsed = new Set(usedQuestions)
     newUsed.add(qIdx)
 
     setCurrentPlayerIndex(0)
     setCurrentQuestion(preguntas[qIdx]!)
-    setTotalTime(randomTime)
-    setTimeLeft(randomTime)
+    setTurnCount(1)
+    setTotalTime(initialTime)
+    setTimeLeft(initialTime)
     setUsedQuestions(newUsed)
     setCustomPenitencia('')
     setPhase('playing')
+
+    try {
+      localStorage.setItem('bomba_players', JSON.stringify(names))
+    } catch { /* no storage */ }
 
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
@@ -105,10 +124,12 @@ export default function BombaPage() {
     setUsedQuestions(newUsed)
     setCurrentQuestion(preguntas[qIdx]!)
 
-    const randomTime = Math.floor(Math.random() * 31) + 15
+    const nextTurn = turnCount + 1
+    const nextDuration = Math.max(10, 25 - nextTurn)
     setCurrentPlayerIndex(nextIndex)
-    setTotalTime(randomTime)
-    setTimeLeft(randomTime)
+    setTurnCount(nextTurn)
+    setTotalTime(nextDuration)
+    setTimeLeft(nextDuration)
 
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
@@ -143,15 +164,16 @@ export default function BombaPage() {
 
     const shuffled = shuffle(names)
     const qIdx = pickRandomIndex(usedQuestions, preguntas.length)
-    const randomTime = Math.floor(Math.random() * 31) + 15
+    const initialTime = 25
     const newUsed = new Set(usedQuestions)
     newUsed.add(qIdx)
 
     setNames(shuffled)
     setCurrentPlayerIndex(0)
     setCurrentQuestion(preguntas[qIdx]!)
-    setTotalTime(randomTime)
-    setTimeLeft(randomTime)
+    setTurnCount(1)
+    setTotalTime(initialTime)
+    setTimeLeft(initialTime)
     setUsedQuestions(newUsed)
     setPenitencia('')
     setCustomPenitencia('')
@@ -176,7 +198,8 @@ export default function BombaPage() {
   }
 
   const progress = totalTime > 0 ? timeLeft / totalTime : 0
-  const pulseDuration = 0.5 + progress * 2
+  const tensionMultiplier = Math.max(0.4, totalTime / 25)
+  const pulseDuration = Math.max(0.3, progress * tensionMultiplier * 2.5)
 
   const bombColor =
     progress > 0.5
