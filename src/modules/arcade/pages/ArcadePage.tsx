@@ -43,10 +43,11 @@ const games: GameEntry[] = [
   },
   {
     title: 'Bomba de Tiempo',
-    description: 'Pasa el cel antes de la explosion',
+    description: 'Responde rapido o la bomba explota',
     icon: Bomb,
-    path: '#',
-    active: false,
+    path: '/arcade/bomba',
+    active: true,
+    turbio: true,
   },
   {
     title: 'Misterio en la Mansion',
