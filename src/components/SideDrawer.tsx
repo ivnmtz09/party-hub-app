@@ -7,11 +7,11 @@ import {
   Code,
   ExternalLink,
   HelpCircle,
-  LayoutDashboard,
-  Gamepad2,
-  UserCheck,
-  Hand,
-  Shuffle,
+  Activity,
+  UserX,
+  Bomb,
+  RotateCw,
+  Target,
   ChevronDown,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
@@ -127,29 +127,29 @@ export default function SideDrawer({ open, onClose }: Props) {
               <div className="space-y-2 border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-800 p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                 <div className="space-y-1">
                   <ManualItem
-                    icon={<LayoutDashboard size={16} strokeWidth={2.5} />}
+                    icon={<Activity size={16} strokeWidth={2.5} />}
                     title="El Tablero"
-                    desc="Crea o unete a un grupo con un codigo de 6 caracteres. Dentro del grupo puedes registrar actividades (Cagadas/Culeadas) que se reflejan en tiempo real en las estadisticas y graficas del grupo."
+                    desc="Registra tus Cagadas, Culeadas y tus idas al GYM. Las graficas se reinician cada mes para coronar a un nuevo lider."
                   />
                   <ManualItem
-                    icon={<Gamepad2 size={16} strokeWidth={2.5} />}
-                    title="Modo Arcade"
-                    desc="Centro de juegos grupales sincronizados en tiempo real. Cada juego tiene su propia dinamica y se juega con los miembros de tu grupo."
-                  />
-                  <ManualItem
-                    icon={<UserCheck size={16} strokeWidth={2.5} />}
+                    icon={<UserX size={16} strokeWidth={2.5} />}
                     title="El Impostor"
-                    desc="Juego de roles secretos. Se asigna un rol secreto a cada jugador (CIVIL o Impostor). Los CIVILES deben descubrir al Impostor mediante votacion y debate. El Impostor debe sabotear sin ser descubierto."
+                    desc="Un jugador oculto no conoce la palabra secreta. Los civiles deben dar pistas de UNA sola palabra. Vota antes de que el impostor gane!"
                   />
                   <ManualItem
-                    icon={<Hand size={16} strokeWidth={2.5} />}
-                    title="El Dedo en la Llaga"
-                    desc="Juego de votacion democratica. Aparece una pregunta como 'Quien es mas probable...' y todos votan por el jugador que creen que mejor encaja. El que mas votos recibe gana la ronda."
+                    icon={<Bomb size={16} strokeWidth={2.5} />}
+                    title="Bomba de Tiempo"
+                    desc="Responde la pregunta de presion y pasa el turno rapido. El tiempo disminuye cada ronda. Si te explota, preparate para una penitencia turbia."
                   />
                   <ManualItem
-                    icon={<Shuffle size={16} strokeWidth={2.5} />}
-                    title="Yo Nunca"
-                    desc="Dinamica de retos. Se muestra una carta con una accion. Si nunca has hecho esa accion, ganas un punto. Si la has hecho, te toca hacer un reto. Ideal para romper el hielo."
+                    icon={<RotateCw size={16} strokeWidth={2.5} />}
+                    title="Ruleta"
+                    desc="Personaliza la rueda con nombres, opciones o letras (ideal para jugar Stop). Gira y que la suerte decida."
+                  />
+                  <ManualItem
+                    icon={<Target size={16} strokeWidth={2.5} />}
+                    title="Dedo en la Llaga"
+                    desc="Votacion grupal y democratica. Quien del grupo es el mas probable en hacer lo que dice la tarjeta?"
                   />
                 </div>
               </div>
@@ -192,7 +192,7 @@ export default function SideDrawer({ open, onClose }: Props) {
               </span>
               <span className="inline-flex items-center gap-1.5 text-xs font-mono text-gray-600 dark:text-gray-400 uppercase tracking-widest">
                 <Code size={12} strokeWidth={2.5} />
-                Version Beta 1.2.3
+                Version 1.3.5
               </span>
             </div>
           </div>
