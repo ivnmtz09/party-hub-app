@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Trash2, Flame, Check, X } from 'lucide-react'
+import { Trash2, Flame, Dumbbell, Check, X } from 'lucide-react'
 import type { Timestamp } from 'firebase/firestore'
 import type { Evento, Miembro } from '../../../firebase/services'
 import { eliminarEvento } from '../../../firebase/services'
@@ -66,8 +66,10 @@ export default function RecentActivity({ eventos, miembros, userId, groupId }: P
             const icono =
               ev.tipo === 'deposicion' ? (
                 <Trash2 size={16} strokeWidth={2.5} className="text-orange-500" />
-              ) : (
+              ) : ev.tipo === 'acto_sexual' ? (
                 <Flame size={16} strokeWidth={2.5} className="text-rose-500" />
+              ) : (
+                <Dumbbell size={16} strokeWidth={2.5} className="text-blue-500" />
               )
 
             return (
@@ -84,7 +86,7 @@ export default function RecentActivity({ eventos, miembros, userId, groupId }: P
                     {getMemberName(ev.userId)}
                   </p>
                   <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    {ev.tipo === 'deposicion' ? 'Cagada' : 'Culeada'} &middot;{' '}
+                    {ev.tipo === 'deposicion' ? 'Cagada' : ev.tipo === 'acto_sexual' ? 'Culeada' : 'Gym'} &middot;{' '}
                     {tiempoRelativo(ev.timestamp as Timestamp)}
                   </p>
                 </div>

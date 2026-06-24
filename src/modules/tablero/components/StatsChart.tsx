@@ -28,11 +28,13 @@ export default function StatsChart({ miembros, eventos }: Props) {
     const eventosUsuarioMes = eventosMesActual.filter((e) => e.userId === m.id)
     const cagadas = eventosUsuarioMes.filter((e) => e.tipo === 'deposicion').length
     const culeadas = eventosUsuarioMes.filter((e) => e.tipo === 'acto_sexual').length
+    const gimnasio = eventosUsuarioMes.filter((e) => e.tipo === 'gym').length
 
     return {
       name: m.displayName,
       CAGADAS: cagadas,
       CULEADAS: culeadas,
+      GYM: gimnasio,
     }
   })
 
@@ -51,7 +53,7 @@ export default function StatsChart({ miembros, eventos }: Props) {
     >
       <div className="flex flex-col gap-1 mb-4">
         <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-          Cagadas vs Culeadas
+          Cagadas vs Culeadas vs Gym
         </h3>
         <div className="inline-block self-start bg-yellow-300 dark:bg-yellow-400 text-black border-2 border-black dark:border-white px-2.5 py-1 text-xs font-black uppercase tracking-widest shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
           ESTADÍSTICAS DE {nombreMesActual}
@@ -92,6 +94,12 @@ export default function StatsChart({ miembros, eventos }: Props) {
           <Bar
             dataKey="CULEADAS"
             fill="#be123c"
+            stroke="#000"
+            strokeWidth={2}
+          />
+          <Bar
+            dataKey="GYM"
+            fill="#3b82f6"
             stroke="#000"
             strokeWidth={2}
           />

@@ -35,14 +35,16 @@ export interface Miembro {
   email: string
   deposiciones: number
   actosSexuales: number
+  gym: number
   ultimaDeposicion: Timestamp | null
   ultimoActoSexual: Timestamp | null
+  ultimoGym: Timestamp | null
 }
 
 export interface Evento {
   id?: string
   userId: string
-  tipo: 'deposicion' | 'acto_sexual'
+  tipo: 'deposicion' | 'acto_sexual' | 'gym'
   timestamp: Timestamp
 }
 
@@ -74,8 +76,10 @@ export async function crearGrupo(nombreGrupo: string, user: User): Promise<strin
     email: user.email || '',
     deposiciones: 0,
     actosSexuales: 0,
+    gym: 0,
     ultimaDeposicion: null,
     ultimoActoSexual: null,
+    ultimoGym: null,
   })
 
   return docRef.id
@@ -106,8 +110,10 @@ export async function unirseGrupo(codigo: string, user: User): Promise<string> {
       email: user.email || '',
       deposiciones: 0,
       actosSexuales: 0,
+      gym: 0,
       ultimaDeposicion: null,
       ultimoActoSexual: null,
+      ultimoGym: null,
     })
   }
 
@@ -127,8 +133,10 @@ export async function asegurarMiembro(user: User, groupId: string): Promise<void
       ...data,
       deposiciones: 0,
       actosSexuales: 0,
+      gym: 0,
       ultimaDeposicion: null,
       ultimoActoSexual: null,
+      ultimoGym: null,
     })
   } else {
     await updateDoc(miembroRef, data)
@@ -177,7 +185,7 @@ export function observarEventos(
 export async function registrarEvento(
   groupId: string,
   userId: string,
-  tipo: 'deposicion' | 'acto_sexual',
+  tipo: 'deposicion' | 'acto_sexual' | 'gym',
 ) {
   const eventoRef = collection(db, 'grupos', groupId, 'eventos')
   await addDoc(eventoRef, {
@@ -192,9 +200,12 @@ export async function registrarEvento(
   if (tipo === 'deposicion') {
     updates.deposiciones = increment(1)
     updates.ultimaDeposicion = serverTimestamp()
-  } else {
+  } else if (tipo === 'acto_sexual') {
     updates.actosSexuales = increment(1)
     updates.ultimoActoSexual = serverTimestamp()
+  } else {
+    updates.gym = increment(1)
+    updates.ultimoGym = serverTimestamp()
   }
 
   await updateDoc(miembroRef, updates)
@@ -235,8 +246,10 @@ export async function eliminarEvento(groupId: string, eventId: string): Promise<
   const miembroRef = doc(db, 'grupos', groupId, 'miembros', evento.userId)
   if (evento.tipo === 'deposicion') {
     await updateDoc(miembroRef, { deposiciones: increment(-1) })
-  } else {
+  } else if (evento.tipo === 'acto_sexual') {
     await updateDoc(miembroRef, { actosSexuales: increment(-1) })
+  } else {
+    await updateDoc(miembroRef, { gym: increment(-1) })
   }
 }
 

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import {
   Trash2,
   Flame,
+  Dumbbell,
   Loader2,
   Plus,
   LogIn,
@@ -84,7 +85,7 @@ export default function TableroPage() {
     setNotificationGroupId(activeGroupId)
   }, [activeGroupId, setNotificationGroupId])
 
-  const handleRegistrar = async (tipo: 'deposicion' | 'acto_sexual') => {
+  const handleRegistrar = async (tipo: 'deposicion' | 'acto_sexual' | 'gym') => {
     if (!user || !activeGroupId || isSubmitting) return
     playTapSound()
     setIsSubmitting(true)
@@ -254,11 +255,11 @@ export default function TableroPage() {
         </p>
       )}
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row">
         <button
           onClick={() => handleRegistrar('deposicion')}
           disabled={isSubmitting}
-          className="flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-orange-800 text-white font-black uppercase tracking-tighter shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-orange-800 text-white font-black uppercase tracking-tighter shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Trash2 size={28} strokeWidth={2.5} />
           <span className="text-xl">REGISTRAR CAGADA</span>
@@ -267,10 +268,19 @@ export default function TableroPage() {
         <button
           onClick={() => handleRegistrar('acto_sexual')}
           disabled={isSubmitting}
-          className="flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-rose-600 text-white font-black uppercase tracking-tighter shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-rose-600 text-white font-black uppercase tracking-tighter shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Flame size={28} strokeWidth={2.5} />
           <span className="text-xl">REGISTRAR CULEADA</span>
+        </button>
+
+        <button
+          onClick={() => handleRegistrar('gym')}
+          disabled={isSubmitting}
+          className="flex-1 flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-blue-600 text-white font-black uppercase tracking-tighter shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Dumbbell size={28} strokeWidth={2.5} />
+          <span className="text-xl">REGISTRAR GYM</span>
         </button>
       </div>
 
