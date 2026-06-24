@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 import { RotateCw, ListPlus } from 'lucide-react'
-import BackButton from '../../../components/BackButton'
+import GameHeader from '../../../components/GameHeader'
 import ArcadeHeader from '../components/ArcadeHeader'
 
 const COLORS = [
@@ -67,17 +67,13 @@ export default function RouletaPage() {
     .join(', ')
 
   return (
-    <div className="relative min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col">
-      <BackButton to="/arcade" />
+    <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col">
       <ArcadeHeader />
-      <div className="flex-1 w-full max-w-lg mx-auto p-4 pt-20 space-y-5">
-
-        <div className="text-center">
-          <h1 className="text-3xl font-black uppercase tracking-widest">Ruleta</h1>
-          <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mt-1">
-            Personaliza tu ruleta y girala
-          </p>
-        </div>
+      <div className="flex-1 w-full max-w-lg mx-auto p-4 space-y-5">
+        <GameHeader title="Ruleta" backTo="/arcade" />
+        <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center">
+          Personaliza tu ruleta y girala
+        </p>
 
         <div className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-4 shadow-brutal dark:shadow-brutal-dark space-y-3">
           <p className="font-black uppercase tracking-wider text-xs text-black dark:text-white">

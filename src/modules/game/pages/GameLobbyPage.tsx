@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../../../context/AuthContext'
 import { useGameRoom } from '../hooks/useGameRoom'
+import GameHeader from '../../../components/GameHeader'
 import BackButton from '../../../components/BackButton'
 import VotingEngine from '../engine/VotingEngine'
 
@@ -69,18 +70,15 @@ export default function GameLobbyPage() {
 
   if (gameRoom.roomCode && gameRoom.sala) {
     return (
-      <div className="relative min-h-[100dvh] bg-gray-950 text-white flex flex-col animate-fade-in-up">
-        <BackButton to="/arcade" />
-        <div className="w-full max-w-md mx-auto p-4 pt-20 flex-1 flex flex-col items-center justify-center gap-8">
+      <div className="min-h-[100dvh] bg-gray-950 text-white flex flex-col animate-fade-in-up">
+        <GameHeader title="Dedo en la Llaga" backTo="/arcade" />
+        <div className="w-full max-w-md mx-auto p-4 flex-1 flex flex-col items-center justify-center gap-8">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-yellow-400 bg-yellow-400 flex items-center justify-center mx-auto mb-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
               <Users size={32} strokeWidth={2.5} className="text-black" />
             </div>
             <p className="text-xs font-black uppercase tracking-widest text-yellow-400 mb-1">
               Sala de Juego
-            </p>
-            <p className="text-2xl font-black uppercase tracking-tighter">
-              Dedo en la Llaga
             </p>
           </div>
 
@@ -166,9 +164,12 @@ export default function GameLobbyPage() {
 
   if (mode === 'create' || mode === 'join') {
     return (
-      <div className="relative min-h-[100dvh] bg-gray-950 text-white flex flex-col animate-fade-in-up">
-        <BackButton onClick={() => { setMode('menu'); setError('') }} />
-        <div className="w-full max-w-md mx-auto p-4 pt-20 flex-1 flex flex-col items-center justify-center gap-6">
+      <div className="min-h-[100dvh] bg-gray-950 text-white flex flex-col">
+        <div className="w-full max-w-md mx-auto p-4 pt-20 flex-1 flex flex-col gap-6">
+          <div className="self-start">
+            <BackButton onClick={() => { setMode('menu'); setError('') }} />
+          </div>
+          <div className="flex flex-col items-center justify-center gap-6 flex-1">
 
           {mode === 'create' && (
             <>
@@ -246,22 +247,20 @@ export default function GameLobbyPage() {
           )}
         </div>
       </div>
+    </div>
     )
   }
 
   return (
-    <div className="relative min-h-[100dvh] bg-gray-950 text-white flex flex-col animate-fade-in-up">
-      <BackButton to="/arcade" />
-      <div className="w-full max-w-md mx-auto p-4 pt-20 flex-1 flex flex-col items-center justify-center gap-6">
+    <div className="min-h-[100dvh] bg-gray-950 text-white flex flex-col animate-fade-in-up">
+      <GameHeader title="Dedo en la Llaga" backTo="/arcade" />
+      <div className="w-full max-w-md mx-auto p-4 flex-1 flex flex-col items-center justify-center gap-6">
 
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-yellow-400 bg-yellow-400 flex items-center justify-center mx-auto mb-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
             <Hand size={32} strokeWidth={2.5} className="text-black" />
           </div>
-          <p className="text-2xl font-black uppercase tracking-tighter">
-            Dedo en la Llaga
-          </p>
-          <p className="text-xs font-bold text-gray-500 mt-1 uppercase tracking-wider">
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">
             Multijugador en tiempo real
           </p>
         </div>
@@ -285,5 +284,5 @@ export default function GameLobbyPage() {
         </div>
       </div>
     </div>
-  )
-}
+    )
+  }

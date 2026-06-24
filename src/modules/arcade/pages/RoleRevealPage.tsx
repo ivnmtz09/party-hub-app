@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Eye, EyeOff, MessageCircle } from 'lucide-react'
 import FlipCard from '../components/FlipCard'
 import ArcadeHeader from '../components/ArcadeHeader'
-import BackButton from '../../../components/BackButton'
+import GameHeader from '../../../components/GameHeader'
 import { useGame } from '../context/GameContext'
 
 export default function RoleRevealPage() {
@@ -42,10 +42,10 @@ export default function RoleRevealPage() {
       : 'Ocultar y pasar'
 
   return (
-    <div className="relative min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col animate-fade-in-up">
-      <BackButton to="/arcade" />
+    <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col animate-fade-in-up">
       <ArcadeHeader />
-      <div className="flex-1 flex flex-col items-center justify-center gap-6 max-w-md mx-auto w-full p-4 pt-20">
+      <GameHeader title="El Impostor" backTo="/arcade" />
+      <div className="flex-1 flex flex-col items-center justify-center gap-6 max-w-md mx-auto w-full p-4">
         <div className="text-center">
           <p className="text-xs font-black uppercase tracking-widest text-fuchsia-500 dark:text-fuchsia-400">
             Revelacion de roles

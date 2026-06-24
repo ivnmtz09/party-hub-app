@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Shuffle, Layers, Hand, Loader2 } from 'lucide-react'
 import { useCardGame } from '../hooks/useCardGame'
-import BackButton from '../../../components/BackButton'
+import GameHeader from '../../../components/GameHeader'
 import type { GameDeck } from '../data/decks'
 
 interface Props {
@@ -33,10 +33,16 @@ export default function CardGameEngine({ deck }: Props) {
   const counterLabel = isTurbio ? 'text-yellow-400' : 'text-gray-500 dark:text-gray-400'
 
   return (
-    <div className={`relative min-h-[100dvh] ${pageBg} text-black dark:text-white flex flex-col animate-fade-in-up`}>
-      <BackButton to="/arcade" />
-      <div className="w-full max-w-md mx-auto p-4 pt-20 flex-1 flex flex-col gap-4">
-        <div className="flex items-center justify-end">
+    <div className={`min-h-[100dvh] ${pageBg} text-black dark:text-white flex flex-col animate-fade-in-up`}>
+      <GameHeader title={deck.titulo} backTo="/arcade" />
+      <div className="w-full max-w-md mx-auto p-4 flex-1 flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <div className={`flex items-center gap-2 ${counterLabel} font-black uppercase tracking-widest text-xs`}>
+            <Layers size={16} strokeWidth={2.5} />
+            <span>
+              {cartasJugadas} / {totalCartas} cartas
+            </span>
+          </div>
 
           <button
             onClick={barajar}
@@ -44,13 +50,6 @@ export default function CardGameEngine({ deck }: Props) {
           >
             <Shuffle size={16} strokeWidth={2.5} />
           </button>
-        </div>
-
-        <div className={`flex items-center justify-center gap-2 ${counterLabel} font-black uppercase tracking-widest text-xs`}>
-          <Layers size={16} strokeWidth={2.5} />
-          <span>
-            {cartasJugadas} / {totalCartas} cartas
-          </span>
         </div>
 
         {isTurbio && (

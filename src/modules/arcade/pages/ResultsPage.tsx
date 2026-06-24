@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Trophy, Frown, RotateCcw, Home } from 'lucide-react'
 import { useGame } from '../context/GameContext'
-import BackButton from '../../../components/BackButton'
+import GameHeader from '../../../components/GameHeader'
 import { guardarPartidaImpostor } from '../../../firebase/services'
 
 export default function ResultsPage() {
@@ -44,12 +44,12 @@ export default function ResultsPage() {
   }
 
   return (
-    <div className={`relative min-h-[100dvh] flex flex-col p-4 pt-20 animate-fade-in-up ${
+    <div className={`min-h-[100dvh] flex flex-col p-4 animate-fade-in-up ${
       civiliansWin
         ? 'bg-emerald-500 dark:bg-emerald-700'
         : 'bg-red-600 dark:bg-red-800'
     }`}>
-      <BackButton to="/arcade" />
+      <GameHeader title="Resultados" backTo="/arcade" />
       <div className="flex-1 flex flex-col items-center justify-center gap-6 max-w-md mx-auto w-full">
         <div className="w-20 h-20 border-4 border-black dark:border-white flex items-center justify-center bg-white dark:bg-gray-900 shadow-brutal dark:shadow-brutal-dark">
           {civiliansWin ? (

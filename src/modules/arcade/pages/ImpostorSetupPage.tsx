@@ -11,7 +11,7 @@ import {
   Minus,
   HelpCircle,
 } from 'lucide-react'
-import BackButton from '../../../components/BackButton'
+import GameHeader from '../../../components/GameHeader'
 import { useGame } from '../context/GameContext'
 import { categoryMap } from '../data/words'
 import ArcadeHeader from '../components/ArcadeHeader'
@@ -88,17 +88,13 @@ export default function ImpostorSetupPage() {
   const canStart = names.length >= 3 && selectedCategories.size > 0
 
   return (
-    <div className="relative min-h-[100dvh] pt-20 bg-gray-50 dark:bg-gray-950 text-black dark:text-white">
-      <BackButton to="/arcade" />
+    <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white">
       <ArcadeHeader />
       <div className="w-full max-w-md mx-auto p-4 space-y-5">
-
-        <div className="text-center">
-          <h1 className="text-3xl font-black uppercase tracking-widest">El Impostor</h1>
-          <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mt-1">
-            Configura la partida
-          </p>
-        </div>
+        <GameHeader title="El Impostor" backTo="/arcade" />
+        <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center">
+          Configura la partida
+        </p>
 
         <div className="grid grid-cols-2 gap-2 border-4 border-black dark:border-white">
           <button
