@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import MainLayout from '../layouts/MainLayout'
 import ArcadePage from '../modules/arcade/pages/ArcadePage'
 import CardGamePage from '../modules/arcade/pages/CardGamePage'
+import RouletaPage from '../modules/arcade/pages/RouletaPage'
 import GameLobbyPage from '../modules/game/pages/GameLobbyPage'
 import ImpostorGameHub from '../modules/arcade/pages/ImpostorGameHub'
 import TableroPage from '../modules/tablero/pages/TableroPage'
@@ -72,6 +73,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <GameLobbyPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/arcade/rouleta',
+    element: (
+      <ProtectedRoute>
+        <RouletaPage />
       </ProtectedRoute>
     ),
   },

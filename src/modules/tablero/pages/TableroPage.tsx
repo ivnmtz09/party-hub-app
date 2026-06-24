@@ -11,6 +11,7 @@ import {
   Settings,
 } from 'lucide-react'
 import { useAuth } from '../../../context/AuthContext'
+import { useNotification } from '../../../context/NotificationContext'
 import {
   observarGruposDelUsuario,
   observarMiembros,
@@ -32,6 +33,7 @@ import { playTapSound } from '../../../utils/audio'
 
 export default function TableroPage() {
   const { user } = useAuth()
+  const { setActiveGroupId: setNotificationGroupId } = useNotification()
   const [grupos, setGrupos] = useState<Grupo[]>([])
   const [activeGroupId, setActiveGroupId] = useState<string | null>(null)
   const [miembros, setMiembros] = useState<Miembro[]>([])
@@ -77,6 +79,10 @@ export default function TableroPage() {
       unsubEventos()
     }
   }, [activeGroupId, user])
+
+  useEffect(() => {
+    setNotificationGroupId(activeGroupId)
+  }, [activeGroupId, setNotificationGroupId])
 
   const handleRegistrar = async (tipo: 'deposicion' | 'acto_sexual') => {
     if (!user || !activeGroupId || isSubmitting) return

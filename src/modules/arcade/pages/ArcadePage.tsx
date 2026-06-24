@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { LucideIcon } from 'lucide-react'
-import { UserX, Hand, Bomb, Search, Play, Skull, AlertTriangle } from 'lucide-react'
+import { UserX, Hand, Bomb, Search, Play, Skull, AlertTriangle, RotateCw } from 'lucide-react'
 
 interface GameEntry {
   title: string
@@ -17,6 +17,13 @@ const games: GameEntry[] = [
     description: 'Descubre al impostor antes de que sea demasiado tarde',
     icon: UserX,
     path: '/arcade/impostor',
+    active: true,
+  },
+  {
+    title: 'Ruleta Personalizada',
+    description: 'Agrega opciones, girala y descubre el resultado',
+    icon: RotateCw,
+    path: '/arcade/rouleta',
     active: true,
   },
   {
