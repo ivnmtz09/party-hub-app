@@ -3,6 +3,7 @@ import { Trash2, Flame, Dumbbell, Check, X } from 'lucide-react'
 import type { Timestamp } from 'firebase/firestore'
 import type { Evento, Miembro } from '../../../firebase/services'
 import { eliminarEvento } from '../../../firebase/services'
+import Skeleton from '../../../components/Skeleton'
 
 function tiempoRelativo(ts: Timestamp | null): string {
   if (!ts) return ''
@@ -22,9 +23,10 @@ interface Props {
   miembros: Miembro[]
   userId: string
   groupId: string
+  loading?: boolean
 }
 
-export default function RecentActivity({ eventos, miembros, userId, groupId }: Props) {
+export default function RecentActivity({ eventos, miembros, userId, groupId, loading = false }: Props) {
   const [confirmingId, setConfirmingId] = useState<string | null>(null)
   const [loadingId, setLoadingId] = useState<string | null>(null)
 
@@ -51,7 +53,9 @@ export default function RecentActivity({ eventos, miembros, userId, groupId }: P
         Actividad Reciente
       </h3>
 
-      {recientes.length === 0 ? (
+      {loading ? (
+        <Skeleton variant="listItem" count={5} />
+      ) : recientes.length === 0 ? (
         <div className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
           <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center">
             No hay registros aun

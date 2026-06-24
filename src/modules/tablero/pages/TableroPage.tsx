@@ -3,7 +3,6 @@ import {
   Trash2,
   Flame,
   Dumbbell,
-  Loader2,
   Plus,
   LogIn,
   Copy,
@@ -30,6 +29,7 @@ import CreateGroupModal from '../components/CreateGroupModal'
 import JoinGroupModal from '../components/JoinGroupModal'
 import GroupSettingsModal from '../components/GroupSettingsModal'
 import RecentActivity from '../components/RecentActivity'
+import Skeleton from '../../../components/Skeleton'
 import { playTapSound } from '../../../utils/audio'
 
 export default function TableroPage() {
@@ -40,6 +40,7 @@ export default function TableroPage() {
   const [miembros, setMiembros] = useState<Miembro[]>([])
   const [eventos, setEventos] = useState<Evento[]>([])
   const [initialized, setInitialized] = useState(false)
+  const [contentLoading, setContentLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showJoinModal, setShowJoinModal] = useState(false)
@@ -73,7 +74,10 @@ export default function TableroPage() {
 
     asegurarMiembro(user, activeGroupId)
 
-    const unsubMiembros = observarMiembros(activeGroupId, setMiembros)
+    const unsubMiembros = observarMiembros(activeGroupId, (list) => {
+      setMiembros(list)
+      setContentLoading(false)
+    })
     const unsubEventos = observarEventos(activeGroupId, setEventos)
     return () => {
       unsubMiembros()
@@ -112,15 +116,11 @@ export default function TableroPage() {
 
   if (!initialized) {
     return (
-      <div className="w-full max-w-md mx-auto p-4 flex flex-col items-center justify-center py-12 gap-3">
-        <Loader2
-          size={28}
-          className="animate-spin text-black dark:text-white"
-          strokeWidth={2.5}
-        />
-        <p className="text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-          Cargando grupos...
-        </p>
+      <div className="w-full max-w-md mx-auto p-4 space-y-4 animate-fade-in-up">
+        <div className="h-10 border-4 border-black dark:border-white bg-gray-300 dark:bg-gray-700 animate-pulse shadow-brutal dark:shadow-brutal-dark" />
+        <Skeleton variant="card" count={2} />
+        <div className="h-8 w-40 border-4 border-black dark:border-white bg-gray-300 dark:bg-gray-700 animate-pulse" />
+        <Skeleton variant="listItem" count={3} />
       </div>
     )
   }
@@ -165,6 +165,19 @@ export default function TableroPage() {
 
   return (
     <div className="w-full max-w-md mx-auto p-4 space-y-6 animate-fade-in-up">
+      {contentLoading ? (
+        <>
+          <div className="h-10 border-4 border-black dark:border-white bg-gray-300 dark:bg-gray-700 animate-pulse shadow-brutal dark:shadow-brutal-dark" />
+          <div className="flex flex-col gap-4 sm:flex-row">
+            <div className="flex-1 h-28 border-4 border-black dark:border-white bg-gray-300 dark:bg-gray-700 animate-pulse shadow-brutal dark:shadow-brutal-dark" />
+            <div className="flex-1 h-28 border-4 border-black dark:border-white bg-gray-300 dark:bg-gray-700 animate-pulse shadow-brutal dark:shadow-brutal-dark" />
+            <div className="flex-1 h-28 border-4 border-black dark:border-white bg-gray-300 dark:bg-gray-700 animate-pulse shadow-brutal dark:shadow-brutal-dark" />
+          </div>
+          <div className="h-48 border-4 border-black dark:border-white bg-gray-300 dark:bg-gray-700 animate-pulse shadow-brutal dark:shadow-brutal-dark" />
+          <Skeleton variant="listItem" count={3} />
+        </>
+      ) : (
+      <>
       <div className="relative">
         <button
           onClick={() => setShowDropdown(!showDropdown)}
@@ -302,6 +315,7 @@ export default function TableroPage() {
         miembros={miembros}
         userId={user?.uid ?? ''}
         groupId={activeGroupId ?? ''}
+        loading={contentLoading}
       />
 
       <CreateGroupModal
@@ -320,6 +334,8 @@ export default function TableroPage() {
           miembros={miembros}
           userId={user?.uid ?? ''}
         />
+      )}
+      </>
       )}
     </div>
   )
