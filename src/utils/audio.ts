@@ -34,3 +34,65 @@ export function playTapSound(): void {
     /* audio no disponible */
   }
 }
+
+function playNotes(notes: number[], baseTime: number, duration: number, type: OscillatorType, gainValue: number, ctx: AudioContext): void {
+  notes.forEach((freq, i) => {
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.type = type
+    const t = baseTime + i * duration
+    osc.frequency.setValueAtTime(freq, t)
+    gain.gain.setValueAtTime(gainValue, t)
+    gain.gain.exponentialRampToValueAtTime(0.001, t + duration)
+    osc.start(t)
+    osc.stop(t + duration)
+  })
+}
+
+export function playWinSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    playNotes([523, 659, 784], ctx.currentTime, 0.2, 'square', 0.12, ctx)
+  } catch { /* audio no disponible */ }
+}
+
+export function playLoseSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    playNotes([400, 350, 300], ctx.currentTime, 0.3, 'sawtooth', 0.1, ctx)
+  } catch { /* audio no disponible */ }
+}
+
+export function playExplosionSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.type = 'sawtooth'
+    osc.frequency.setValueAtTime(150, ctx.currentTime)
+    osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 0.6)
+    gain.gain.setValueAtTime(0.25, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 0.6)
+
+    const noise = ctx.createOscillator()
+    const noiseGain = ctx.createGain()
+    noise.connect(noiseGain)
+    noiseGain.connect(ctx.destination)
+    noise.type = 'sawtooth'
+    noise.frequency.setValueAtTime(2000, ctx.currentTime)
+    noise.frequency.setValueAtTime(100, ctx.currentTime + 0.3)
+    noiseGain.gain.setValueAtTime(0.08, ctx.currentTime)
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3)
+    noise.start(ctx.currentTime)
+    noise.stop(ctx.currentTime + 0.3)
+  } catch { /* audio no disponible */ }
+}

@@ -13,6 +13,7 @@ import {
 import ArcadeHeader from '../components/ArcadeHeader'
 import GameHeader from '../../../components/GameHeader'
 import { preguntas, penitencias } from '../data/bomba'
+import { playExplosionSound } from '../../../utils/audio'
 
 type GamePhase = 'setup' | 'playing' | 'exploded' | 'resolution'
 type PenitenceMode = 'aleatoria' | 'personalizada'
@@ -144,6 +145,7 @@ export default function BombaPage() {
 
   useEffect(() => {
     if (timeLeft > 0 || phase !== 'playing') return
+    playExplosionSound()
     setPhase('exploded')
 
     if (penitenceMode === 'aleatoria') {

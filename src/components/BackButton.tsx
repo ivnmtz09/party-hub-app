@@ -1,5 +1,6 @@
 import { ArrowLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { playTapSound } from '../utils/audio'
 
 interface BackButtonProps {
   onClick?: () => void
@@ -10,6 +11,7 @@ export default function BackButton({ onClick, to }: BackButtonProps) {
   const navigate = useNavigate()
 
   const handleClick = () => {
+    playTapSound()
     if (onClick) {
       onClick()
     } else if (to) {

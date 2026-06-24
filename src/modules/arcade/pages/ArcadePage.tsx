@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { LucideIcon } from 'lucide-react'
 import { UserX, Hand, Bomb, Search, Play, Skull, AlertTriangle, RotateCw } from 'lucide-react'
+import { playTapSound } from '../../../utils/audio'
 
 interface GameEntry {
   title: string
@@ -102,6 +103,7 @@ export default function ArcadePage() {
             {active ? (
               <Link
                 to={path}
+                onClick={playTapSound}
                 className="w-full py-3 bg-yellow-300 dark:bg-yellow-400 border-t-4 border-black dark:border-white text-black dark:text-gray-900 font-black uppercase tracking-wider text-sm flex items-center justify-center gap-2 active:translate-y-0.5 transition-all"
               >
                 <Play size={16} strokeWidth={2.5} />

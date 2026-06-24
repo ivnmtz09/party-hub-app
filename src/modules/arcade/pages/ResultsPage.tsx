@@ -4,6 +4,7 @@ import { Trophy, Frown, RotateCcw, Home } from 'lucide-react'
 import { useGame } from '../context/GameContext'
 import GameHeader from '../../../components/GameHeader'
 import { guardarPartidaImpostor } from '../../../firebase/services'
+import { playWinSound, playLoseSound } from '../../../utils/audio'
 
 export default function ResultsPage() {
   const navigate = useNavigate()
@@ -15,6 +16,19 @@ export default function ResultsPage() {
       playerNames: state.config.playerNames,
       roles: state.players.map((p) => ({ name: p.name, isImpostor: p.isImpostor })),
     })
+  }, [state])
+
+  useEffect(() => {
+    if (!state || state.phase !== 'Result') return
+    const votedPlayer = state.votedPlayer
+    const votedIsImpostor = votedPlayer
+      ? state.players.find((p) => p.name === votedPlayer)?.isImpostor
+      : false
+    if (votedIsImpostor === true) {
+      playWinSound()
+    } else {
+      playLoseSound()
+    }
   }, [state])
 
   if (!state || state.phase !== 'Result') {
