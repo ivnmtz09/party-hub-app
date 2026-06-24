@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Check, Vote } from 'lucide-react'
 import { useGame } from '../context/GameContext'
 import ArcadeHeader from '../components/ArcadeHeader'
+import BackButton from '../../../components/BackButton'
 
 export default function VotingPage() {
   const { state, castVote, nextPhase } = useGame()
@@ -22,9 +23,10 @@ export default function VotingPage() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col animate-fade-in-up">
+    <div className="relative min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col animate-fade-in-up">
+      <BackButton to="/arcade" />
       <ArcadeHeader />
-      <div className="flex-1 flex flex-col items-center justify-center gap-8 max-w-md mx-auto w-full p-4">
+      <div className="flex-1 flex flex-col items-center justify-center gap-8 max-w-md mx-auto w-full p-4 pt-20">
         <div className="text-center">
           <p className="text-xs font-black uppercase tracking-widest text-fuchsia-500 dark:text-fuchsia-400">
             Fase de Votacion

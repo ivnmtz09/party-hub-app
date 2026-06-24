@@ -1,7 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import {
-  ArrowLeft,
   Plus,
   LogIn,
   Users,
@@ -13,11 +11,11 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../../../context/AuthContext'
 import { useGameRoom } from '../hooks/useGameRoom'
+import BackButton from '../../../components/BackButton'
 import VotingEngine from '../engine/VotingEngine'
 
 export default function GameLobbyPage() {
   const { user } = useAuth()
-  const navigate = useNavigate()
   const [mode, setMode] = useState<'menu' | 'create' | 'join' | null>('menu')
   const [joinCode, setJoinCode] = useState('')
   const [error, setError] = useState('')
@@ -71,8 +69,9 @@ export default function GameLobbyPage() {
 
   if (gameRoom.roomCode && gameRoom.sala) {
     return (
-      <div className="min-h-[100dvh] bg-gray-950 text-white flex flex-col animate-fade-in-up">
-        <div className="w-full max-w-md mx-auto p-4 flex-1 flex flex-col items-center justify-center gap-8">
+      <div className="relative min-h-[100dvh] bg-gray-950 text-white flex flex-col animate-fade-in-up">
+        <BackButton to="/arcade" />
+        <div className="w-full max-w-md mx-auto p-4 pt-20 flex-1 flex flex-col items-center justify-center gap-8">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-yellow-400 bg-yellow-400 flex items-center justify-center mx-auto mb-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
               <Users size={32} strokeWidth={2.5} className="text-black" />
@@ -167,15 +166,9 @@ export default function GameLobbyPage() {
 
   if (mode === 'create' || mode === 'join') {
     return (
-      <div className="min-h-[100dvh] bg-gray-950 text-white flex flex-col animate-fade-in-up">
-        <div className="w-full max-w-md mx-auto p-4 flex-1 flex flex-col items-center justify-center gap-6">
-          <button
-            onClick={() => { setMode('menu'); setError('') }}
-            className="self-start flex items-center gap-1 text-xs font-black uppercase tracking-wider text-gray-500 hover:text-white transition-colors"
-          >
-            <ArrowLeft size={16} strokeWidth={2.5} />
-            Volver
-          </button>
+      <div className="relative min-h-[100dvh] bg-gray-950 text-white flex flex-col animate-fade-in-up">
+        <BackButton onClick={() => { setMode('menu'); setError('') }} />
+        <div className="w-full max-w-md mx-auto p-4 pt-20 flex-1 flex flex-col items-center justify-center gap-6">
 
           {mode === 'create' && (
             <>
@@ -257,15 +250,9 @@ export default function GameLobbyPage() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-gray-950 text-white flex flex-col animate-fade-in-up">
-      <div className="w-full max-w-md mx-auto p-4 flex-1 flex flex-col items-center justify-center gap-6">
-        <button
-          onClick={() => navigate('/arcade')}
-          className="self-start flex items-center gap-1 text-xs font-black uppercase tracking-wider text-gray-500 hover:text-white transition-colors"
-        >
-          <ArrowLeft size={16} strokeWidth={2.5} />
-          Volver
-        </button>
+    <div className="relative min-h-[100dvh] bg-gray-950 text-white flex flex-col animate-fade-in-up">
+      <BackButton to="/arcade" />
+      <div className="w-full max-w-md mx-auto p-4 pt-20 flex-1 flex flex-col items-center justify-center gap-6">
 
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-yellow-400 bg-yellow-400 flex items-center justify-center mx-auto mb-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { cargarPartidaImpostor } from '../../../firebase/services'
 import {
   Users,
@@ -7,12 +6,12 @@ import {
   X,
   Tags,
   Play,
-  ArrowLeft,
   Wifi,
   Plus,
   Minus,
   HelpCircle,
 } from 'lucide-react'
+import BackButton from '../../../components/BackButton'
 import { useGame } from '../context/GameContext'
 import { categoryMap } from '../data/words'
 import ArcadeHeader from '../components/ArcadeHeader'
@@ -22,7 +21,6 @@ type GameMode = 'local' | 'online'
 const MAX_IMPOSTORS = 3
 
 export default function ImpostorSetupPage() {
-  const navigate = useNavigate()
   const { startGame } = useGame()
 
   const [mode, setMode] = useState<GameMode>('local')
@@ -90,16 +88,10 @@ export default function ImpostorSetupPage() {
   const canStart = names.length >= 3 && selectedCategories.size > 0
 
   return (
-    <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white">
+    <div className="relative min-h-[100dvh] pt-20 bg-gray-50 dark:bg-gray-950 text-black dark:text-white">
+      <BackButton to="/arcade" />
       <ArcadeHeader />
       <div className="w-full max-w-md mx-auto p-4 space-y-5">
-        <button
-          onClick={() => navigate('/arcade')}
-          className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
-        >
-          <ArrowLeft size={16} strokeWidth={2.5} />
-          Volver
-        </button>
 
         <div className="text-center">
           <h1 className="text-3xl font-black uppercase tracking-widest">El Impostor</h1>

@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
-import { Shuffle, Layers, Hand, ArrowLeft, Loader2 } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { Shuffle, Layers, Hand, Loader2 } from 'lucide-react'
 import { useCardGame } from '../hooks/useCardGame'
+import BackButton from '../../../components/BackButton'
 import type { GameDeck } from '../data/decks'
 
 interface Props {
@@ -9,7 +9,6 @@ interface Props {
 }
 
 export default function CardGameEngine({ deck }: Props) {
-  const navigate = useNavigate()
   const {
     cartaActual,
     totalCartas,
@@ -34,16 +33,10 @@ export default function CardGameEngine({ deck }: Props) {
   const counterLabel = isTurbio ? 'text-yellow-400' : 'text-gray-500 dark:text-gray-400'
 
   return (
-    <div className={`min-h-[100dvh] ${pageBg} text-black dark:text-white flex flex-col animate-fade-in-up`}>
-      <div className="w-full max-w-md mx-auto p-4 flex-1 flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => navigate('/arcade')}
-            className="flex items-center gap-1 text-xs font-black uppercase tracking-wider text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
-          >
-            <ArrowLeft size={16} strokeWidth={2.5} />
-            Volver
-          </button>
+    <div className={`relative min-h-[100dvh] ${pageBg} text-black dark:text-white flex flex-col animate-fade-in-up`}>
+      <BackButton to="/arcade" />
+      <div className="w-full max-w-md mx-auto p-4 pt-20 flex-1 flex flex-col gap-4">
+        <div className="flex items-center justify-end">
 
           <button
             onClick={barajar}

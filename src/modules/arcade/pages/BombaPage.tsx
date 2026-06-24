@@ -1,7 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
 import {
-  ArrowLeft,
   Bomb,
   RotateCcw,
   Square,
@@ -13,6 +11,7 @@ import {
   Zap,
 } from 'lucide-react'
 import ArcadeHeader from '../components/ArcadeHeader'
+import BackButton from '../../../components/BackButton'
 import { preguntas, penitencias } from '../data/bomba'
 
 type GamePhase = 'setup' | 'playing' | 'exploded' | 'resolution'
@@ -37,7 +36,6 @@ function pickRandomIndex(exclude: Set<number>, total: number): number {
 }
 
 export default function BombaPage() {
-  const navigate = useNavigate()
   const [phase, setPhase] = useState<GamePhase>('setup')
   const [names, setNames] = useState<string[]>([])
   const [inputName, setInputName] = useState('')
@@ -189,16 +187,10 @@ export default function BombaPage() {
 
   if (phase === 'setup') {
     return (
-      <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col">
+      <div className="relative min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col">
+        <BackButton to="/arcade" />
         <ArcadeHeader />
-        <div className="flex-1 w-full max-w-md mx-auto p-4 space-y-5">
-          <button
-            onClick={() => navigate('/arcade')}
-            className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
-          >
-            <ArrowLeft size={16} strokeWidth={2.5} />
-            Volver
-          </button>
+        <div className="flex-1 w-full max-w-md mx-auto p-4 pt-20 space-y-5">
 
           <div className="text-center">
             <h1 className="text-3xl font-black uppercase tracking-widest">Bomba de Tiempo</h1>
@@ -341,9 +333,10 @@ export default function BombaPage() {
 
   if (phase === 'resolution') {
     return (
-      <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col">
+      <div className="relative min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col">
+        <BackButton to="/arcade" />
         <ArcadeHeader />
-        <div className="flex-1 flex flex-col items-center justify-center gap-8 max-w-md mx-auto w-full p-4">
+        <div className="flex-1 flex flex-col items-center justify-center gap-8 max-w-md mx-auto w-full p-4 pt-20">
           <div className="w-20 h-20 border-4 border-black dark:border-white bg-yellow-300 dark:bg-yellow-400 flex items-center justify-center shadow-brutal dark:shadow-brutal-dark">
             <ShieldAlert size={40} strokeWidth={2.5} className="text-black dark:text-gray-900" />
           </div>
@@ -401,9 +394,10 @@ export default function BombaPage() {
   const timeDisplay = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 
   return (
-    <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col">
+    <div className="relative min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col">
+      <BackButton to="/arcade" />
       <ArcadeHeader />
-      <div className="flex-1 flex flex-col items-center justify-center gap-6 max-w-md mx-auto w-full p-4">
+      <div className="flex-1 flex flex-col items-center justify-center gap-6 max-w-md mx-auto w-full p-4 pt-20">
         <div className="text-center">
           <p className="text-xs font-black uppercase tracking-widest text-red-500 dark:text-red-400">
             Turno de
