@@ -12,7 +12,7 @@ export default function BrandLogo({ size = 'md' }: Props) {
   return (
     <span className="inline-flex items-center gap-0 font-black tracking-tighter leading-none select-none">
       <span
-        className={`${sizes[size]} bg-yellow-400 dark:bg-fuchsia-400 text-black border-2 border-black dark:border-white -rotate-2 shadow-brutal-sm dark:shadow-brutal-sm-dark`}
+        className={`${sizes[size]} bg-yellow-400 dark:bg-yellow-400 text-yellow-800 dark:text-yellow-100 border-2 border-black dark:border-white -rotate-2 shadow-brutal-sm dark:shadow-brutal-sm-dark`}
       >
         PARTY
       </span>
