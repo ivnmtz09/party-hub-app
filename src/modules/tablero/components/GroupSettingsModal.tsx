@@ -105,16 +105,16 @@ export default function GroupSettingsModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 select-none"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-brutal-lg dark:shadow-brutal-lg-dark max-h-[90vh] overflow-y-auto"
+        className="relative w-full max-w-md border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-5 sm:p-6 shadow-brutal-lg dark:shadow-brutal-lg-dark max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 p-1 border-2 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white"
+          className="absolute top-3 right-3 p-1.5 border-2 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         >
           <X size={20} strokeWidth={2.5} />
         </button>
@@ -140,12 +140,12 @@ export default function GroupSettingsModal({
                   type="text"
                   value={nombre}
                   onChange={(e) => setNombre(e.target.value)}
-                  className="flex-1 py-2 px-3 border-3 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-bold uppercase tracking-wider placeholder:text-gray-400 focus:outline-none focus:ring-0"
+                  className="flex-1 py-2 px-3 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-bold uppercase tracking-wider placeholder:text-gray-400 focus:outline-none focus:ring-0 text-base"
                 />
                 <button
                   onClick={handleSaveName}
                   disabled={savingName || !nombre.trim() || nombre.trim() === group.nombre}
-                  className="p-2 border-3 border-black dark:border-white bg-cyan-300 dark:bg-cyan-400 text-black dark:text-gray-900 shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-2 border-4 border-black dark:border-white bg-cyan-300 dark:bg-cyan-400 text-black dark:text-gray-900 shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {savingName ? (
                     <Loader2 size={18} className="animate-spin" strokeWidth={2.5} />

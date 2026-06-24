@@ -16,11 +16,11 @@ export default function DeleteConfirmationModal({
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 animate-fade-in">
-      <div className="w-full max-w-sm border-4 border-black bg-white dark:bg-gray-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 space-y-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 select-none">
+      <div className="w-full max-w-sm border-4 border-black dark:border-white bg-white dark:bg-gray-900 shadow-brutal-lg dark:shadow-brutal-lg-dark p-5 sm:p-6 space-y-6">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 border-2 border-black bg-red-500 flex items-center justify-center">
+            <div className="w-10 h-10 border-2 border-black dark:border-white bg-red-500 flex items-center justify-center">
               <AlertTriangle size={20} strokeWidth={2.5} className="text-white" />
             </div>
             <p className="text-lg font-black uppercase tracking-tighter text-black dark:text-white">
@@ -29,7 +29,7 @@ export default function DeleteConfirmationModal({
           </div>
           <button
             onClick={onClose}
-            className="p-1 border-2 border-black bg-gray-200 dark:bg-gray-700 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+            className="p-1.5 border-2 border-black dark:border-white bg-gray-200 dark:bg-gray-700 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
           >
             <X size={16} strokeWidth={2.5} />
           </button>
@@ -42,14 +42,14 @@ export default function DeleteConfirmationModal({
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 py-3 border-4 border-black bg-gray-300 dark:bg-gray-700 text-black dark:text-white font-black uppercase tracking-wider text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
+            className="flex-1 py-3 border-4 border-black dark:border-white bg-gray-300 dark:bg-gray-700 text-black dark:text-white font-black uppercase tracking-wider text-sm shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
           >
             Cancelar
           </button>
           <button
             onClick={onConfirm}
             disabled={loading}
-            className="flex-1 py-3 border-4 border-black bg-red-500 text-white font-black uppercase tracking-wider text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 py-3 border-4 border-black dark:border-white bg-red-500 text-white font-black uppercase tracking-wider text-sm shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? '...' : 'Confirmar'}
           </button>

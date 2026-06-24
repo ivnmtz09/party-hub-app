@@ -33,16 +33,16 @@ export default function JoinGroupModal({ open, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 select-none"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-brutal-lg dark:shadow-brutal-lg-dark"
+        className="relative w-full max-w-md border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-5 sm:p-6 shadow-brutal-lg dark:shadow-brutal-lg-dark"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 p-1 border-2 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white"
+          className="absolute top-3 right-3 p-1.5 border-2 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         >
           <X size={20} strokeWidth={2.5} />
         </button>
@@ -57,7 +57,7 @@ export default function JoinGroupModal({ open, onClose }: Props) {
           onChange={(e) => setCodigo(e.target.value.toUpperCase().slice(0, 6))}
           placeholder="Codigo de 6 caracteres"
           maxLength={6}
-          className="w-full py-3 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-bold uppercase tracking-widest text-center text-2xl placeholder:text-gray-400 focus:outline-none focus:ring-0 mb-4"
+          className="w-full py-3 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-bold uppercase tracking-widest text-center text-2xl placeholder:text-gray-400 focus:outline-none focus:ring-0 mb-4 text-base"
         />
 
         {error && (
