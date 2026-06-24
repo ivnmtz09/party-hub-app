@@ -51,16 +51,18 @@ export function useImpostorGame() {
   }, [])
 
   const nextPhase = useCallback(() => {
-    if (!state) return
-    const currentIndex = PHASE_ORDER.indexOf(state.phase)
-    if (currentIndex === -1 || currentIndex >= PHASE_ORDER.length - 1) return
-    const nextPhaseValue = PHASE_ORDER[currentIndex + 1]!
-    setState({
-      ...state,
-      phase: nextPhaseValue,
-      round: nextPhaseValue === 'Setup' ? state.round + 1 : state.round,
+    setState((prev) => {
+      if (!prev) return prev
+      const currentIndex = PHASE_ORDER.indexOf(prev.phase)
+      if (currentIndex === -1 || currentIndex >= PHASE_ORDER.length - 1) return prev
+      const nextPhaseValue = PHASE_ORDER[currentIndex + 1]!
+      return {
+        ...prev,
+        phase: nextPhaseValue,
+        round: nextPhaseValue === 'Setup' ? prev.round + 1 : prev.round,
+      }
     })
-  }, [state])
+  }, [])
 
   const castVote = useCallback((playerName: string) => {
     setState((prev) => {

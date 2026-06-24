@@ -29,9 +29,15 @@ export default function ImpostorSetupPage() {
 
   const [names, setNames] = useState<string[]>([])
   const [inputName, setInputName] = useState('')
-  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
-    new Set([categoryMap[0]!.name]),
-  )
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(() => {
+    const saved = localStorage.getItem('impostor_categories')
+    if (saved) {
+      try {
+        return new Set(JSON.parse(saved) as string[])
+      } catch { /* ignore */ }
+    }
+    return new Set([categoryMap[0]!.name])
+  })
   const [impostorCount, setImpostorCount] = useState(1)
   const [includeHint, setIncludeHint] = useState(true)
 
@@ -54,6 +60,10 @@ export default function ImpostorSetupPage() {
   const removeName = (name: string) => {
     setNames(names.filter((n) => n !== name))
   }
+
+  useEffect(() => {
+    localStorage.setItem('impostor_categories', JSON.stringify(Array.from(selectedCategories)))
+  }, [selectedCategories])
 
   const toggleCategory = (cat: string) => {
     setSelectedCategories((prev) => {

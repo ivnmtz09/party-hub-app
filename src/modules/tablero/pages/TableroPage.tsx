@@ -274,7 +274,7 @@ export default function TableroPage() {
         </button>
       </div>
 
-      <StatsChart miembros={miembros} />
+      <StatsChart miembros={miembros} eventos={eventos} />
 
       <section>
         <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-3">

@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, RotateCw, ListPlus } from 'lucide-react'
+import { RotateCw, ListPlus, ArrowLeft } from 'lucide-react'
 import ArcadeHeader from '../components/ArcadeHeader'
 
 const COLORS = [
@@ -68,16 +68,15 @@ export default function RouletaPage() {
     .join(', ')
 
   return (
-    <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col">
+    <div className="relative min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col">
+      <button
+        onClick={() => navigate('/arcade')}
+        className="absolute top-4 left-4 bg-white dark:bg-gray-800 border-2 border-black dark:border-white shadow-brutal-sm p-2 z-50 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+      >
+        <ArrowLeft size={16} strokeWidth={2.5} className="text-black dark:text-white" />
+      </button>
       <ArcadeHeader />
       <div className="flex-1 w-full max-w-lg mx-auto p-4 space-y-5">
-        <button
-          onClick={() => navigate('/arcade')}
-          className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
-        >
-          <ArrowLeft size={16} strokeWidth={2.5} />
-          Volver
-        </button>
 
         <div className="text-center">
           <h1 className="text-3xl font-black uppercase tracking-widest">Ruleta</h1>
@@ -114,7 +113,7 @@ export default function RouletaPage() {
                 <div
                   ref={wheelRef}
                   onTransitionEnd={handleTransitionEnd}
-                  className="w-full h-full rounded-full border-[6px] border-black shadow-brutal dark:shadow-brutal-dark"
+                  className="w-full h-full rounded-full border-[6px] border-black"
                   style={{
                     background: `conic-gradient(${gradientStops})`,
                     transform: `rotate(${rotation}deg)`,
@@ -126,13 +125,16 @@ export default function RouletaPage() {
                 <div className="absolute inset-0 pointer-events-none">
                   {items.map((item, i) => {
                     const midAngle = i * sectorAngle + sectorAngle / 2
+                    const normalizedAngle = ((midAngle % 360) + 360) % 360
+                    const flip = normalizedAngle > 90 && normalizedAngle < 270
+                    const rotateFix = flip ? 180 : 0
                     return (
                       <div
                         key={i}
-                        className="absolute left-1/2 top-1/2 font-black uppercase text-xs text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-none"
+                        className="absolute left-1/2 top-1/2 font-black uppercase text-xs text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-none whitespace-nowrap"
                         style={{
-                          transform: `rotate(${midAngle}deg) translateY(-60%)`,
-                          transformOrigin: 'left center',
+                          transform: `rotate(${midAngle}deg) translateX(50%) rotate(${rotateFix}deg)`,
+                          transformOrigin: '0 0',
                         }}
                       >
                         {item}
@@ -171,12 +173,23 @@ export default function RouletaPage() {
               <p className="text-4xl sm:text-5xl font-black uppercase tracking-tighter text-black dark:text-white animate-blink break-words">
                 {result}
               </p>
-              <button
-                onClick={() => setResult(null)}
-                className="w-full py-4 border-4 border-black dark:border-white bg-fuchsia-400 dark:bg-fuchsia-500 text-black dark:text-gray-900 font-black uppercase tracking-wider text-lg shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
-              >
-                Cerrar
-              </button>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setResult(null)}
+                  className="w-full py-4 border-4 border-black dark:border-white bg-emerald-400 dark:bg-emerald-500 text-black dark:text-gray-900 font-black uppercase tracking-wider text-lg shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
+                >
+                  MANTENER
+                </button>
+                <button
+                  onClick={() => {
+                    setItems((prev) => prev.filter((i) => i !== result))
+                    setResult(null)
+                  }}
+                  className="w-full py-4 border-4 border-black dark:border-white bg-red-400 dark:bg-red-500 text-black dark:text-gray-900 font-black uppercase tracking-wider text-lg shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
+                >
+                  ELIMINAR
+                </button>
+              </div>
             </div>
           </div>
         )}
