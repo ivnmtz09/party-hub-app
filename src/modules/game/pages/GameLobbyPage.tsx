@@ -3,7 +3,7 @@ import {
   Plus,
   LogIn,
   Users,
-  Hand,
+
   Copy,
   Check,
   Loader2,
@@ -14,6 +14,8 @@ import { useGameRoom } from '../hooks/useGameRoom'
 import GameHeader from '../../../components/GameHeader'
 import BackButton from '../../../components/BackButton'
 import VotingEngine from '../engine/VotingEngine'
+import CardGameEngine from '../../arcade/components/CardGameEngine'
+import { getDeckById } from '../../arcade/data/decks'
 
 export default function GameLobbyPage() {
   const { user } = useAuth()
@@ -27,6 +29,8 @@ export default function GameLobbyPage() {
     displayName: user?.displayName ?? 'Invitado',
     onError: (msg) => setError(msg),
   })
+
+  const deck = getDeckById('dedo-en-la-llaga')
 
   const handleCreate = async () => {
     setError('')
@@ -252,36 +256,12 @@ export default function GameLobbyPage() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-gray-950 text-white flex flex-col animate-fade-in-up">
-      <GameHeader title="Dedo en la Llaga" backTo="/arcade" />
-      <div className="w-full max-w-md mx-auto p-4 flex-1 flex flex-col items-center justify-center gap-6">
-
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-yellow-400 bg-yellow-400 flex items-center justify-center mx-auto mb-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-            <Hand size={32} strokeWidth={2.5} className="text-black" />
-          </div>
-          <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-            Multijugador en tiempo real
-          </p>
-        </div>
-
-        <div className="w-full space-y-4">
-          <button
-            onClick={() => setMode('create')}
-            className="w-full flex items-center justify-center gap-2 py-4 border-4 border-yellow-400 bg-yellow-400 text-black font-black uppercase tracking-wider text-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
-          >
-            <Plus size={22} strokeWidth={2.5} />
-            CREAR SALA
-          </button>
-
-          <button
-            onClick={() => setMode('join')}
-            className="w-full flex items-center justify-center gap-2 py-4 border-4 border-white bg-black text-white font-black uppercase tracking-wider text-lg shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
-          >
-            <LogIn size={22} strokeWidth={2.5} />
-            UNIRSE CON CODIGO
-          </button>
-        </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col p-4 sm:p-6 transition-colors text-black dark:text-white">
+      <div className="w-full max-w-md mx-auto pt-2 pb-8">
+        <GameHeader title="El Dedo en la Llaga" backTo="/arcade" />
+      </div>
+      <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md mx-auto pb-12">
+        <CardGameEngine deck={deck} />
       </div>
     </div>
     )
