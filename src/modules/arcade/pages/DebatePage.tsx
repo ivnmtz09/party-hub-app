@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Clock, MessageCircle } from 'lucide-react'
 import { useGame } from '../context/GameContext'
-import ArcadeHeader from '../components/ArcadeHeader'
 import GameHeader from '../../../components/GameHeader'
 
 const DEBATE_SECONDS = 120
@@ -50,7 +49,6 @@ export default function DebatePage() {
 
   return (
     <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col animate-fade-in-up">
-      <ArcadeHeader />
       <GameHeader title="El Impostor" backTo="/arcade" />
       <div className="flex-1 flex flex-col items-center justify-center gap-6 max-w-md mx-auto w-full p-4">
         <div className="flex items-center gap-2">

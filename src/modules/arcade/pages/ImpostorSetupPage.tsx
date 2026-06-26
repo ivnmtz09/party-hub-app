@@ -14,7 +14,6 @@ import {
 import GameHeader from '../../../components/GameHeader'
 import { useGame } from '../context/GameContext'
 import { categoryMap } from '../data/words'
-import ArcadeHeader from '../components/ArcadeHeader'
 
 type GameMode = 'local' | 'online'
 
@@ -89,7 +88,6 @@ export default function ImpostorSetupPage() {
 
   return (
     <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white">
-      <ArcadeHeader />
       <div className="w-full max-w-md mx-auto p-4 space-y-5">
         <GameHeader title="El Impostor" backTo="/arcade" />
         <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center">

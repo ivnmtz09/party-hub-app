@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Check, Vote } from 'lucide-react'
 import { useGame } from '../context/GameContext'
-import ArcadeHeader from '../components/ArcadeHeader'
 import GameHeader from '../../../components/GameHeader'
 
 export default function VotingPage() {
@@ -24,7 +23,6 @@ export default function VotingPage() {
 
   return (
     <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col animate-fade-in-up">
-      <ArcadeHeader />
       <GameHeader title="El Impostor" backTo="/arcade" />
       <div className="flex-1 flex flex-col items-center justify-center gap-8 max-w-md mx-auto w-full p-4">
         <div className="text-center">

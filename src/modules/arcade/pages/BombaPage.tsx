@@ -10,7 +10,6 @@ import {
   Clock,
   Zap,
 } from 'lucide-react'
-import ArcadeHeader from '../components/ArcadeHeader'
 import GameHeader from '../../../components/GameHeader'
 import { preguntas, penitencias } from '../data/bomba'
 import { playExplosionSound } from '../../../utils/audio'
@@ -213,7 +212,6 @@ export default function BombaPage() {
   if (phase === 'setup') {
     return (
       <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col">
-        <ArcadeHeader />
         <div className="flex-1 w-full max-w-md mx-auto p-4 space-y-5">
           <GameHeader title="Bomba de Tiempo" backTo="/arcade" />
           <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center">
@@ -355,7 +353,6 @@ export default function BombaPage() {
   if (phase === 'resolution') {
     return (
       <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col">
-        <ArcadeHeader />
         <div className="flex-1 flex flex-col items-center justify-center gap-8 max-w-md mx-auto w-full p-4">
           <GameHeader title="Bomba de Tiempo" backTo="/arcade" />
           <div className="w-20 h-20 border-4 border-black dark:border-white bg-yellow-300 dark:bg-yellow-400 flex items-center justify-center shadow-brutal dark:shadow-brutal-dark">
@@ -416,7 +413,6 @@ export default function BombaPage() {
 
   return (
     <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col">
-      <ArcadeHeader />
       <GameHeader title="Bomba de Tiempo" backTo="/arcade" />
       <div className="flex-1 flex flex-col items-center justify-center gap-6 max-w-md mx-auto w-full p-4">
         <div className="text-center">

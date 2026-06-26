@@ -1,7 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 import { RotateCw, ListPlus } from 'lucide-react'
 import GameHeader from '../../../components/GameHeader'
-import ArcadeHeader from '../components/ArcadeHeader'
 
 const COLORS = [
   '#EF4444', '#F97316', '#EAB308', '#22C55E',
@@ -68,7 +67,6 @@ export default function RouletaPage() {
 
   return (
     <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col">
-      <ArcadeHeader />
       <div className="flex-1 w-full max-w-lg mx-auto p-4 space-y-5">
         <GameHeader title="Ruleta" backTo="/arcade" />
         <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center">
