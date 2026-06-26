@@ -30,7 +30,7 @@ export default function GameLobbyPage() {
     onError: (msg) => setError(msg),
   })
 
-  const deck = getDeckById('dedo-en-la-llaga')
+  const deck = getDeckById('dedo-en-la-llaga')!
 
   const handleCreate = async () => {
     setError('')

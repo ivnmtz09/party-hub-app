@@ -6,7 +6,7 @@ import ArcadePage from '../modules/arcade/pages/ArcadePage'
 import CardGamePage from '../modules/arcade/pages/CardGamePage'
 import RouletaPage from '../modules/arcade/pages/RouletaPage'
 import BombaPage from '../modules/arcade/pages/BombaPage'
-import GameLobbyPage from '../modules/game/pages/GameLobbyPage'
+import DedoLlagaSetupPage from '../modules/arcade/pages/DedoLlagaSetupPage'
 import ImpostorGameHub from '../modules/arcade/pages/ImpostorGameHub'
 import TableroPage from '../modules/tablero/pages/TableroPage'
 import LoginPage from '../components/LoginPage'
@@ -73,7 +73,7 @@ export const router = createBrowserRouter([
     path: '/arcade/juego',
     element: (
       <ProtectedRoute>
-        <GameLobbyPage />
+        <DedoLlagaSetupPage />
       </ProtectedRoute>
     ),
   },
