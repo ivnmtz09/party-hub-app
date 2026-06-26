@@ -431,3 +431,142 @@ export async function cargarPartidaImpostor(): Promise<ImpostorSession | null> {
   if (!snap.exists()) return null
   return snap.data() as ImpostorSession
 }
+
+/* ───── Dedo en la Llaga Online ───── */
+
+export interface DedoPlayer {
+  id: string
+  name: string
+}
+
+export interface DedoRoom {
+  code: string
+  game: string
+  hostId: string
+  players: DedoPlayer[]
+  phase: 'lobby' | 'voting' | 'results'
+  currentCard: string
+  votes: Record<string, string>
+}
+
+let dedoCodes = new Set<string>()
+
+function generarCodigoDedo(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  for (let attempt = 0; attempt < 50; attempt++) {
+    let codigo = ''
+    for (let i = 0; i < 4; i++) {
+      codigo += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    if (!dedoCodes.has(codigo)) {
+      dedoCodes.add(codigo)
+      return codigo
+    }
+  }
+  return `${Date.now().toString(36).slice(-4).toUpperCase()}`
+}
+
+export async function crearSalaDedo(
+  userId: string,
+  displayName: string,
+): Promise<string> {
+  const code = generarCodigoDedo()
+  const salaRef = doc(db, 'arcade_rooms', code)
+  await setDoc(salaRef, {
+    code,
+    game: 'dedo_llaga',
+    hostId: userId,
+    players: [{ id: userId, name: displayName }],
+    phase: 'lobby',
+    currentCard: '',
+    votes: {},
+  })
+  return code
+}
+
+export async function unirseSalaDedo(
+  codigo: string,
+  userId: string,
+  displayName: string,
+): Promise<void> {
+  const salaRef = doc(db, 'arcade_rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) throw new Error('Sala no encontrada')
+
+  const data = snap.data() as DedoRoom
+  if (data.phase !== 'lobby') throw new Error('La partida ya empezo')
+
+  const exists = data.players.some((p) => p.id === userId)
+  if (!exists) {
+    await updateDoc(salaRef, {
+      players: arrayUnion({ id: userId, name: displayName }),
+    })
+  }
+}
+
+export function observarSalaDedo(
+  codigo: string,
+  callback: (sala: DedoRoom) => void,
+): () => void {
+  const salaRef = doc(db, 'arcade_rooms', codigo)
+  return onSnapshot(salaRef, (snap) => {
+    if (snap.exists()) {
+      callback(snap.data() as DedoRoom)
+    }
+  })
+}
+
+export async function iniciarJuegoDedo(
+  codigo: string,
+  card: string,
+): Promise<void> {
+  await updateDoc(doc(db, 'arcade_rooms', codigo), {
+    phase: 'voting',
+    currentCard: card,
+    votes: {},
+  })
+}
+
+export async function emitirVotoDedo(
+  codigo: string,
+  voterId: string,
+  targetId: string,
+): Promise<void> {
+  await updateDoc(doc(db, 'arcade_rooms', codigo), {
+    [`votes.${voterId}`]: targetId,
+  })
+}
+
+export async function avanzarFaseDedo(
+  codigo: string,
+  phase: DedoRoom['phase'],
+): Promise<void> {
+  await updateDoc(doc(db, 'arcade_rooms', codigo), { phase })
+}
+
+export async function siguienteCartaDedo(
+  codigo: string,
+  card: string,
+): Promise<void> {
+  await updateDoc(doc(db, 'arcade_rooms', codigo), {
+    phase: 'voting',
+    currentCard: card,
+    votes: {},
+  })
+}
+
+export async function abandonarSalaDedo(
+  codigo: string,
+  userId: string,
+): Promise<void> {
+  const salaRef = doc(db, 'arcade_rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) return
+  const data = snap.data() as DedoRoom
+  const players = data.players.filter((p) => p.id !== userId)
+  const update: Record<string, unknown> = { players }
+  if (data.hostId === userId && players.length > 0) {
+    update.hostId = players[0]!.id
+  }
+  await updateDoc(salaRef, update)
+}
