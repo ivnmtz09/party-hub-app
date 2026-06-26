@@ -11,35 +11,41 @@ function shuffle<T>(arr: T[]): T[] {
   return a
 }
 
+function initGameState(cartas: string[]) {
+  const shuffled = shuffle([...cartas])
+  return {
+    remaining: shuffled.slice(1),
+    current: shuffled[0] ?? null,
+    playedCount: 1,
+  }
+}
+
 export function useCardGame(cartas: string[]) {
-  const [remaining, setRemaining] = useState<string[]>(() => shuffle([...cartas]))
-  const [current, setCurrent] = useState<string | null>(null)
-  const [playedCount, setPlayedCount] = useState(0)
+  const [state, setState] = useState(() => initGameState(cartas))
 
   const barajar = useCallback(() => {
-    setRemaining(shuffle([...cartas]))
-    setCurrent(null)
-    setPlayedCount(0)
+    setState(initGameState(cartas))
   }, [cartas])
 
   const obtenerSiguiente = useCallback(() => {
-    if (remaining.length === 0) {
-      setCurrent(null)
-      return null
-    }
-    const next = remaining[0] ?? null
-    const rest = remaining.slice(1)
-    setCurrent(next)
-    setRemaining(rest)
-    setPlayedCount((c) => c + 1)
-    return next
-  }, [remaining])
+    setState((prev) => {
+      if (prev.remaining.length === 0) {
+        return { ...prev, current: null }
+      }
+      const next = prev.remaining[0] ?? null
+      return {
+        remaining: prev.remaining.slice(1),
+        current: next,
+        playedCount: prev.playedCount + 1,
+      }
+    })
+  }, [])
 
   return {
-    cartasRestantes: remaining.length,
-    cartaActual: current,
+    cartasRestantes: state.remaining.length,
+    cartaActual: state.current,
     totalCartas: cartas.length,
-    cartasJugadas: playedCount,
+    cartasJugadas: state.playedCount,
     barajar,
     obtenerSiguiente,
   } as const
