@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Shuffle, Layers, Hand, Loader2 } from 'lucide-react'
+import { Shuffle, Layers, Loader2 } from 'lucide-react'
 import { useCardGame } from '../hooks/useCardGame'
 import GameHeader from '../../../components/GameHeader'
 import type { GameDeck } from '../data/decks'
@@ -25,11 +25,16 @@ export default function CardGameEngine({ deck }: Props) {
 
   const isTurbio = deck.esTurbio
 
-  const theme = isTurbio
-    ? 'bg-black text-red-400 border-yellow-400 shadow-brutal-dark'
-    : 'bg-white dark:bg-gray-800 text-black dark:text-white border-black dark:border-white shadow-brutal dark:shadow-brutal-dark'
+  // Card styling
+  let cardClasses = 'w-full min-h-[300px] flex flex-col items-center justify-center p-8 cursor-pointer select-none shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all';
 
-  const pageBg = isTurbio ? 'bg-gray-950' : 'bg-gray-50 dark:bg-gray-950'
+  if (isTurbio) {
+    cardClasses += ' bg-black text-red-400 border-yellow-400';
+  } else {
+    cardClasses += ' bg-gray-100 dark:bg-gray-800 border-2 border-black dark:border-white text-black dark:text-white';
+  }
+
+  const pageBg = isTurbio ? 'bg-red-900' : 'bg-white dark:bg-gray-950';
   const counterLabel = isTurbio ? 'text-yellow-400' : 'text-gray-500 dark:text-gray-400'
 
   return (
@@ -60,11 +65,8 @@ export default function CardGameEngine({ deck }: Props) {
 
         <div className="flex-1 flex items-center justify-center">
           {cartaActual ? (
-            <div
-              onClick={obtenerSiguiente}
-              className={`w-full min-h-[300px] flex flex-col items-center justify-center p-8 border-4 ${theme} cursor-pointer select-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all`}
-            >
-              <Hand size={32} strokeWidth={2.5} className="mb-6 opacity-60" />
+        <div onClick={obtenerSiguiente} className={cardClasses}
+        >
               <p className="font-black uppercase tracking-tighter text-2xl text-center leading-tight">
                 {cartaActual}
               </p>
