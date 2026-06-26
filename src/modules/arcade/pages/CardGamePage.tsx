@@ -15,7 +15,7 @@ export default function CardGamePage() {
 
   return (
     <div className={`min-h-[100dvh] ${pageBg} text-black dark:text-white flex flex-col animate-fade-in-up`}>
-      <GameHeader title="YO NUNCA" backTo="/arcade" />
+      <GameHeader title={deck.titulo} backTo="/arcade" />
       <div className="flex-1 flex items-center justify-center">
         <CardGameEngine deck={deck} />
       </div>

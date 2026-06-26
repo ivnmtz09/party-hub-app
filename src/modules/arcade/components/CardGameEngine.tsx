@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
-import { Shuffle, Layers, Loader2 } from 'lucide-react'
+import { Shuffle, Layers, Hand, Loader2 } from 'lucide-react'
 import { useCardGame } from '../hooks/useCardGame'
-import GameHeader from '../../../components/GameHeader'
 import type { GameDeck } from '../data/decks'
 
 interface Props {
@@ -34,13 +33,10 @@ export default function CardGameEngine({ deck }: Props) {
     cardClasses += ' bg-gray-100 dark:bg-gray-800 border-2 border-black dark:border-white text-black dark:text-white';
   }
 
-  const pageBg = isTurbio ? 'bg-red-900' : 'bg-white dark:bg-gray-950';
   const counterLabel = isTurbio ? 'text-yellow-400' : 'text-gray-500 dark:text-gray-400'
 
   return (
-    <div className={`min-h-[100dvh] ${pageBg} text-black dark:text-white flex flex-col animate-fade-in-up`}>
-      <GameHeader title={deck.titulo} backTo="/arcade" />
-      <div className="w-full max-w-md mx-auto p-4 flex-1 flex flex-col gap-4">
+    <div className="w-full max-w-md mx-auto p-4 flex-1 flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div className={`flex items-center gap-2 ${counterLabel} font-black uppercase tracking-widest text-xs`}>
             <Layers size={16} strokeWidth={2.5} />
@@ -65,8 +61,8 @@ export default function CardGameEngine({ deck }: Props) {
 
         <div className="flex-1 flex items-center justify-center">
           {cartaActual ? (
-        <div onClick={obtenerSiguiente} className={cardClasses}
-        >
+        <div onClick={obtenerSiguiente} className={cardClasses}>
+              <Hand size={32} strokeWidth={2.5} className="mb-6 opacity-60" />
               <p className="font-black uppercase tracking-tighter text-2xl text-center leading-tight">
                 {cartaActual}
               </p>
@@ -94,6 +90,5 @@ export default function CardGameEngine({ deck }: Props) {
           </p>
         )}
       </div>
-    </div>
   )
 }
