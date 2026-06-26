@@ -11,14 +11,10 @@ export default function CardGamePage() {
     return <Navigate to="/arcade" replace />
   }
 
-  const pageBg = deck.esTurbio ? 'bg-red-900' : 'bg-white dark:bg-gray-950'
-
   return (
-    <div className={`min-h-[100dvh] ${pageBg} text-black dark:text-white flex flex-col animate-fade-in-up`}>
+    <>
       <GameHeader title={deck.titulo} backTo="/arcade" />
-      <div className="flex-1 flex items-center justify-center">
-        <CardGameEngine deck={deck} />
-      </div>
-    </div>
+      <CardGameEngine deck={deck} />
+    </>
   )
 }
