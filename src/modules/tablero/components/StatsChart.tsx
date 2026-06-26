@@ -86,20 +86,20 @@ export default function StatsChart({ miembros, eventos }: Props) {
           />
           <Bar
             dataKey="CAGADAS"
-            fill="#9a3412"
+            fill="#f97316"
             stroke="#000"
             strokeWidth={2}
             radius={[0, 0, 0, 0]}
           />
           <Bar
             dataKey="CULEADAS"
-            fill="#be123c"
+            fill="#ec4899"
             stroke="#000"
             strokeWidth={2}
           />
           <Bar
             dataKey="GYM"
-            fill="#3b82f6"
+            fill="#06b6d4"
             stroke="#000"
             strokeWidth={2}
           />

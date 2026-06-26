@@ -71,9 +71,9 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
               ev.tipo === 'deposicion' ? (
                 <Trash2 size={16} strokeWidth={2.5} className="text-orange-500" />
               ) : ev.tipo === 'acto_sexual' ? (
-                <Flame size={16} strokeWidth={2.5} className="text-rose-500" />
+                <Flame size={16} strokeWidth={2.5} className="text-pink-500" />
               ) : (
-                <Dumbbell size={16} strokeWidth={2.5} className="text-blue-500" />
+                <Dumbbell size={16} strokeWidth={2.5} className="text-cyan-500" />
               )
 
             return (

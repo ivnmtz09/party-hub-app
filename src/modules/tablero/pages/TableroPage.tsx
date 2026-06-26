@@ -272,7 +272,7 @@ export default function TableroPage() {
         <button
           onClick={() => handleRegistrar('deposicion')}
           disabled={isSubmitting}
-          className="flex-1 flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-orange-800 text-white font-black uppercase tracking-tighter shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-orange-400 dark:bg-orange-500 text-black font-black uppercase tracking-tighter shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Trash2 size={28} strokeWidth={2.5} />
           <span className="text-xl">REGISTRAR CAGADA</span>
@@ -281,7 +281,7 @@ export default function TableroPage() {
         <button
           onClick={() => handleRegistrar('acto_sexual')}
           disabled={isSubmitting}
-          className="flex-1 flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-rose-600 text-white font-black uppercase tracking-tighter shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-pink-400 dark:bg-pink-500 text-black font-black uppercase tracking-tighter shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Flame size={28} strokeWidth={2.5} />
           <span className="text-xl">REGISTRAR CULEADA</span>
@@ -290,7 +290,7 @@ export default function TableroPage() {
         <button
           onClick={() => handleRegistrar('gym')}
           disabled={isSubmitting}
-          className="flex-1 flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-blue-600 text-white font-black uppercase tracking-tighter shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-cyan-400 dark:bg-cyan-500 text-black font-black uppercase tracking-tighter shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Dumbbell size={28} strokeWidth={2.5} />
           <span className="text-xl">REGISTRAR GYM</span>
