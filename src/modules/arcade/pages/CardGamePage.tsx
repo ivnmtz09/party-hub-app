@@ -12,9 +12,11 @@ export default function CardGamePage() {
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col p-4 text-black dark:text-white transition-colors">
       <GameHeader title={deck.titulo} backTo="/arcade" />
-      <CardGameEngine deck={deck} />
-    </>
+      <div className="flex-1 flex flex-col w-full max-w-md mx-auto">
+        <CardGameEngine deck={deck} />
+      </div>
+    </div>
   )
 }
