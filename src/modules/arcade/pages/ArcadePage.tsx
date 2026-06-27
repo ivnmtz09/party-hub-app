@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import type { LucideIcon } from 'lucide-react'
 import { UserX, Hand, Bomb, Search, Play, Skull, AlertTriangle, RotateCw } from 'lucide-react'
 import { playTapSound } from '../../../utils/audio'
+import ArcadeSkeleton from '../components/ArcadeSkeleton'
 
 interface GameEntry {
   title: string
@@ -60,6 +62,27 @@ const games: GameEntry[] = [
 ]
 
 export default function ArcadePage() {
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 400)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="w-full max-w-md mx-auto p-4">
+        <div className="h-8 w-24 bg-gray-300 dark:bg-gray-700 animate-pulse mb-2" />
+        <div className="h-4 w-40 bg-gray-300 dark:bg-gray-700 animate-pulse mb-6" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <ArcadeSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full max-w-md mx-auto p-4 animate-fade-in-up">
       <h2 className="text-2xl font-black uppercase tracking-wider text-black dark:text-white">
