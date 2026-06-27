@@ -17,7 +17,7 @@ export default function BrandLogo({ size = "md" }: Props) {
         PARTY
       </span>
       <span
-        className={`${sizes[size]} bg-black dark:bg-black text-white dark:text-white border-2 border-black dark:border-black rotate-2`}
+        className={`${sizes[size]} bg-pink-400 dark:bg-pink-500 text-black dark:text-black border-2 border-black dark:border-black rotate-2 shadow-brutal-sm dark:shadow-brutal-sm`}
       >
         HUB
       </span>
