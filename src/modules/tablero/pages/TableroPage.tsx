@@ -299,12 +299,7 @@ export default function TableroPage() {
 
       <StatsChart miembros={miembros} eventos={eventos} />
 
-      <section>
-        <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-3">
-          Miembros del grupo
-        </h3>
-        <MemberList miembros={miembros} adminId={activeGroup?.adminId} />
-      </section>
+      <MemberList miembros={miembros} adminId={activeGroup?.adminId} />
 
       <section>
         <StatsSection miembros={miembros} eventos={eventos} />
