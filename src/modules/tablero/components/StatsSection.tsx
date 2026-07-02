@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { ChevronDown, ChevronUp, Dumbbell } from 'lucide-react'
 import type { Timestamp } from 'firebase/firestore'
 import type { Miembro, Evento } from '../../../firebase/services'
 
@@ -24,12 +26,23 @@ interface Props {
 }
 
 export default function StatsSection({ miembros, eventos }: Props) {
+  const [isOpen, setIsOpen] = useState(false)
+
   return (
     <div className="space-y-3">
-      <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-        Estadisticas
-      </h3>
-      {miembros.map((m) => {
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between py-3 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+      >
+        <span>ESTADISTICAS</span>
+        {isOpen ? (
+          <ChevronUp size={20} strokeWidth={2.5} />
+        ) : (
+          <ChevronDown size={20} strokeWidth={2.5} />
+        )}
+      </button>
+
+      {isOpen && miembros.map((m) => {
         const eventosUsuario = eventos.filter((e) => e.userId === m.id)
         const ultimoEvento = eventosUsuario[0]
 
@@ -53,6 +66,13 @@ export default function StatsSection({ miembros, eventos }: Props) {
                   Ultima culeada:
                 </span>{' '}
                 {tiempoDesde(m.ultimoActoSexual)}
+              </div>
+              <div>
+                <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                  <Dumbbell size={14} strokeWidth={2.5} />
+                  Ultimo gym:
+                </span>{' '}
+                {tiempoDesde(m.ultimoGym)}
               </div>
               {ultimoEvento && 'timestamp' in ultimoEvento && (
                 <div className="col-span-2 text-gray-500 dark:text-gray-500 mt-1">
