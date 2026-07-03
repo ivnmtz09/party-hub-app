@@ -65,7 +65,7 @@ export default function StatsChart({ miembros, eventos }: Props) {
         <BarChart
           data={data}
           layout="vertical"
-          margin={{ top: 0, right: 20, left: 0, bottom: 0 }}
+          margin={{ top: 20, right: 30, left: 40, bottom: 0 }}
           barCategoryGap="20%"
         >
           <XAxis
@@ -78,12 +78,19 @@ export default function StatsChart({ miembros, eventos }: Props) {
           <YAxis
             type="category"
             dataKey="name"
-            tick={{ fontSize: 10, fontWeight: 700 }}
-            width={80}
+            width={100}
             axisLine={false}
             tickLine={false}
+            tickFormatter={(value) => value.length > 14 ? value.substring(0, 14) + '...' : value}
+            tick={({ x, y, payload }) => (
+              <g transform={`translate(${x},${y})`}>
+                <text x={0} y={0} dy={4} textAnchor="end" className="fill-black dark:fill-white font-bold" style={{ fontSize: 11 }}>
+                  {payload.value}
+                </text>
+              </g>
+            )}
           />
-          <CartesianGrid horizontal={false} vertical={true} strokeDasharray="4 4" stroke="#9ca3af" opacity={0.6} />
+          <CartesianGrid horizontal={true} vertical={true} strokeDasharray="4 4" stroke="#9ca3af" opacity={0.6} />
           <Legend
             wrapperStyle={{ fontSize: 10, fontWeight: 700 }}
           />
