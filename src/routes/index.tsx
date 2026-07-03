@@ -8,6 +8,7 @@ import RouletaPage from '../modules/arcade/pages/RouletaPage'
 import BombaPage from '../modules/arcade/pages/BombaPage'
 import DedoLlagaLobby from '../modules/arcade/pages/DedoLlagaLobby'
 import CodigoSecretoLobby from '../modules/arcade/pages/CodigoSecretoLobby'
+import FrenteLobby from '../modules/arcade/pages/FrenteLobby'
 import ImpostorGameHub from '../modules/arcade/pages/ImpostorGameHub'
 import TableroPage from '../modules/tablero/pages/TableroPage'
 import LoginPage from '../components/LoginPage'
@@ -99,6 +100,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <CodigoSecretoLobby />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/arcade/frente-a-frente',
+    element: (
+      <ProtectedRoute>
+        <FrenteLobby />
       </ProtectedRoute>
     ),
   },

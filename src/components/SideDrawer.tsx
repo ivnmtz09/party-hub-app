@@ -13,6 +13,7 @@ import {
   RotateCw,
   Target,
   Lock,
+  Users,
   ChevronDown,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
@@ -156,6 +157,11 @@ export default function SideDrawer({ open, onClose }: Props) {
                     icon={<Lock size={16} strokeWidth={2.5} />}
                     title="Codigo Secreto"
                     desc="1v1: Adivina el codigo de 4 cifras de tu rival. Picas y fijas, el primero en descifrarlo gana!"
+                  />
+                  <ManualItem
+                    icon={<Users size={16} strokeWidth={2.5} />}
+                    title="Frente a Frente"
+                    desc="Charadas en equipo. Pon el celular en tu frente y adivina famosos mientras tu equipo da pistas. 60 segundos por turno!"
                   />
                 </div>
               </div>

@@ -754,3 +754,178 @@ export async function abandonarSalaCodigo(
     await updateDoc(salaRef, update)
   }
 }
+
+/* ───── Frente a Frente ───── */
+
+export interface FrentePlayer {
+  id: string
+  name: string
+  teamIndex: number
+}
+
+export interface FrenteTeam {
+  name: string
+  score: number
+  finished: boolean
+}
+
+export interface FrenteRoom {
+  code: string
+  game: 'frente_a_frente'
+  hostId: string
+  players: FrentePlayer[]
+  phase: 'lobby' | 'playing' | 'finished'
+  currentTeam: number
+  teams: FrenteTeam[]
+}
+
+let frenteCodes = new Set<string>()
+
+function generarCodigoFrente(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  for (let attempt = 0; attempt < 50; attempt++) {
+    let codigo = ''
+    for (let i = 0; i < 4; i++) {
+      codigo += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    if (!frenteCodes.has(codigo)) {
+      frenteCodes.add(codigo)
+      return codigo
+    }
+  }
+  return `${Date.now().toString(36).slice(-4).toUpperCase()}`
+}
+
+export async function crearSalaFrente(
+  userId: string,
+  displayName: string,
+): Promise<string> {
+  const code = generarCodigoFrente()
+  const salaRef = doc(db, 'frente_rooms', code)
+  await setDoc(salaRef, {
+    code,
+    game: 'frente_a_frente',
+    hostId: userId,
+    players: [{ id: userId, name: displayName, teamIndex: 0 }],
+    phase: 'lobby',
+    currentTeam: 0,
+    teams: [
+      { name: 'Equipo 1', score: 0, finished: false },
+      { name: 'Equipo 2', score: 0, finished: false },
+    ],
+  })
+  return code
+}
+
+export async function unirseSalaFrente(
+  codigo: string,
+  userId: string,
+  displayName: string,
+  teamIndex: number,
+): Promise<void> {
+  const salaRef = doc(db, 'frente_rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) throw new Error('Sala no encontrada')
+
+  const data = snap.data() as FrenteRoom
+  if (data.phase !== 'lobby') throw new Error('La partida ya empezo')
+
+  const exists = data.players.some((p) => p.id === userId)
+  if (!exists) {
+    await updateDoc(salaRef, {
+      players: arrayUnion({ id: userId, name: displayName, teamIndex }),
+    })
+  }
+}
+
+export function observarSalaFrente(
+  codigo: string,
+  callback: (sala: FrenteRoom) => void,
+): () => void {
+  const salaRef = doc(db, 'frente_rooms', codigo)
+  return onSnapshot(salaRef, (snap) => {
+    if (snap.exists()) {
+      callback(snap.data() as FrenteRoom)
+    }
+  })
+}
+
+export async function agregarEquipoFrente(codigo: string, name: string): Promise<void> {
+  const salaRef = doc(db, 'frente_rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) return
+  const data = snap.data() as FrenteRoom
+  await updateDoc(salaRef, {
+    teams: [...data.teams, { name, score: 0, finished: false }],
+  })
+}
+
+export async function cambiarEquipoJugadorFrente(
+  codigo: string,
+  userId: string,
+  teamIndex: number,
+): Promise<void> {
+  const salaRef = doc(db, 'frente_rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) return
+  const data = snap.data() as FrenteRoom
+  const players = data.players.map((p) =>
+    p.id === userId ? { ...p, teamIndex } : p,
+  )
+  await updateDoc(salaRef, { players })
+}
+
+export async function iniciarJuegoFrente(codigo: string): Promise<void> {
+  const salaRef = doc(db, 'frente_rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) return
+  const data = snap.data() as FrenteRoom
+  const teams = data.teams.map((t) => ({ ...t, finished: false, score: 0 }))
+  await updateDoc(salaRef, {
+    phase: 'playing',
+    currentTeam: 0,
+    teams,
+  })
+}
+
+export async function finalizarTurnoFrente(
+  codigo: string,
+  teamIndex: number,
+  score: number,
+): Promise<void> {
+  const salaRef = doc(db, 'frente_rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) return
+  const data = snap.data() as FrenteRoom
+  const teams = data.teams.map((t, i) =>
+    i === teamIndex ? { ...t, score: t.score + score, finished: true } : t,
+  )
+  const nextTeam = teams.findIndex((t) => !t.finished)
+  const update: Record<string, unknown> = { teams }
+  if (nextTeam !== -1) {
+    update.currentTeam = nextTeam
+  } else {
+    update.phase = 'finished'
+  }
+  await updateDoc(salaRef, update)
+}
+
+export async function abandonarSalaFrente(
+  codigo: string,
+  userId: string,
+): Promise<void> {
+  const salaRef = doc(db, 'frente_rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) return
+  const data = snap.data() as FrenteRoom
+  const players = data.players.filter((p) => p.id !== userId)
+  if (players.length === 0) {
+    await deleteDoc(salaRef)
+  } else {
+    const update: Record<string, unknown> = { players }
+    if (data.hostId === userId) {
+      update.hostId = players[0]!.id
+    }
+    await updateDoc(salaRef, update)
+  }
+}

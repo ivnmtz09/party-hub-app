@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import type { LucideIcon } from 'lucide-react'
-import { UserX, Hand, Bomb, Search, Play, Skull, AlertTriangle, RotateCw, Lock } from 'lucide-react'
+import { UserX, Hand, Bomb, Search, Play, Skull, AlertTriangle, RotateCw, Lock, Users } from 'lucide-react'
 import { playTapSound } from '../../../utils/audio'
 import ArcadeSkeleton from '../components/ArcadeSkeleton'
 
@@ -57,6 +57,13 @@ const games: GameEntry[] = [
     description: 'Adivina el codigo de 4 cifras de tu rival (1v1)',
     icon: Lock,
     path: '/arcade/codigo-secreto',
+    active: true,
+  },
+  {
+    title: 'Frente a Frente',
+    description: 'Charadas en equipo. Adivina famosos con el celular en la frente',
+    icon: Users,
+    path: '/arcade/frente-a-frente',
     active: true,
   },
   {
