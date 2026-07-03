@@ -156,12 +156,12 @@ export default function SideDrawer({ open, onClose }: Props) {
                   <ManualItem
                     icon={<Lock size={16} strokeWidth={2.5} />}
                     title="Codigo Secreto"
-                    desc="1v1: Adivina el codigo de 4 cifras de tu rival. Picas y fijas, el primero en descifrarlo gana!"
+                    desc="Juego de deduccion 1v1. Adivina el codigo de 4 cifras de tu rival. Fija = Numero y posicion correctos. Pica = Numero correcto en posicion equivocada. El primero en descifrarlo, gana."
                   />
                   <ManualItem
                     icon={<Users size={16} strokeWidth={2.5} />}
                     title="Frente a Frente"
-                    desc="Charadas en equipo. Pon el celular en tu frente y adivina famosos mientras tu equipo da pistas. 60 segundos por turno!"
+                    desc="Juego por equipos. Ponte el celular en la frente. Tu equipo debe darte pistas para que adivines el personaje en pantalla antes de que el tiempo explote."
                   />
                 </div>
               </div>
@@ -204,7 +204,7 @@ export default function SideDrawer({ open, onClose }: Props) {
               </span>
               <span className="inline-flex items-center gap-1.5 text-xs font-mono text-gray-600 dark:text-gray-400 uppercase tracking-widest">
                 <Code size={12} strokeWidth={2.5} />
-                Version 1.4.5
+                Version 1.5.0
               </span>
             </div>
           </div>
