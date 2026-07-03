@@ -122,21 +122,21 @@ export default function MemberList({ miembros, adminId }: Props) {
                 </div>
 
                 {(ultimoGym || ultimaDepo || ultimoSexo) && (
-                  <div className="mt-2 pt-2 border-t-2 border-black dark:border-white space-y-0.5">
+                  <div className="flex flex-col gap-1 mt-2 text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     {ultimaDepo && (
-                      <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400">
-                        Cagada: {ultimaDepo}
-                      </p>
+                      <span className="flex items-center gap-1">
+                        <Trash2 size={14} strokeWidth={2.5} /> Ultima cagada: {ultimaDepo}
+                      </span>
                     )}
                     {ultimoSexo && (
-                      <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400">
-                        Culeada: {ultimoSexo}
-                      </p>
+                      <span className="flex items-center gap-1">
+                        <Flame size={14} strokeWidth={2.5} /> Ultima culeada: {ultimoSexo}
+                      </span>
                     )}
                     {ultimoGym && (
-                      <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400">
-                        Gym: {ultimoGym}
-                      </p>
+                      <span className="flex items-center gap-1">
+                        <Dumbbell size={14} strokeWidth={2.5} /> Ultimo dia de gym: {ultimoGym}
+                      </span>
                     )}
                   </div>
                 )}

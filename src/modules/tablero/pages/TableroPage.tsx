@@ -23,7 +23,6 @@ import {
   type Evento,
 } from '../../../firebase/services'
 import MemberList from '../components/MemberList'
-import StatsSection from '../components/StatsSection'
 import StatsChart from '../components/StatsChart'
 import CreateGroupModal from '../components/CreateGroupModal'
 import JoinGroupModal from '../components/JoinGroupModal'
@@ -300,10 +299,6 @@ export default function TableroPage() {
       <StatsChart miembros={miembros} eventos={eventos} />
 
       <MemberList miembros={miembros} adminId={activeGroup?.adminId} />
-
-      <section>
-        <StatsSection miembros={miembros} eventos={eventos} />
-      </section>
 
       <RecentActivity
         eventos={eventos}
