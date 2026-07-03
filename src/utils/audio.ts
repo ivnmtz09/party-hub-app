@@ -96,3 +96,49 @@ export function playExplosionSound(): void {
     noise.stop(ctx.currentTime + 0.3)
   } catch { /* audio no disponible */ }
 }
+
+export function playCagadaSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.type = 'sawtooth'
+    osc.frequency.setValueAtTime(200, ctx.currentTime)
+    osc.frequency.exponentialRampToValueAtTime(60, ctx.currentTime + 0.5)
+    gain.gain.setValueAtTime(0.2, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 0.5)
+  } catch { /* audio no disponible */ }
+}
+
+export function playCuleadaSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    playNotes([523, 659, 784, 1047], ctx.currentTime, 0.15, 'square', 0.1, ctx)
+  } catch { /* audio no disponible */ }
+}
+
+export function playGymSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.type = 'square'
+    osc.frequency.setValueAtTime(300, ctx.currentTime)
+    osc.frequency.linearRampToValueAtTime(600, ctx.currentTime + 0.1)
+    osc.frequency.linearRampToValueAtTime(300, ctx.currentTime + 0.2)
+    osc.frequency.linearRampToValueAtTime(600, ctx.currentTime + 0.3)
+    gain.gain.setValueAtTime(0.15, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 0.35)
+  } catch { /* audio no disponible */ }
+}

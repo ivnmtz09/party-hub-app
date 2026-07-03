@@ -29,7 +29,7 @@ import JoinGroupModal from '../components/JoinGroupModal'
 import GroupSettingsModal from '../components/GroupSettingsModal'
 import RecentActivity from '../components/RecentActivity'
 import Skeleton from '../../../components/Skeleton'
-import { playTapSound } from '../../../utils/audio'
+import { playCagadaSound, playCuleadaSound, playGymSound } from '../../../utils/audio'
 
 export default function TableroPage() {
   const { user } = useAuth()
@@ -90,7 +90,9 @@ export default function TableroPage() {
 
   const handleRegistrar = async (tipo: 'deposicion' | 'acto_sexual' | 'gym') => {
     if (!user || !activeGroupId || isSubmitting) return
-    playTapSound()
+    if (tipo === 'deposicion') playCagadaSound()
+    else if (tipo === 'acto_sexual') playCuleadaSound()
+    else playGymSound()
     setIsSubmitting(true)
     setErrorMsg('')
     try {
