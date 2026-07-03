@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Crown, ChevronDown, ChevronUp, Dumbbell, Trash2, Flame } from 'lucide-react'
 import type { Timestamp } from 'firebase/firestore'
 import type { Miembro } from '../../../firebase/services'
@@ -21,8 +21,33 @@ function tiempoRelativo(ts: Timestamp | null): string {
   return `hace ${Math.floor(dias / 30)}mes`
 }
 
+function determinateRotation(id: string): number {
+  let hash = 0
+  for (let i = 0; i < id.length; i++) {
+    hash = ((hash << 5) - hash) + id.charCodeAt(i)
+    hash |= 0
+  }
+  return (hash % 21) - 10
+}
+
 export default function MemberList({ miembros, adminId }: Props) {
   const [isOpen, setIsOpen] = useState(false)
+
+  const getLeaderId = useMemo(() => {
+    const fn = (key: 'deposiciones' | 'actosSexuales' | 'gym'): string | null => {
+      if (miembros.length === 0) return null
+      const values = miembros.map((m) => m[key] || 0)
+      const maxVal = Math.max(...values)
+      if (maxVal === 0) return null
+      const leaders = miembros.filter((m) => (m[key] || 0) === maxVal)
+      return leaders.length === 1 ? leaders[0]!.id : null
+    }
+    return fn
+  }, [miembros])
+
+  const leaderCagadas = getLeaderId('deposiciones')
+  const leaderCuleadas = getLeaderId('actosSexuales')
+  const leaderGym = getLeaderId('gym')
 
   if (miembros.length === 0) {
     return (
@@ -52,6 +77,10 @@ export default function MemberList({ miembros, adminId }: Props) {
             const ultimoGym = m.ultimoGym ? tiempoRelativo(m.ultimoGym as Timestamp) : ''
             const ultimaDepo = m.ultimaDeposicion ? tiempoRelativo(m.ultimaDeposicion as Timestamp) : ''
             const ultimoSexo = m.ultimoActoSexual ? tiempoRelativo(m.ultimoActoSexual as Timestamp) : ''
+            const crownRotation = determinateRotation(m.id)
+            const showCrownCagadas = leaderCagadas === m.id
+            const showCrownCuleadas = leaderCuleadas === m.id
+            const showCrownGym = leaderGym === m.id
 
             return (
               <div
@@ -61,11 +90,6 @@ export default function MemberList({ miembros, adminId }: Props) {
                 <div className="flex items-center gap-3 mb-3">
                   <div className="relative w-12 h-12 flex-shrink-0 flex items-center justify-center bg-yellow-300 dark:bg-yellow-400 border-2 border-black dark:border-white font-black text-xl text-black dark:text-gray-900">
                     {m.displayName.charAt(0).toUpperCase()}
-                    {m.id === adminId && (
-                      <div className="absolute -top-2 -right-2">
-                        <Crown size={14} strokeWidth={2.5} className="text-yellow-600 dark:text-yellow-300" />
-                      </div>
-                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-black uppercase tracking-wider text-sm text-black dark:text-white truncate">
@@ -86,39 +110,30 @@ export default function MemberList({ miembros, adminId }: Props) {
                 </div>
 
                 <div className="flex gap-6 text-sm">
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1">
-                      <Trash2 size={16} strokeWidth={2.5} className="text-amber-600 dark:text-amber-400" />
-                      <p className="text-lg font-black text-amber-600 dark:text-amber-400">
-                        {m.deposiciones}
-                      </p>
-                    </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-                      CAGADAS
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1">
-                      <Flame size={16} strokeWidth={2.5} className="text-pink-600 dark:text-pink-400" />
-                      <p className="text-lg font-black text-pink-600 dark:text-pink-400">
-                        {m.actosSexuales}
-                      </p>
-                    </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-                      CULEADAS
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1">
-                      <Dumbbell size={16} strokeWidth={2.5} className="text-blue-600 dark:text-blue-400" />
-                      <p className="text-lg font-black text-blue-600 dark:text-blue-400">
-                        {m.gym || 0}
-                      </p>
-                    </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-                      GYM
-                    </p>
-                  </div>
+                  <CounterWithCrown
+                    value={m.deposiciones}
+                    label="CAGADAS"
+                    icon={<Trash2 size={16} strokeWidth={2.5} className="text-amber-600 dark:text-amber-400" />}
+                    valueClass="text-lg font-black text-amber-600 dark:text-amber-400"
+                    showCrown={showCrownCagadas}
+                    crownRotation={crownRotation}
+                  />
+                  <CounterWithCrown
+                    value={m.actosSexuales}
+                    label="CULEADAS"
+                    icon={<Flame size={16} strokeWidth={2.5} className="text-pink-600 dark:text-pink-400" />}
+                    valueClass="text-lg font-black text-pink-600 dark:text-pink-400"
+                    showCrown={showCrownCuleadas}
+                    crownRotation={crownRotation}
+                  />
+                  <CounterWithCrown
+                    value={m.gym || 0}
+                    label="GYM"
+                    icon={<Dumbbell size={16} strokeWidth={2.5} className="text-blue-600 dark:text-blue-400" />}
+                    valueClass="text-lg font-black text-blue-600 dark:text-blue-400"
+                    showCrown={showCrownGym}
+                    crownRotation={crownRotation}
+                  />
                 </div>
 
                 {(ultimoGym || ultimaDepo || ultimoSexo) && (
@@ -146,5 +161,43 @@ export default function MemberList({ miembros, adminId }: Props) {
         </div>
       )}
     </section>
+  )
+}
+
+function CounterWithCrown({
+  value,
+  label,
+  icon,
+  valueClass,
+  showCrown,
+  crownRotation,
+}: {
+  value: number
+  label: string
+  icon: React.ReactNode
+  valueClass: string
+  showCrown: boolean
+  crownRotation: number
+}) {
+  return (
+    <div className="text-center">
+      <div className="relative inline-flex flex-col items-center">
+        {showCrown && (
+          <Crown
+            size={16}
+            strokeWidth={2.5}
+            className="text-yellow-500 absolute -top-3 left-1/2 -translate-x-1/2"
+            style={{ transform: `rotate(${crownRotation}deg)` }}
+          />
+        )}
+        <div className="flex items-center justify-center gap-1">
+          {icon}
+          <p className={valueClass}>{value}</p>
+        </div>
+      </div>
+      <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+        {label}
+      </p>
+    </div>
   )
 }
