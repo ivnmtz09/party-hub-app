@@ -12,6 +12,7 @@ import {
   Bomb,
   RotateCw,
   Target,
+  Lock,
   ChevronDown,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
@@ -150,6 +151,11 @@ export default function SideDrawer({ open, onClose }: Props) {
                     icon={<Target size={16} strokeWidth={2.5} />}
                     title="Dedo en la Llaga"
                     desc="Votacion grupal y democratica. Quien del grupo es el mas probable en hacer lo que dice la tarjeta?"
+                  />
+                  <ManualItem
+                    icon={<Lock size={16} strokeWidth={2.5} />}
+                    title="Codigo Secreto"
+                    desc="1v1: Adivina el codigo de 4 cifras de tu rival. Picas y fijas, el primero en descifrarlo gana!"
                   />
                 </div>
               </div>

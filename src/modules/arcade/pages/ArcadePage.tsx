@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import type { LucideIcon } from 'lucide-react'
-import { UserX, Hand, Bomb, Search, Play, Skull, AlertTriangle, RotateCw } from 'lucide-react'
+import { UserX, Hand, Bomb, Search, Play, Skull, AlertTriangle, RotateCw, Lock } from 'lucide-react'
 import { playTapSound } from '../../../utils/audio'
 import ArcadeSkeleton from '../components/ArcadeSkeleton'
 
@@ -51,6 +51,13 @@ const games: GameEntry[] = [
     path: '/arcade/bomba',
     active: true,
     turbio: true,
+  },
+  {
+    title: 'Codigo Secreto',
+    description: 'Adivina el codigo de 4 cifras de tu rival (1v1)',
+    icon: Lock,
+    path: '/arcade/codigo-secreto',
+    active: true,
   },
   {
     title: 'Misterio en la Mansion',

@@ -570,3 +570,187 @@ export async function abandonarSalaDedo(
   }
   await updateDoc(salaRef, update)
 }
+
+/* ───── Codigo Secreto ───── */
+
+export interface CodigoPlayer {
+  id: string
+  name: string
+}
+
+export interface Guess {
+  guess: string
+  fijas: number
+  picas: number
+}
+
+export interface CodigoRoom {
+  code: string
+  game: 'codigo_secreto'
+  hostId: string
+  players: CodigoPlayer[]
+  phase: 'lobby' | 'setup' | 'playing' | 'finished'
+  secretCode: { p1: string; p2: string }
+  guesses: { p1: Guess[]; p2: Guess[] }
+  winner: string | null
+}
+
+let codigoCodes = new Set<string>()
+
+function generarCodigoCodigo(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  for (let attempt = 0; attempt < 50; attempt++) {
+    let codigo = ''
+    for (let i = 0; i < 4; i++) {
+      codigo += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    if (!codigoCodes.has(codigo)) {
+      codigoCodes.add(codigo)
+      return codigo
+    }
+  }
+  return `${Date.now().toString(36).slice(-4).toUpperCase()}`
+}
+
+export async function crearSalaCodigo(
+  userId: string,
+  displayName: string,
+): Promise<string> {
+  const code = generarCodigoCodigo()
+  const salaRef = doc(db, 'codigo_rooms', code)
+  await setDoc(salaRef, {
+    code,
+    game: 'codigo_secreto',
+    hostId: userId,
+    players: [{ id: userId, name: displayName }],
+    phase: 'lobby',
+    secretCode: { p1: '', p2: '' },
+    guesses: { p1: [], p2: [] },
+    winner: null,
+  })
+  return code
+}
+
+export async function unirseSalaCodigo(
+  codigo: string,
+  userId: string,
+  displayName: string,
+): Promise<void> {
+  const salaRef = doc(db, 'codigo_rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) throw new Error('Sala no encontrada')
+
+  const data = snap.data() as CodigoRoom
+  if (data.phase !== 'lobby') throw new Error('La partida ya empezo')
+  if (data.players.length >= 2) throw new Error('Sala llena')
+
+  const exists = data.players.some((p) => p.id === userId)
+  if (!exists) {
+    await updateDoc(salaRef, {
+      players: arrayUnion({ id: userId, name: displayName }),
+      phase: 'setup',
+    })
+  }
+}
+
+export function observarSalaCodigo(
+  codigo: string,
+  callback: (sala: CodigoRoom) => void,
+): () => void {
+  const salaRef = doc(db, 'codigo_rooms', codigo)
+  return onSnapshot(salaRef, (snap) => {
+    if (snap.exists()) {
+      callback(snap.data() as CodigoRoom)
+    }
+  })
+}
+
+export async function guardarCodigoSecreto(
+  codigo: string,
+  userId: string,
+  secret: string,
+): Promise<void> {
+  const salaRef = doc(db, 'codigo_rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) return
+  const data = snap.data() as CodigoRoom
+  const playerIndex = data.players.findIndex((p) => p.id === userId)
+  if (playerIndex === -1) return
+  const key = playerIndex === 0 ? 'p1' : 'p2'
+  const update: Record<string, unknown> = {
+    [`secretCode.${key}`]: secret,
+  }
+  const otherKey = key === 'p1' ? 'p2' : 'p1'
+  if (data.secretCode[otherKey as keyof typeof data.secretCode] !== '' && data.phase === 'setup') {
+    update.phase = 'playing'
+  }
+  await updateDoc(salaRef, update)
+}
+
+export async function enviarIntentoCodigo(
+  codigo: string,
+  userId: string,
+  guess: string,
+  fijas: number,
+  picas: number,
+): Promise<void> {
+  const salaRef = doc(db, 'codigo_rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) return
+  const data = snap.data() as CodigoRoom
+  const playerIndex = data.players.findIndex((p) => p.id === userId)
+  if (playerIndex === -1) return
+  const key = playerIndex === 0 ? 'p1' : 'p2'
+  const newGuess: Guess = { guess, fijas, picas }
+  const updatedGuesses = [...data.guesses[key], newGuess]
+
+  let winner: string | null = null
+  let phase: CodigoRoom['phase'] = 'playing'
+
+  if (fijas === 4) {
+    winner = userId
+    phase = 'finished'
+  } else if (updatedGuesses.length >= 10) {
+    const opponentKey = key === 'p1' ? 'p2' : 'p1'
+    if (data.guesses[opponentKey].length >= 10) {
+      phase = 'finished'
+    }
+  }
+
+  const update: Record<string, unknown> = {
+    [`guesses.${key}`]: updatedGuesses,
+  }
+  if (winner !== null) update.winner = winner
+  if (phase !== data.phase) update.phase = phase
+
+  await updateDoc(salaRef, update)
+}
+
+export async function reiniciarJuegoCodigo(codigo: string): Promise<void> {
+  await updateDoc(doc(db, 'codigo_rooms', codigo), {
+    phase: 'setup',
+    secretCode: { p1: '', p2: '' },
+    guesses: { p1: [], p2: [] },
+    winner: null,
+  })
+}
+
+export async function abandonarSalaCodigo(
+  codigo: string,
+  userId: string,
+): Promise<void> {
+  const salaRef = doc(db, 'codigo_rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) return
+  const data = snap.data() as CodigoRoom
+  const players = data.players.filter((p) => p.id !== userId)
+  if (players.length === 0) {
+    await deleteDoc(salaRef)
+  } else {
+    const update: Record<string, unknown> = { players }
+    if (data.hostId === userId && players.length > 0) {
+      update.hostId = players[0]!.id
+    }
+    await updateDoc(salaRef, update)
+  }
+}
