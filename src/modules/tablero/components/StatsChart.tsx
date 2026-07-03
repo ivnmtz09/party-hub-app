@@ -65,7 +65,7 @@ export default function StatsChart({ miembros, eventos }: Props) {
         <BarChart
           data={data}
           layout="vertical"
-          margin={{ top: 20, right: 30, left: 40, bottom: 0 }}
+          margin={{ top: 20, right: 30, left: 20, bottom: 0 }}
           barCategoryGap="20%"
         >
           <XAxis
@@ -81,7 +81,7 @@ export default function StatsChart({ miembros, eventos }: Props) {
             width={100}
             axisLine={false}
             tickLine={false}
-            tickFormatter={(value) => value.length > 14 ? value.substring(0, 14) + '...' : value}
+            tickFormatter={(value) => value.split(' ')[0]}
             tick={({ x, y, payload }) => (
               <g transform={`translate(${x},${y})`}>
                 <text x={0} y={0} dy={4} textAnchor="end" className="fill-black dark:fill-white font-bold" style={{ fontSize: 11 }}>
