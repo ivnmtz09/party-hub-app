@@ -90,7 +90,7 @@ export default function StatsChart({ miembros, eventos }: Props) {
               </g>
             )}
           />
-          <CartesianGrid horizontal={true} vertical={true} strokeDasharray="4 4" stroke="#9ca3af" opacity={0.6} />
+          <CartesianGrid horizontal={false} vertical={true} strokeDasharray="4 4" stroke="#9ca3af" opacity={0.6} />
           <Legend
             wrapperStyle={{ fontSize: 10, fontWeight: 700 }}
           />
