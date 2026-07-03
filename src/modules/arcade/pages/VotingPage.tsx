@@ -60,10 +60,10 @@ export default function VotingPage() {
                   {isSelected ? (
                     <Check size={22} strokeWidth={3} />
                   ) : (
-                    <span className="font-black">{player.name.charAt(0)}</span>
+                    <span className="font-black">{player.name.charAt(0).toUpperCase()}</span>
                   )}
                 </div>
-                <span className="text-xs">{player.name}</span>
+                <span className="text-xs">{player.name.split(' ')[0]}</span>
               </button>
             )
           })}

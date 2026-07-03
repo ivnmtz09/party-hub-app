@@ -23,7 +23,7 @@ function pickRandomCard(used: Set<string>): string {
 type LobbyPhase = 'menu' | 'creating' | 'joining' | 'inside'
 
 export default function DedoLlagaLobby() {
-  const { user } = useAuth()
+  const { user, userProfile } = useAuth()
   const [phase, setPhase] = useState<LobbyPhase>('menu')
   const [roomCode, setRoomCode] = useState('')
   const [nameInput, setNameInput] = useState('')
@@ -35,7 +35,7 @@ export default function DedoLlagaLobby() {
   const [loading, setLoading] = useState(false)
 
   const userId = user?.uid ?? ''
-  const displayName = user?.displayName ?? (nameInput.trim() || 'Invitado')
+  const displayName = userProfile?.nickname || user?.displayName || (nameInput.trim() || 'Invitado')
   const isHost = room?.hostId === userId
 
   useEffect(() => {
@@ -164,7 +164,7 @@ export default function DedoLlagaLobby() {
                     {p.name.charAt(0).toUpperCase()}
                   </div>
                   <span className="font-bold text-sm uppercase tracking-wider text-black dark:text-white">
-                    {p.name}
+                    {p.name.split(' ')[0]}
                     {p.id === room.hostId && (
                       <span className="text-[10px] text-fuchsia-500 dark:text-fuchsia-400 ml-2">
                         (Anfitrion)

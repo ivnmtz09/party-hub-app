@@ -92,7 +92,7 @@ export default function ResultsPage() {
                   El impostor era
                 </p>
                 <p className="text-xl font-black text-black dark:text-white mt-1">
-                  {impostor?.name ?? 'Desconocido'}
+                  {impostor?.name.split(' ')[0] ?? 'Desconocido'}
                 </p>
               </div>
               <div className="border-t-2 border-black dark:border-white pt-4">
@@ -114,7 +114,7 @@ export default function ResultsPage() {
                   El verdadero impostor era
                 </p>
                 <p className="text-xl font-black text-black dark:text-white mt-1">
-                  {impostor?.name ?? 'Desconocido'}
+                  {impostor?.name.split(' ')[0] ?? 'Desconocido'}
                 </p>
               </div>
               <div className="border-t-2 border-black dark:border-white pt-4">

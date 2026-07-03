@@ -25,7 +25,7 @@ function generarCodigoAleatorio(): string {
 type LobbyPhase = 'menu' | 'joining' | 'inside'
 
 export default function CodigoSecretoLobby() {
-  const { user } = useAuth()
+  const { user, userProfile } = useAuth()
   const [phase, setPhase] = useState<LobbyPhase>('menu')
   const [roomCode, setRoomCode] = useState('')
   const [nameInput, setNameInput] = useState('')
@@ -39,7 +39,7 @@ export default function CodigoSecretoLobby() {
   const secretInputRefs = useRef<(HTMLInputElement | null)[]>([])
 
   const userId = user?.uid ?? ''
-  const displayName = user?.displayName ?? (nameInput.trim() || 'Invitado')
+  const displayName = userProfile?.nickname || user?.displayName || (nameInput.trim() || 'Invitado')
   const isHost = room?.hostId === userId
 
   useEffect(() => {
@@ -226,7 +226,7 @@ export default function CodigoSecretoLobby() {
                         {p.name.charAt(0).toUpperCase()}
                       </div>
                       <span className="font-bold text-sm uppercase tracking-wider text-black dark:text-white">
-                        {p.name}
+                        {p.name.split(' ')[0]}
                         {p.id === room.hostId && (
                           <span className="text-[10px] text-cyan-500 dark:text-cyan-400 ml-2">
                             (Anfitrion)
@@ -347,7 +347,7 @@ export default function CodigoSecretoLobby() {
                           {p.name.charAt(0).toUpperCase()}
                         </div>
                         <span className="font-bold text-sm uppercase tracking-wider text-black dark:text-white flex-1">
-                          {p.name}
+                          {p.name.split(' ')[0]}
                           {p.id === room.hostId && (
                             <span className="text-[10px] text-cyan-500 dark:text-cyan-400 ml-2">
                               (Anfitrion)

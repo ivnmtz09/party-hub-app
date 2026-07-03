@@ -110,12 +110,12 @@ export default function DedoLlagaOnline({
                   EMPATE
                 </p>
                 <p className="text-2xl font-black uppercase tracking-tighter text-black dark:text-white animate-pulse">
-                  {tiedPlayers.map((p) => p.name).join(' Y ')} SE TOMAN UN SHOT
+                  {tiedPlayers.map((p) => p.name.split(' ')[0]).join(' Y ')} SE TOMAN UN SHOT
                 </p>
               </>
             ) : winner ? (
               <p className="text-2xl font-black uppercase tracking-tighter text-black dark:text-white animate-pulse">
-                {winner.name} RECIBE LA PENITENCIA
+                {winner.name.split(' ')[0]} RECIBE LA PENITENCIA
               </p>
             ) : (
               <p className="text-2xl font-black uppercase tracking-tighter text-black dark:text-white">
@@ -129,7 +129,7 @@ export default function DedoLlagaOnline({
                   key={p.id}
                   className="flex justify-between text-xs font-bold text-gray-500 dark:text-gray-400 border-b border-black dark:border-white py-1"
                 >
-                  <span>{p.name}</span>
+                  <span>{p.name.split(' ')[0]}</span>
                   <span>{voteCounts[p.id] || 0} voto{ (voteCounts[p.id] || 0) !== 1 ? 's' : '' }</span>
                 </div>
               ))}
@@ -192,7 +192,7 @@ export default function DedoLlagaOnline({
                   onClick={() => handleVote(p.id)}
                   className="py-4 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-black uppercase tracking-wider text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all hover:bg-fuchsia-100 dark:hover:bg-fuchsia-900/30"
                 >
-                  {p.name}
+                  {p.name.split(' ')[0]}
                 </button>
               ))}
             </div>

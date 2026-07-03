@@ -18,7 +18,7 @@ import CardGameEngine from '../../arcade/components/CardGameEngine'
 import { getDeckById } from '../../arcade/data/decks'
 
 export default function GameLobbyPage() {
-  const { user } = useAuth()
+  const { user, userProfile } = useAuth()
   const [mode, setMode] = useState<'menu' | 'create' | 'join' | null>('menu')
   const [joinCode, setJoinCode] = useState('')
   const [error, setError] = useState('')
@@ -26,7 +26,7 @@ export default function GameLobbyPage() {
 
   const gameRoom = useGameRoom({
     userId: user?.uid ?? '',
-    displayName: user?.displayName ?? 'Invitado',
+    displayName: userProfile?.nickname || user?.displayName || 'Invitado',
     onError: (msg) => setError(msg),
   })
 
@@ -125,7 +125,7 @@ export default function GameLobbyPage() {
                     {p.displayName.charAt(0).toUpperCase()}
                   </div>
                   <span className="font-bold text-sm uppercase tracking-wider text-white">
-                    {p.displayName}
+                    {p.displayName.split(' ')[0]}
                     {p.id === gameRoom.sala?.hostId && (
                       <span className="text-[10px] text-yellow-400 ml-2">
                         (Anfitrion)

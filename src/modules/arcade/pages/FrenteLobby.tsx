@@ -17,7 +17,7 @@ import { Users, Plus, LogIn, Copy, Check, Loader2, X, Shuffle } from 'lucide-rea
 type LobbyPhase = 'menu' | 'joining' | 'inside'
 
 export default function FrenteLobby() {
-  const { user } = useAuth()
+  const { user, userProfile } = useAuth()
   const [phase, setPhase] = useState<LobbyPhase>('menu')
   const [roomCode, setRoomCode] = useState('')
   const [nameInput, setNameInput] = useState('')
@@ -28,7 +28,7 @@ export default function FrenteLobby() {
   const [loading, setLoading] = useState(false)
 
   const userId = user?.uid ?? ''
-  const displayName = user?.displayName ?? (nameInput.trim() || 'Invitado')
+  const displayName = userProfile?.nickname || user?.displayName || (nameInput.trim() || 'Invitado')
   const isHost = room?.hostId === userId
 
   useEffect(() => {
@@ -201,7 +201,7 @@ export default function FrenteLobby() {
                           key={p.id}
                           className="text-[10px] font-bold uppercase tracking-wider bg-white dark:bg-gray-600 border border-black dark:border-white px-1.5 py-0.5 text-black dark:text-white"
                         >
-                          {p.name}
+                          {p.name.split(' ')[0]}
                           {p.id === room.hostId && ' (Host)'}
                         </span>
                       ))}

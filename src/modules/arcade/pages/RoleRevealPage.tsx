@@ -51,7 +51,7 @@ export default function RoleRevealPage() {
           <h1 className="text-xl sm:text-2xl font-black uppercase tracking-wider mt-1">
             Pasa el telefono a{' '}
             <span className="text-fuchsia-600 dark:text-fuchsia-400">
-              {currentPlayer.name}
+              {currentPlayer.name.split(' ')[0]}
             </span>
           </h1>
           <p className="text-xs font-bold text-gray-500 dark:text-gray-400 mt-1">

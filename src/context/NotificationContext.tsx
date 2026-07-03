@@ -68,8 +68,8 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
             doc(db, 'grupos', activeGroupId, 'miembros', data.userId),
           )
           if (miembroSnap.exists()) {
-            const m = miembroSnap.data() as { displayName: string }
-            displayName = m.displayName
+            const m = miembroSnap.data() as { displayName: string; nickname?: string }
+            displayName = (m.nickname || m.displayName.split(' ')[0]) ?? 'Alguien'
             memberCache.current[data.userId] = displayName
           } else {
             displayName = 'Alguien'

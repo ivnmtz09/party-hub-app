@@ -33,7 +33,7 @@ export default function StatsChart({ miembros, eventos }: Props) {
     const gimnasio = eventosUsuarioMes.filter((e) => e.tipo === 'gym').length
 
     return {
-      name: m.displayName,
+      name: m.nickname || m.displayName.split(' ')[0],
       CAGADAS: cagadas,
       CULEADAS: culeadas,
       GYM: gimnasio,

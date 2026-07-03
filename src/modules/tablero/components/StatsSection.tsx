@@ -52,7 +52,7 @@ export default function StatsSection({ miembros, eventos }: Props) {
             className="border-2 border-black dark:border-white bg-white dark:bg-gray-800 p-4 text-sm shadow-brutal-sm dark:shadow-brutal-sm-dark"
           >
             <p className="font-black uppercase tracking-wider text-sm mb-2 text-black dark:text-white">
-              {m.displayName}
+              {m.nickname || m.displayName.split(' ')[0]}
             </p>
             <div className="grid grid-cols-2 gap-2 text-xs font-bold text-gray-600 dark:text-gray-300">
               <div>

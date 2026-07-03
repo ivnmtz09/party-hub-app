@@ -33,7 +33,11 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
   const recientes = eventos.slice(0, 5)
 
   const getMemberName = (uid: string): string =>
-    miembros.find((m) => m.id === uid)?.displayName ?? uid
+    (() => {
+      const m = miembros.find((x) => x.id === uid)
+      if (!m) return uid
+      return (m.nickname || m.displayName.split(' ')[0]) ?? uid
+    })()
 
   const handleDelete = async (eventId: string) => {
     setLoadingId(eventId)

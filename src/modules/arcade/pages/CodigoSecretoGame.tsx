@@ -198,7 +198,7 @@ export default function CodigoSecretoGame({ room, userId, roomCode, onReplay, on
         {canGuess ? (
           <div className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] space-y-4">
             <p className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 text-center">
-              Adivina el codigo de {opponent?.name ?? 'rival'}
+              Adivina el codigo de {(opponent?.name ?? 'rival').split(' ')[0]}
             </p>
 
             <div className="flex justify-center gap-3">
@@ -304,7 +304,7 @@ export default function CodigoSecretoGame({ room, userId, roomCode, onReplay, on
         {opponent && (
           <div className="flex items-center justify-between border-2 border-black dark:border-white bg-white dark:bg-gray-800 px-4 py-3 shadow-brutal-sm dark:shadow-brutal-sm-dark">
             <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-              {opponent.name}
+              {opponent.name.split(' ')[0]}
             </span>
             <span className="text-xs font-black text-cyan-500 dark:text-cyan-400">
               {opponentGuesses.length}/{INTENTOS_MAX} intentos

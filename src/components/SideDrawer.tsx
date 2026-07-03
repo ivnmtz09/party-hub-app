@@ -15,9 +15,11 @@ import {
   Lock,
   Users,
   ChevronDown,
+  User,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import { useNavigate } from "react-router-dom";
 import useLockBodyScroll from "../hooks/useLockBodyScroll";
 
 interface Props {
@@ -52,8 +54,9 @@ function ManualItem({
 }
 
 export default function SideDrawer({ open, onClose }: Props) {
-  const { user, logout } = useAuth();
+  const { user, userProfile, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
   const overlayRef = useRef<HTMLDivElement>(null);
   const [showManual, setShowManual] = useState(false);
 
@@ -97,20 +100,31 @@ export default function SideDrawer({ open, onClose }: Props) {
 
           <div className="flex-1 p-4 space-y-6 overflow-y-auto">
             <div className="flex items-center gap-3 p-3 border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-800">
-              <div className="w-10 h-10 bg-yellow-300 dark:bg-yellow-400 border-2 border-black dark:border-white flex items-center justify-center text-sm font-black text-black dark:text-gray-900">
-                {(user?.displayName ?? user?.email ?? "?")
+              <div
+                className="w-10 h-10 border-2 border-black dark:border-white flex items-center justify-center text-sm font-black text-black"
+                style={{ backgroundColor: userProfile?.avatar || '#fbbf24' }}
+              >
+                {(userProfile?.nickname || user?.displayName || user?.email || "?")
                   .charAt(0)
                   .toUpperCase()}
               </div>
               <div className="min-w-0">
                 <p className="font-black uppercase tracking-wider text-sm text-black dark:text-white truncate">
-                  {user?.displayName ?? "Invitado"}
+                  {userProfile?.nickname || user?.displayName || "Invitado"}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                   {user?.email ?? ""}
                 </p>
               </div>
             </div>
+
+            <button
+              onClick={() => { onClose(); navigate('/perfil') }}
+              className="w-full flex items-center gap-3 px-3 py-3 border-2 border-black dark:border-white bg-white dark:bg-gray-800 font-black uppercase tracking-wider text-sm text-black dark:text-white shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+            >
+              <User size={20} strokeWidth={2.5} />
+              <span className="flex-1 text-left">MI PERFIL</span>
+            </button>
 
             <button
               onClick={() => setShowManual(!showManual)}
@@ -204,7 +218,7 @@ export default function SideDrawer({ open, onClose }: Props) {
               </span>
               <span className="inline-flex items-center gap-1.5 text-xs font-mono text-gray-600 dark:text-gray-400 uppercase tracking-widest">
                 <Code size={12} strokeWidth={2.5} />
-                Version 1.5.0
+                Version 1.6.0
               </span>
             </div>
           </div>

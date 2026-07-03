@@ -171,7 +171,7 @@ export default function GroupSettingsModal({
                         <Crown size={14} strokeWidth={2.5} className="text-yellow-600 dark:text-yellow-300 shrink-0" />
                       )}
                       <span className="font-bold text-sm uppercase tracking-wider text-black dark:text-white">
-                        {m.displayName}
+                        {m.nickname || m.displayName.split(' ')[0]}
                       </span>
                     </div>
                     {m.id !== group.adminId && (
@@ -228,7 +228,7 @@ export default function GroupSettingsModal({
                       <Crown size={14} strokeWidth={2.5} className="text-yellow-600 dark:text-yellow-300 shrink-0" />
                     )}
                     <span className="font-bold text-sm uppercase tracking-wider text-black dark:text-white">
-                      {m.displayName}
+                      {m.nickname || m.displayName.split(' ')[0]}
                     </span>
                   </div>
                 ))}

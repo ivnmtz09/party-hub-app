@@ -129,7 +129,7 @@ export default function VotingEngine({
                   >
                     {p.displayName.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-sm">{p.displayName}</span>
+                  <span className="text-sm">{p.displayName.split(' ')[0]}</span>
                 </button>
               )
             })}
@@ -179,7 +179,7 @@ export default function VotingEngine({
                 EL MAS PROBABLE ES:
               </p>
               <p className="font-black uppercase tracking-tighter text-3xl text-black mt-2">
-                {winner.displayName}
+                {winner.displayName.split(' ')[0]}
               </p>
               <p className="text-black/60 font-bold text-sm mt-2">
                 {maxVotes} voto{maxVotes !== 1 ? 's' : ''}
@@ -208,7 +208,7 @@ export default function VotingEngine({
                       {i + 1}
                     </span>
                     <span className="font-bold text-sm uppercase tracking-wider text-white">
-                      {p.displayName}
+                      {p.displayName.split(' ')[0]}
                     </span>
                   </div>
                   <span className="font-black text-yellow-400">
