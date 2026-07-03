@@ -5,6 +5,8 @@ import {
   YAxis,
   ResponsiveContainer,
   Legend,
+  CartesianGrid,
+  LabelList,
 } from 'recharts'
 import type { Miembro, Evento } from '../../../firebase/services'
 
@@ -81,6 +83,7 @@ export default function StatsChart({ miembros, eventos }: Props) {
             axisLine={false}
             tickLine={false}
           />
+          <CartesianGrid horizontal={false} vertical={true} strokeDasharray="4 4" stroke="#9ca3af" opacity={0.6} />
           <Legend
             wrapperStyle={{ fontSize: 10, fontWeight: 700 }}
           />
@@ -90,19 +93,25 @@ export default function StatsChart({ miembros, eventos }: Props) {
             stroke="#000"
             strokeWidth={2}
             radius={[0, 0, 0, 0]}
-          />
+          >
+            <LabelList className="fill-black dark:fill-white font-black text-sm" dataKey="CAGADAS" offset={10} position="right" />
+          </Bar>
           <Bar
             dataKey="CULEADAS"
             fill="#ec4899"
             stroke="#000"
             strokeWidth={2}
-          />
+          >
+            <LabelList className="fill-black dark:fill-white font-black text-sm" dataKey="CULEADAS" offset={10} position="right" />
+          </Bar>
           <Bar
             dataKey="GYM"
             fill="#06b6d4"
             stroke="#000"
             strokeWidth={2}
-          />
+          >
+            <LabelList className="fill-black dark:fill-white font-black text-sm" dataKey="GYM" offset={10} position="right" />
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>
