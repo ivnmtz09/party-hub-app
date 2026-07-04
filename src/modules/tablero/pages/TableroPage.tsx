@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import {
   Trash2,
   Flame,
@@ -47,6 +47,66 @@ export default function TableroPage() {
   const [copied, setCopied] = useState(false)
   const [showSettingsModal, setShowSettingsModal] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
+  const [timeFilter, setTimeFilter] = useState<'este_mes' | 'mes_pasado' | 'esta_semana' | 'hoy'>('este_mes')
+
+  const filteredEventos = useMemo(() => {
+    const now = new Date()
+
+    const getTimestamp = (e: Evento): Date => {
+      if (!e.timestamp) return new Date(0)
+      if (typeof (e.timestamp as any)?.toDate === 'function') return (e.timestamp as any).toDate()
+      return new Date(e.timestamp as any)
+    }
+
+    return eventos.filter((e) => {
+      const date = getTimestamp(e)
+
+      switch (timeFilter) {
+        case 'hoy': {
+          const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+          const eventStart = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+          return eventStart.getTime() === todayStart.getTime()
+        }
+        case 'esta_semana': {
+          const dayOfWeek = now.getDay()
+          const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - ((dayOfWeek + 6) % 7))
+          monday.setHours(0, 0, 0, 0)
+          return date >= monday
+        }
+        case 'mes_pasado': {
+          const firstOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+          const firstOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+          return date >= firstOfLastMonth && date < firstOfThisMonth
+        }
+        case 'este_mes':
+        default: {
+          const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+          return date >= firstOfMonth
+        }
+      }
+    })
+  }, [eventos, timeFilter])
+
+  const NOMBRES_MESES = [
+    'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO',
+    'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'
+  ]
+
+  const filterLabel = useMemo(() => {
+    const now = new Date()
+    switch (timeFilter) {
+      case 'hoy': return 'HOY'
+      case 'esta_semana': return 'ESTA SEMANA'
+      case 'mes_pasado': {
+        const lastMonth = now.getMonth() - 1
+        const year = lastMonth < 0 ? now.getFullYear() - 1 : now.getFullYear()
+        const monthIndex = lastMonth < 0 ? 11 : lastMonth
+        return `${NOMBRES_MESES[monthIndex]} ${year}`
+      }
+      case 'este_mes':
+      default: return `${NOMBRES_MESES[now.getMonth()]} ${now.getFullYear()}`
+    }
+  }, [timeFilter])
 
   useEffect(() => {
     if (!user) return
@@ -217,7 +277,26 @@ export default function TableroPage() {
                   {g.nombre}
                 </button>
               ))}
-            </div>
+      </div>
+
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {(['este_mes', 'mes_pasado', 'esta_semana', 'hoy'] as const).map((f) => (
+          <button
+            key={f}
+            onClick={() => setTimeFilter(f)}
+            className={`shrink-0 px-3 py-2 border-2 border-black dark:border-white font-black text-xs uppercase tracking-wider transition-all ${
+              timeFilter === f
+                ? 'bg-yellow-400 text-black shadow-brutal-sm'
+                : 'bg-white dark:bg-gray-800 text-black dark:text-white'
+            }`}
+          >
+            {f === 'este_mes' && 'ESTE MES'}
+            {f === 'mes_pasado' && 'MES PASADO'}
+            {f === 'esta_semana' && 'ESTA SEMANA'}
+            {f === 'hoy' && 'HOY'}
+          </button>
+        ))}
+      </div>
           </>
         )}
       </div>
@@ -298,7 +377,7 @@ export default function TableroPage() {
         </button>
       </div>
 
-      <StatsChart miembros={miembros} eventos={eventos} />
+      <StatsChart miembros={miembros} eventos={filteredEventos} filterLabel={filterLabel} />
 
       <MemberList miembros={miembros} adminId={activeGroup?.adminId} />
 

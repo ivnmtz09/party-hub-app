@@ -13,24 +13,27 @@ import type { Miembro, Evento } from '../../../firebase/services'
 interface Props {
   miembros: Miembro[]
   eventos: Evento[]
+  filterLabel?: string
 }
 
-export default function StatsChart({ miembros, eventos }: Props) {
+export default function StatsChart({ miembros, eventos, filterLabel }: Props) {
   const now = new Date()
   const currentMonth = now.getMonth()
   const currentYear = now.getFullYear()
 
-  const eventosMesActual = eventos.filter((e) => {
-    if (!e.timestamp) return false
-    const date = typeof e.timestamp?.toDate === 'function' ? e.timestamp.toDate() : new Date(e.timestamp as any)
-    return date.getMonth() === currentMonth && date.getFullYear() === currentYear
-  })
+  const eventosFiltrados = filterLabel
+    ? eventos
+    : eventos.filter((e) => {
+        if (!e.timestamp) return false
+        const date = typeof e.timestamp?.toDate === 'function' ? e.timestamp.toDate() : new Date(e.timestamp as any)
+        return date.getMonth() === currentMonth && date.getFullYear() === currentYear
+      })
 
   const data = miembros.map((m) => {
-    const eventosUsuarioMes = eventosMesActual.filter((e) => e.userId === m.id)
-    const cagadas = eventosUsuarioMes.filter((e) => e.tipo === 'deposicion').length
-    const culeadas = eventosUsuarioMes.filter((e) => e.tipo === 'acto_sexual').length
-    const gimnasio = eventosUsuarioMes.filter((e) => e.tipo === 'gym').length
+    const eventosUsuario = eventosFiltrados.filter((e) => e.userId === m.id)
+    const cagadas = eventosUsuario.filter((e) => e.tipo === 'deposicion').length
+    const culeadas = eventosUsuario.filter((e) => e.tipo === 'acto_sexual').length
+    const gimnasio = eventosUsuario.filter((e) => e.tipo === 'gym').length
 
     return {
       name: m.nickname || m.displayName.split(' ')[0],
@@ -46,7 +49,8 @@ export default function StatsChart({ miembros, eventos }: Props) {
     'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO',
     'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'
   ]
-  const nombreMesActual = NOMBRES_MESES[currentMonth] ?? ''
+
+  const displayTitle = filterLabel || `ESTADÍSTICAS DE ${NOMBRES_MESES[currentMonth] ?? ''}`
 
   return (
     <div
@@ -58,7 +62,7 @@ export default function StatsChart({ miembros, eventos }: Props) {
           Cagadas vs Culeadas vs Gym
         </h3>
         <div className="inline-block self-start bg-yellow-300 dark:bg-yellow-400 text-black border-2 border-black dark:border-white px-2.5 py-1 text-xs font-black uppercase tracking-widest shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-          ESTADÍSTICAS DE {nombreMesActual}
+          ESTADÍSTICAS DE {displayTitle}
         </div>
       </div>
       <ResponsiveContainer width="100%" height={Math.max(200, data.length * 60)}>
