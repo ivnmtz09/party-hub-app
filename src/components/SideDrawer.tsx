@@ -102,9 +102,14 @@ export default function SideDrawer({ open, onClose }: Props) {
             <div className="flex items-center gap-3 p-3 border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-800">
               <div
                 className="w-10 h-10 border-2 border-black dark:border-white flex items-center justify-center text-sm font-black text-black"
-                style={{ backgroundColor: userProfile?.avatar || '#fbbf24' }}
+                style={{ backgroundColor: userProfile?.avatar || "#fbbf24" }}
               >
-                {(userProfile?.nickname || user?.displayName || user?.email || "?")
+                {(
+                  userProfile?.nickname ||
+                  user?.displayName ||
+                  user?.email ||
+                  "?"
+                )
                   .charAt(0)
                   .toUpperCase()}
               </div>
@@ -119,7 +124,10 @@ export default function SideDrawer({ open, onClose }: Props) {
             </div>
 
             <button
-              onClick={() => { onClose(); navigate('/perfil') }}
+              onClick={() => {
+                onClose();
+                navigate("/perfil");
+              }}
               className="w-full flex items-center gap-3 px-3 py-3 border-2 border-black dark:border-white bg-white dark:bg-gray-800 font-black uppercase tracking-wider text-sm text-black dark:text-white shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
             >
               <User size={20} strokeWidth={2.5} />
@@ -218,7 +226,7 @@ export default function SideDrawer({ open, onClose }: Props) {
               </span>
               <span className="inline-flex items-center gap-1.5 text-xs font-mono text-gray-600 dark:text-gray-400 uppercase tracking-widest">
                 <Code size={12} strokeWidth={2.5} />
-                Version 1.6.0
+                Version 1.6.1
               </span>
             </div>
           </div>
