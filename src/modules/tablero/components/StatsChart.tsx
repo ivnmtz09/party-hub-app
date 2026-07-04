@@ -17,20 +17,8 @@ interface Props {
 }
 
 export default function StatsChart({ miembros, eventos, filterLabel }: Props) {
-  const now = new Date()
-  const currentMonth = now.getMonth()
-  const currentYear = now.getFullYear()
-
-  const eventosFiltrados = filterLabel
-    ? eventos
-    : eventos.filter((e) => {
-        if (!e.timestamp) return false
-        const date = typeof e.timestamp?.toDate === 'function' ? e.timestamp.toDate() : new Date(e.timestamp as any)
-        return date.getMonth() === currentMonth && date.getFullYear() === currentYear
-      })
-
   const data = miembros.map((m) => {
-    const eventosUsuario = eventosFiltrados.filter((e) => e.userId === m.id)
+    const eventosUsuario = eventos.filter((e) => e.userId === m.id)
     const cagadas = eventosUsuario.filter((e) => e.tipo === 'deposicion').length
     const culeadas = eventosUsuario.filter((e) => e.tipo === 'acto_sexual').length
     const gimnasio = eventosUsuario.filter((e) => e.tipo === 'gym').length
@@ -50,7 +38,7 @@ export default function StatsChart({ miembros, eventos, filterLabel }: Props) {
     'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'
   ]
 
-  const displayTitle = filterLabel || `ESTADÍSTICAS DE ${NOMBRES_MESES[currentMonth] ?? ''}`
+  const displayTitle = filterLabel || `ESTADÍSTICAS DE ${NOMBRES_MESES[new Date().getMonth()] ?? ''}`
 
   return (
     <div

@@ -50,39 +50,32 @@ export default function TableroPage() {
   const [timeFilter, setTimeFilter] = useState<'este_mes' | 'mes_pasado' | 'esta_semana' | 'hoy'>('este_mes')
 
   const filteredEventos = useMemo(() => {
-    const now = new Date()
-
-    const getTimestamp = (e: Evento): Date => {
-      if (!e.timestamp) return new Date(0)
-      if (typeof (e.timestamp as any)?.toDate === 'function') return (e.timestamp as any).toDate()
-      return new Date(e.timestamp as any)
-    }
+    const ahora = new Date()
 
     return eventos.filter((e) => {
-      const date = getTimestamp(e)
+      const fechaEvento = e.timestamp?.toDate ? e.timestamp.toDate() : new Date(e.timestamp as any)
 
       switch (timeFilter) {
-        case 'hoy': {
-          const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-          const eventStart = new Date(date.getFullYear(), date.getMonth(), date.getDate())
-          return eventStart.getTime() === todayStart.getTime()
-        }
+        case 'hoy':
+          return fechaEvento.getFullYear() === ahora.getFullYear() &&
+                 fechaEvento.getMonth() === ahora.getMonth() &&
+                 fechaEvento.getDate() === ahora.getDate()
         case 'esta_semana': {
-          const dayOfWeek = now.getDay()
-          const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - ((dayOfWeek + 6) % 7))
-          monday.setHours(0, 0, 0, 0)
-          return date >= monday
+          const dayOfWeek = ahora.getDay()
+          const inicioSemana = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate() - ((dayOfWeek + 6) % 7))
+          inicioSemana.setHours(0, 0, 0, 0)
+          return fechaEvento >= inicioSemana && fechaEvento <= ahora
         }
         case 'mes_pasado': {
-          const firstOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-          const firstOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-          return date >= firstOfLastMonth && date < firstOfThisMonth
+          const mesAnterior = ahora.getMonth() - 1
+          const indiceMes = mesAnterior < 0 ? 11 : mesAnterior
+          const añoMesAnterior = mesAnterior < 0 ? ahora.getFullYear() - 1 : ahora.getFullYear()
+          return fechaEvento.getMonth() === indiceMes && fechaEvento.getFullYear() === añoMesAnterior
         }
         case 'este_mes':
-        default: {
-          const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-          return date >= firstOfMonth
-        }
+        default:
+          return fechaEvento.getMonth() === ahora.getMonth() &&
+                 fechaEvento.getFullYear() === ahora.getFullYear()
       }
     })
   }, [eventos, timeFilter])
