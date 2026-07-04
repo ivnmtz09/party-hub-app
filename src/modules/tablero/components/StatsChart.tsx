@@ -65,7 +65,7 @@ export default function StatsChart({ miembros, eventos }: Props) {
         <BarChart
           data={data}
           layout="vertical"
-          margin={{ top: 20, right: 30, left: 20, bottom: 0 }}
+          margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
           barCategoryGap="20%"
         >
           <XAxis
@@ -78,7 +78,7 @@ export default function StatsChart({ miembros, eventos }: Props) {
           <YAxis
             type="category"
             dataKey="name"
-            width={100}
+            width={55}
             axisLine={false}
             tickLine={false}
             tickFormatter={(value) => value.split(' ')[0]}
