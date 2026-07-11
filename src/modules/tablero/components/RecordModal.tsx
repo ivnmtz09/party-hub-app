@@ -56,7 +56,7 @@ function formatoFecha(ts: Timestamp): string {
 }
 
 const TIPO_LABEL: Record<string, string> = {
-  depocion: 'CAGADA',
+  deposicion: 'CAGADA',
   acto_sexual: 'CULEADA',
   gym: 'GYM',
 }
