@@ -6,10 +6,11 @@ import { updateActivityRecord, uploadRecordPhoto } from '../../../firebase/servi
 interface Props {
   evento: Evento
   groupId: string
+  isOwner: boolean
   onClose: () => void
 }
 
-export default function ActivityDetailOrEdit({ evento, groupId, onClose }: Props) {
+export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose }: Props) {
   const [isEditing, setIsEditing] = useState(false)
   const [rating, setRating] = useState(evento.rating ?? 0)
   const [note, setNote] = useState(evento.note ?? '')
@@ -54,6 +55,10 @@ export default function ActivityDetailOrEdit({ evento, groupId, onClose }: Props
   }
 
   const handleSave = async () => {
+    if (!isOwner) {
+      setError('No tienes permiso para modificar este registro.')
+      return
+    }
     setSaving(true)
     setError('')
     try {
@@ -81,13 +86,15 @@ export default function ActivityDetailOrEdit({ evento, groupId, onClose }: Props
           <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
             Calificacion
           </p>
-          <button
-            onClick={() => setIsEditing(true)}
-            className="flex items-center gap-1 px-2 py-1 border-2 border-black dark:border-white bg-yellow-300 dark:bg-yellow-500 text-black dark:text-gray-900 font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
-          >
-            <Pencil size={10} strokeWidth={2.5} />
-            Editar
-          </button>
+          {isOwner && (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="flex items-center gap-1 px-2 py-1 border-2 border-black dark:border-white bg-yellow-300 dark:bg-yellow-500 text-black dark:text-gray-900 font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+            >
+              <Pencil size={10} strokeWidth={2.5} />
+              Editar
+            </button>
+          )}
         </div>
 
         {renderStars(rating)}

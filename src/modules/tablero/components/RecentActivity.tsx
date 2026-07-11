@@ -180,6 +180,7 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
                   <ActivityDetailOrEdit
                     evento={ev}
                     groupId={groupId}
+                    isOwner={isOwn}
                     onClose={() => setExpandedId(null)}
                   />
                 )}
