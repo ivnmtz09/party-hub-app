@@ -78,7 +78,7 @@ export default function ProfilePage() {
             <div className="flex gap-3">
               {([
                 { key: 'letter' as const, label: 'INICIAL' },
-                { key: 'marble' as const, label: 'FIGURA' },
+                { key: 'pixel' as const, label: 'FIGURA' },
               ]).map((opt) => (
                 <button
                   key={opt.key}

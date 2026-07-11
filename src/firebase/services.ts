@@ -34,7 +34,7 @@ export interface Miembro {
   displayName: string
   nickname: string
   avatar: string
-  avatarType: 'letter' | 'marble'
+  avatarType: 'letter' | 'pixel'
   email: string
   deposiciones: number
   actosSexuales: number
@@ -306,7 +306,7 @@ export function uploadRecordPhoto(file: File): Promise<string> {
 export interface UserProfileData {
   nickname: string
   avatar: string
-  avatarType: 'letter' | 'marble'
+  avatarType: 'letter' | 'pixel'
 }
 
 export async function getUserProfile(uid: string): Promise<UserProfileData | null> {

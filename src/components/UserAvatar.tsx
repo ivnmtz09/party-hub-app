@@ -19,7 +19,7 @@ export const AVATAR_COLORS = [
   '#14b8a6',
 ]
 
-export type AvatarType = 'letter' | 'marble'
+export type AvatarType = 'letter' | 'pixel'
 
 interface UserAvatarProps {
   name: string
@@ -36,16 +36,16 @@ export default function UserAvatar({
   size = 48,
   className = '',
 }: UserAvatarProps) {
-  if (type === 'marble') {
+  if (type === 'pixel') {
     return (
       <div
         className={`border-2 border-black dark:border-white overflow-hidden ${className}`}
         style={{ width: size, height: size }}
       >
         <Avatar
-          name={name}
-          variant="marble"
-          colors={[color, '#ffffff', '#000000', '#fbbf24', '#ec4899']}
+          name={name || 'User'}
+          variant="pixel"
+          colors={[color, '#000000', '#ffffff', '#facc15', '#ef4444']}
           size={size}
         />
       </div>
