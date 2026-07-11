@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Flame, Trash2, Dumbbell, Gamepad2 } from 'lucide-react'
 import BrandLogo from './BrandLogo'
 
@@ -8,7 +9,22 @@ const iconos = [
   { Icon: Gamepad2, delay: '0.45s' },
 ]
 
+const LOADING_MESSAGES = [
+  'CARGANDO EL CAOS...',
+  'PREPARANDO LAS INDIRECTAS...',
+  'BUSCANDO A LOS IRRESPONSABLES...',
+  'AFILANDO EL DEDO EN LA LLAGA...',
+  'CALCULANDO PROBABILIDADES DE DESASTRE...',
+  'OCULTANDO PRUEBAS DEL FIN DE SEMANA...',
+  'SINCRONIZANDO SECRETOS DEL GRUPO...',
+  'CALENTANDO MOTORES PARA LA PROXIMA...',
+  'ASEGURANDO LAS PUERTAS DEL GIMNASIO...',
+  'INICIANDO PROTOCOLO DE FIESTA...',
+]
+
 export default function SplashScreen() {
+  const randomMessage = useMemo(() => LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)], [])
+
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white dark:bg-gray-950 transition-colors duration-300">
       <div className="flex flex-col items-center gap-6">
@@ -27,7 +43,7 @@ export default function SplashScreen() {
         </div>
 
         <p className="mt-8 text-xl font-black uppercase tracking-widest text-black dark:text-white animate-pulse">
-          CARGANDO EL CAOS...
+          {randomMessage}
         </p>
       </div>
     </div>
