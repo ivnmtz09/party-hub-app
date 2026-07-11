@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../../context/AuthContext'
 import GameHeader from '../../../components/GameHeader'
-import UserAvatar, { AVATAR_COLORS, type AvatarType } from '../../../components/UserAvatar'
+import UserAvatar, { AVATAR_COLORS, ICON_OPTIONS, type AvatarType } from '../../../components/UserAvatar'
 import { Save, Check } from 'lucide-react'
 
 export default function ProfilePage() {
@@ -9,6 +9,7 @@ export default function ProfilePage() {
   const [nickname, setNickname] = useState('')
   const [avatar, setAvatar] = useState('#fbbf24')
   const [avatarType, setAvatarType] = useState<AvatarType>('letter')
+  const [avatarIcon, setAvatarIcon] = useState('Gamepad2')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
@@ -17,6 +18,7 @@ export default function ProfilePage() {
       setNickname(userProfile.nickname)
       setAvatar(userProfile.avatar || '#fbbf24')
       setAvatarType(userProfile.avatarType || 'letter')
+      setAvatarIcon(userProfile.avatarIcon || 'Gamepad2')
     }
   }, [userProfile])
 
@@ -24,7 +26,7 @@ export default function ProfilePage() {
     setSaving(true)
     setSaved(false)
     try {
-      await updateUserProfile({ nickname: nickname.trim(), avatar, avatarType })
+      await updateUserProfile({ nickname: nickname.trim(), avatar, avatarType, avatarIcon })
       setSaved(true)
       setTimeout(() => setSaved(false), 2000)
     } catch {
@@ -50,6 +52,7 @@ export default function ProfilePage() {
               name={displayName}
               color={avatar}
               type={avatarType}
+              avatarIcon={avatarIcon}
               size={80}
             />
           </div>
@@ -78,7 +81,7 @@ export default function ProfilePage() {
             <div className="flex gap-3">
               {([
                 { key: 'letter' as const, label: 'INICIAL' },
-                { key: 'pixel' as const, label: 'FIGURA' },
+                { key: 'shape' as const, label: 'FIGURA' },
               ]).map((opt) => (
                 <button
                   key={opt.key}
@@ -94,6 +97,32 @@ export default function ProfilePage() {
               ))}
             </div>
           </div>
+
+          {avatarType === 'shape' && (
+            <div className="space-y-2">
+              <label className="block text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                Figura
+              </label>
+              <div className="grid grid-cols-4 gap-3">
+                {ICON_OPTIONS.map((opt) => {
+                  const Icon = opt.icon
+                  return (
+                    <button
+                      key={opt.id}
+                      onClick={() => setAvatarIcon(opt.id)}
+                      className={`w-full aspect-square border-4 border-black dark:border-white flex items-center justify-center transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
+                        avatarIcon === opt.id
+                          ? 'bg-yellow-400 dark:bg-yellow-500 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]'
+                          : 'bg-white dark:bg-gray-700 shadow-none'
+                      }`}
+                    >
+                      <Icon size={24} strokeWidth={2.5} className="text-black" />
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
 
           <div className="space-y-2">
             <label className="block text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">

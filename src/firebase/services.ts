@@ -34,7 +34,8 @@ export interface Miembro {
   displayName: string
   nickname: string
   avatar: string
-  avatarType: 'letter' | 'pixel'
+  avatarType: 'letter' | 'shape'
+  avatarIcon: string
   email: string
   deposiciones: number
   actosSexuales: number
@@ -83,6 +84,7 @@ export async function crearGrupo(nombreGrupo: string, user: User): Promise<strin
     nickname: profile.nickname,
     avatar: profile.avatar,
     avatarType: profile.avatarType,
+    avatarIcon: profile.avatarIcon,
     email: user.email || '',
     deposiciones: 0,
     actosSexuales: 0,
@@ -121,6 +123,7 @@ export async function unirseGrupo(codigo: string, user: User): Promise<string> {
       nickname: profile.nickname,
       avatar: profile.avatar,
       avatarType: profile.avatarType,
+      avatarIcon: profile.avatarIcon,
       email: user.email || '',
       deposiciones: 0,
       actosSexuales: 0,
@@ -143,6 +146,7 @@ export async function asegurarMiembro(user: User, groupId: string): Promise<void
     nickname: profile.nickname,
     avatar: profile.avatar,
     avatarType: profile.avatarType,
+    avatarIcon: profile.avatarIcon,
     email: user.email || '',
   }
   if (!snap.exists()) {
@@ -306,7 +310,8 @@ export function uploadRecordPhoto(file: File): Promise<string> {
 export interface UserProfileData {
   nickname: string
   avatar: string
-  avatarType: 'letter' | 'pixel'
+  avatarType: 'letter' | 'shape'
+  avatarIcon: string
 }
 
 export async function getUserProfile(uid: string): Promise<UserProfileData | null> {
@@ -317,6 +322,7 @@ export async function getUserProfile(uid: string): Promise<UserProfileData | nul
     nickname: data.nickname || '',
     avatar: data.avatar || '#fbbf24',
     avatarType: data.avatarType || 'letter',
+    avatarIcon: data.avatarIcon || 'Gamepad2',
   }
 }
 
@@ -334,6 +340,7 @@ export async function actualizarMiembroEnGrupos(uid: string, data: UserProfileDa
       nickname: data.nickname,
       avatar: data.avatar,
       avatarType: data.avatarType,
+      avatarIcon: data.avatarIcon,
     })
   )
 
@@ -342,7 +349,7 @@ export async function actualizarMiembroEnGrupos(uid: string, data: UserProfileDa
 
 async function getProfileOrFallback(uid: string): Promise<UserProfileData> {
   const profile = await getUserProfile(uid)
-  return profile ?? { nickname: '', avatar: '#fbbf24', avatarType: 'letter' }
+  return profile ?? { nickname: '', avatar: '#fbbf24', avatarType: 'letter', avatarIcon: 'Gamepad2' }
 }
 
 /* ───── Juego Multijugador ───── */

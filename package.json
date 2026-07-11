@@ -9,7 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "boring-avatars": "^2.0.4",
     "firebase": "^12.15.0",
     "lucide-react": "^1.21.0",
     "react": "^19.2.7",

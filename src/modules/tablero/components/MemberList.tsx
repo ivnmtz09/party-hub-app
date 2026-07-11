@@ -93,6 +93,7 @@ export default function MemberList({ miembros, adminId }: Props) {
                     name={m.nickname || m.displayName}
                     color={m.avatar || '#fbbf24'}
                     type={m.avatarType || 'letter'}
+                    avatarIcon={m.avatarIcon || 'Gamepad2'}
                     size={48}
                   />
                   <div className="flex-1 min-w-0">

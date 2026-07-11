@@ -105,6 +105,7 @@ export default function SideDrawer({ open, onClose }: Props) {
                 name={userProfile?.nickname || user?.displayName || user?.email || '?'}
                 color={userProfile?.avatar || '#fbbf24'}
                 type={userProfile?.avatarType || 'letter'}
+                avatarIcon={userProfile?.avatarIcon || 'Gamepad2'}
                 size={40}
               />
               <div className="min-w-0">
