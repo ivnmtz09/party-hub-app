@@ -1,23 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../../context/AuthContext'
 import GameHeader from '../../../components/GameHeader'
+import UserAvatar, { AVATAR_COLORS, type AvatarType } from '../../../components/UserAvatar'
 import { Save, Check } from 'lucide-react'
-
-const AVATAR_COLORS = [
-  '#fbbf24',
-  '#ef4444',
-  '#3b82f6',
-  '#10b981',
-  '#8b5cf6',
-  '#ec4899',
-  '#f97316',
-  '#06b6d4',
-]
 
 export default function ProfilePage() {
   const { userProfile, updateUserProfile } = useAuth()
   const [nickname, setNickname] = useState('')
   const [avatar, setAvatar] = useState('#fbbf24')
+  const [avatarType, setAvatarType] = useState<AvatarType>('letter')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
@@ -25,6 +16,7 @@ export default function ProfilePage() {
     if (userProfile) {
       setNickname(userProfile.nickname)
       setAvatar(userProfile.avatar || '#fbbf24')
+      setAvatarType(userProfile.avatarType || 'letter')
     }
   }, [userProfile])
 
@@ -32,7 +24,7 @@ export default function ProfilePage() {
     setSaving(true)
     setSaved(false)
     try {
-      await updateUserProfile({ nickname: nickname.trim(), avatar })
+      await updateUserProfile({ nickname: nickname.trim(), avatar, avatarType })
       setSaved(true)
       setTimeout(() => setSaved(false), 2000)
     } catch {
@@ -42,9 +34,7 @@ export default function ProfilePage() {
     }
   }
 
-  const displayInitial = nickname?.trim()
-    ? nickname.trim().charAt(0).toUpperCase()
-    : '?'
+  const displayName = nickname?.trim() || '?'
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col p-4 sm:p-6 transition-colors">
@@ -54,13 +44,14 @@ export default function ProfilePage() {
 
       <div className="flex-1 w-full max-w-md mx-auto flex flex-col gap-6">
         <div className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] space-y-6">
+
           <div className="flex flex-col items-center gap-4">
-            <div
-              className="w-20 h-20 border-4 border-black dark:border-white flex items-center justify-center font-black text-3xl text-black"
-              style={{ backgroundColor: avatar }}
-            >
-              {displayInitial}
-            </div>
+            <UserAvatar
+              name={displayName}
+              color={avatar}
+              type={avatarType}
+              size={80}
+            />
           </div>
 
           <div className="space-y-2">
@@ -82,7 +73,31 @@ export default function ProfilePage() {
 
           <div className="space-y-2">
             <label className="block text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-              Avatar
+              Tipo de Avatar
+            </label>
+            <div className="flex gap-3">
+              {([
+                { key: 'letter' as const, label: 'INICIAL' },
+                { key: 'marble' as const, label: 'FIGURA' },
+              ]).map((opt) => (
+                <button
+                  key={opt.key}
+                  onClick={() => setAvatarType(opt.key)}
+                  className={`flex-1 py-3 border-4 border-black dark:border-white font-black uppercase tracking-wider text-sm transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
+                    avatarType === opt.key
+                      ? 'bg-yellow-400 dark:bg-yellow-500 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]'
+                      : 'bg-white dark:bg-gray-700 text-black dark:text-white shadow-none'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+              Color
             </label>
             <div className="grid grid-cols-4 gap-3">
               {AVATAR_COLORS.map((color) => (

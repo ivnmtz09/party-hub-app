@@ -18,12 +18,10 @@ import {
   getUserProfile,
   updateUserProfile as updateProfileService,
   actualizarMiembroEnGrupos,
+  type UserProfileData,
 } from '../firebase/services'
 
-export interface UserProfile {
-  nickname: string
-  avatar: string
-}
+export type UserProfile = UserProfileData
 
 interface AuthContextValue {
   user: User | null

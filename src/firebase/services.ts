@@ -34,6 +34,7 @@ export interface Miembro {
   displayName: string
   nickname: string
   avatar: string
+  avatarType: 'letter' | 'marble'
   email: string
   deposiciones: number
   actosSexuales: number
@@ -81,6 +82,7 @@ export async function crearGrupo(nombreGrupo: string, user: User): Promise<strin
     displayName: user.displayName || 'Miembro',
     nickname: profile.nickname,
     avatar: profile.avatar,
+    avatarType: profile.avatarType,
     email: user.email || '',
     deposiciones: 0,
     actosSexuales: 0,
@@ -118,6 +120,7 @@ export async function unirseGrupo(codigo: string, user: User): Promise<string> {
       displayName: user.displayName || 'Miembro',
       nickname: profile.nickname,
       avatar: profile.avatar,
+      avatarType: profile.avatarType,
       email: user.email || '',
       deposiciones: 0,
       actosSexuales: 0,
@@ -139,6 +142,7 @@ export async function asegurarMiembro(user: User, groupId: string): Promise<void
     displayName: user.displayName || 'Miembro',
     nickname: profile.nickname,
     avatar: profile.avatar,
+    avatarType: profile.avatarType,
     email: user.email || '',
   }
   if (!snap.exists()) {
@@ -299,17 +303,28 @@ export function uploadRecordPhoto(file: File): Promise<string> {
 
 /* ───── Perfil de Usuario ───── */
 
-export async function getUserProfile(uid: string): Promise<{ nickname: string; avatar: string } | null> {
-  const snap = await getDoc(doc(db, 'users', uid))
-  if (!snap.exists()) return null
-  return snap.data() as { nickname: string; avatar: string }
+export interface UserProfileData {
+  nickname: string
+  avatar: string
+  avatarType: 'letter' | 'marble'
 }
 
-export async function updateUserProfile(uid: string, data: { nickname: string; avatar: string }): Promise<void> {
+export async function getUserProfile(uid: string): Promise<UserProfileData | null> {
+  const snap = await getDoc(doc(db, 'users', uid))
+  if (!snap.exists()) return null
+  const data = snap.data()
+  return {
+    nickname: data.nickname || '',
+    avatar: data.avatar || '#fbbf24',
+    avatarType: data.avatarType || 'letter',
+  }
+}
+
+export async function updateUserProfile(uid: string, data: UserProfileData): Promise<void> {
   await setDoc(doc(db, 'users', uid), data, { merge: true })
 }
 
-export async function actualizarMiembroEnGrupos(uid: string, data: { nickname: string; avatar: string }): Promise<void> {
+export async function actualizarMiembroEnGrupos(uid: string, data: UserProfileData): Promise<void> {
   const gruposRef = collection(db, 'grupos')
   const q = query(gruposRef, where('miembrosIds', 'array-contains', uid))
   const snapshot = await getDocs(q)
@@ -318,15 +333,16 @@ export async function actualizarMiembroEnGrupos(uid: string, data: { nickname: s
     updateDoc(doc(db, 'grupos', d.id, 'miembros', uid), {
       nickname: data.nickname,
       avatar: data.avatar,
+      avatarType: data.avatarType,
     })
   )
 
   await Promise.all(updates)
 }
 
-async function getProfileOrFallback(uid: string): Promise<{ nickname: string; avatar: string }> {
+async function getProfileOrFallback(uid: string): Promise<UserProfileData> {
   const profile = await getUserProfile(uid)
-  return profile ?? { nickname: '', avatar: '#fbbf24' }
+  return profile ?? { nickname: '', avatar: '#fbbf24', avatarType: 'letter' }
 }
 
 /* ───── Juego Multijugador ───── */

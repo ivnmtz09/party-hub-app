@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { Crown, ChevronDown, ChevronUp, Dumbbell, Trash2, Flame } from 'lucide-react'
 import type { Timestamp } from 'firebase/firestore'
 import type { Miembro } from '../../../firebase/services'
+import UserAvatar from '../../../components/UserAvatar'
 
 interface Props {
   miembros: Miembro[]
@@ -88,12 +89,12 @@ export default function MemberList({ miembros, adminId }: Props) {
                 className="border-2 border-black dark:border-white bg-white dark:bg-gray-800 p-4 shadow-brutal-sm dark:shadow-brutal-sm-dark"
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <div
-                    className="relative w-12 h-12 flex-shrink-0 flex items-center justify-center border-2 border-black dark:border-white font-black text-xl text-black"
-                    style={{ backgroundColor: m.avatar || '#fbbf24' }}
-                  >
-                    {(m.nickname || m.displayName).charAt(0).toUpperCase()}
-                  </div>
+                  <UserAvatar
+                    name={m.nickname || m.displayName}
+                    color={m.avatar || '#fbbf24'}
+                    type={m.avatarType || 'letter'}
+                    size={48}
+                  />
                   <div className="flex-1 min-w-0">
                     <p className="font-black uppercase tracking-wider text-sm text-black dark:text-white truncate">
                       {m.nickname || m.displayName.split(' ')[0]}

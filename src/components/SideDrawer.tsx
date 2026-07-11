@@ -21,6 +21,7 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
 import useLockBodyScroll from "../hooks/useLockBodyScroll";
+import UserAvatar from "./UserAvatar";
 
 interface Props {
   open: boolean;
@@ -100,19 +101,12 @@ export default function SideDrawer({ open, onClose }: Props) {
 
           <div className="flex-1 p-4 space-y-6 overflow-y-auto">
             <div className="flex items-center gap-3 p-3 border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-800">
-              <div
-                className="w-10 h-10 border-2 border-black dark:border-white flex items-center justify-center text-sm font-black text-black"
-                style={{ backgroundColor: userProfile?.avatar || "#fbbf24" }}
-              >
-                {(
-                  userProfile?.nickname ||
-                  user?.displayName ||
-                  user?.email ||
-                  "?"
-                )
-                  .charAt(0)
-                  .toUpperCase()}
-              </div>
+              <UserAvatar
+                name={userProfile?.nickname || user?.displayName || user?.email || '?'}
+                color={userProfile?.avatar || '#fbbf24'}
+                type={userProfile?.avatarType || 'letter'}
+                size={40}
+              />
               <div className="min-w-0">
                 <p className="font-black uppercase tracking-wider text-sm text-black dark:text-white truncate">
                   {userProfile?.nickname || user?.displayName || "Invitado"}
