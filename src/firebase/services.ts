@@ -48,6 +48,9 @@ export interface Evento {
   userId: string
   tipo: 'deposicion' | 'acto_sexual' | 'gym'
   timestamp: Timestamp
+  rating?: number
+  note?: string
+  photoUrl?: string
 }
 
 type EventoCallback = (eventos: Evento[]) => void
@@ -262,6 +265,31 @@ export async function eliminarEvento(groupId: string, eventId: string): Promise<
   } else {
     await updateDoc(miembroRef, { gym: increment(-1) })
   }
+}
+
+export async function updateActivityRecord(
+  groupId: string,
+  eventId: string,
+  data: { rating?: number; note?: string; photoUrl?: string },
+): Promise<void> {
+  const eventoRef = doc(db, 'grupos', groupId, 'eventos', eventId)
+  const snap = await getDoc(eventoRef)
+  if (!snap.exists()) throw new Error('Evento no encontrado')
+  await updateDoc(eventoRef, data)
+}
+
+export function uploadRecordPhoto(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const MAX_SIZE = 1 * 1024 * 1024
+    if (file.size > MAX_SIZE) {
+      reject(new Error('La imagen no debe superar 1MB'))
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = () => reject(new Error('Error al leer el archivo'))
+    reader.readAsDataURL(file)
+  })
 }
 
 /* ───── Perfil de Usuario ───── */

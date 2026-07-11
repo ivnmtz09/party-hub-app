@@ -4,6 +4,7 @@ import type { Timestamp } from 'firebase/firestore'
 import type { Evento, Miembro } from '../../../firebase/services'
 import { eliminarEvento } from '../../../firebase/services'
 import Skeleton from '../../../components/Skeleton'
+import RecordModal from './RecordModal'
 
 function tiempoRelativo(ts: Timestamp | null): string {
   if (!ts) return ''
@@ -29,6 +30,7 @@ interface Props {
 export default function RecentActivity({ eventos, miembros, userId, groupId, loading = false }: Props) {
   const [confirmingId, setConfirmingId] = useState<string | null>(null)
   const [loadingId, setLoadingId] = useState<string | null>(null)
+  const [selectedEvento, setSelectedEvento] = useState<Evento | null>(null)
 
   const recientes = eventos.slice(0, 5)
 
@@ -83,7 +85,10 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
             return (
               <div
                 key={ev.id}
-                className="flex items-center gap-3 border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                onClick={() => {
+                  if (!isConfirming) setSelectedEvento(ev)
+                }}
+                className={`flex items-center gap-3 border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${!isConfirming ? 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors' : ''}`}
               >
                 <div className="w-8 h-8 border-2 border-black dark:border-white flex items-center justify-center shrink-0 bg-gray-100 dark:bg-gray-700">
                   {icono}
@@ -101,7 +106,10 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
 
                 {isOwn && !isConfirming && (
                   <button
-                    onClick={() => setConfirmingId(ev.id!)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setConfirmingId(ev.id!)
+                    }}
                     className="p-2 border-2 border-black bg-red-500 text-white hover:bg-red-600 transition-opacity shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
                   >
                     {isLoading ? (
@@ -113,7 +121,7 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
                 )}
 
                 {isOwn && isConfirming && (
-                  <div className="flex gap-1.5 transition-opacity shrink-0">
+                  <div className="flex gap-1.5 transition-opacity shrink-0" onClick={(e) => e.stopPropagation()}>
                     <button
                       onClick={() => setConfirmingId(null)}
                       className="flex items-center gap-1 px-2 py-2 border-2 border-black bg-gray-300 dark:bg-gray-600 text-black dark:text-white font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all min-w-[44px] min-h-[44px]"
@@ -135,6 +143,16 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
             )
           })}
         </div>
+      )}
+
+      {selectedEvento && (
+        <RecordModal
+          open={true}
+          onClose={() => setSelectedEvento(null)}
+          evento={selectedEvento}
+          miembros={miembros}
+          groupId={groupId}
+        />
       )}
     </section>
   )
