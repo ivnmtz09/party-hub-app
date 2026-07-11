@@ -200,13 +200,18 @@ export async function registrarEvento(
   groupId: string,
   userId: string,
   tipo: 'deposicion' | 'acto_sexual' | 'gym',
+  meta?: { rating?: number; note?: string; photoUrl?: string },
 ) {
   const eventoRef = collection(db, 'grupos', groupId, 'eventos')
-  await addDoc(eventoRef, {
+  const docData: Record<string, unknown> = {
     userId,
     tipo,
     timestamp: serverTimestamp(),
-  })
+  }
+  if (meta?.rating) docData.rating = meta.rating
+  if (meta?.note) docData.note = meta.note
+  if (meta?.photoUrl) docData.photoUrl = meta.photoUrl
+  await addDoc(eventoRef, docData)
 
   const miembroRef = doc(db, 'grupos', groupId, 'miembros', userId)
   const updates: Record<string, unknown> = {}

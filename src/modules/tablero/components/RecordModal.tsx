@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
   X,
   Star,
   Edit,
   Save,
-  Image,
+  Camera,
   Trash2,
   Flame,
   Dumbbell,
@@ -13,13 +13,33 @@ import type { Timestamp } from 'firebase/firestore'
 import type { Evento, Miembro } from '../../../firebase/services'
 import { updateActivityRecord, uploadRecordPhoto } from '../../../firebase/services'
 
-interface Props {
+interface AnchorRect {
+  x: number
+  y: number
+}
+
+interface PropsCreate {
+  mode: 'create'
+  open: boolean
+  onClose: () => void
+  tipo: 'deposicion' | 'acto_sexual' | 'gym'
+  groupId: string
+  anchorRect?: AnchorRect
+  onSave: (data: { rating: number; note: string; photoUrl: string }) => Promise<void>
+}
+
+interface PropsViewEdit {
+  mode: 'view' | 'edit'
   open: boolean
   onClose: () => void
   evento: Evento
   miembros: Miembro[]
   groupId: string
+  anchorRect?: AnchorRect
+  onSave?: (data: { rating: number; note: string; photoUrl: string }) => Promise<void>
 }
+
+type Props = PropsCreate | PropsViewEdit
 
 function formatoFecha(ts: Timestamp): string {
   const d = ts.toDate()
@@ -36,36 +56,61 @@ function formatoFecha(ts: Timestamp): string {
 }
 
 const TIPO_LABEL: Record<string, string> = {
-  deposicion: 'CAGADA',
+  depocion: 'CAGADA',
   acto_sexual: 'CULEADA',
   gym: 'GYM',
 }
 
-export default function RecordModal({ open, onClose, evento, miembros, groupId }: Props) {
-  const [isEditing, setIsEditing] = useState(false)
-  const [rating, setRating] = useState(evento.rating ?? 0)
-  const [note, setNote] = useState(evento.note ?? '')
-  const [photoUrl, setPhotoUrl] = useState(evento.photoUrl ?? '')
+function getModalPosition(anchor?: AnchorRect) {
+  if (!anchor) return {}
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+  const modalW = Math.min(vw - 32, 448)
+  const modalH = 420
+  let left = anchor.x - modalW / 2
+  let top = anchor.y - modalH - 16
+  if (left < 16) left = 16
+  if (left + modalW > vw - 16) left = vw - modalW - 16
+  if (top < 16) top = anchor.y + 16
+  if (top + modalH > vh - 16) top = vh - modalH - 16
+  return { left: `${left}px`, top: `${top}px` }
+}
+
+export default function RecordModal(props: Props) {
+  const { open, onClose, groupId, anchorRect } = props
+
+  const isCreate = props.mode === 'create'
+  const tipo = isCreate ? props.tipo : props.evento.tipo
+
+  const [isEditing, setIsEditing] = useState(props.mode !== 'view')
+  const [rating, setRating] = useState(
+    isCreate ? 0 : (props.evento.rating ?? 0),
+  )
+  const [note, setNote] = useState(
+    isCreate ? '' : (props.evento.note ?? ''),
+  )
+  const [photoUrl, setPhotoUrl] = useState(
+    isCreate ? '' : (props.evento.photoUrl ?? ''),
+  )
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const fileRef = useRef<HTMLInputElement>(null)
 
-  if (!open) return null
-
-  const miembro = miembros.find((m) => m.id === evento.userId)
-  const nombreUsuario = miembro
-    ? miembro.nickname || miembro.displayName.split(' ')[0]
-    : evento.userId
-
-  const tipoLabel = TIPO_LABEL[evento.tipo] ?? evento.tipo.toUpperCase()
-
-  const icono =
-    evento.tipo === 'deposicion' ? (
-      <Trash2 size={20} strokeWidth={2.5} className="text-orange-500" />
-    ) : evento.tipo === 'acto_sexual' ? (
-      <Flame size={20} strokeWidth={2.5} className="text-pink-500" />
-    ) : (
-      <Dumbbell size={20} strokeWidth={2.5} className="text-cyan-500" />
-    )
+  useEffect(() => {
+    if (!open) return
+    if (isCreate) {
+      setIsEditing(true)
+      setRating(0)
+      setNote('')
+      setPhotoUrl('')
+    } else {
+      setIsEditing(props.mode === 'edit')
+      setRating(props.evento.rating ?? 0)
+      setNote(props.evento.note ?? '')
+      setPhotoUrl(props.evento.photoUrl ?? '')
+    }
+    setError('')
+  }, [open])
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -83,8 +128,12 @@ export default function RecordModal({ open, onClose, evento, miembros, groupId }
     setSaving(true)
     setError('')
     try {
-      await updateActivityRecord(groupId, evento.id!, { rating, note, photoUrl })
-      setIsEditing(false)
+      if (isCreate) {
+        await props.onSave({ rating, note, photoUrl })
+      } else if (props.onSave) {
+        await updateActivityRecord(groupId, props.evento.id!, { rating, note, photoUrl })
+      }
+      onClose()
     } catch {
       setError('Error al guardar los cambios')
     } finally {
@@ -93,9 +142,17 @@ export default function RecordModal({ open, onClose, evento, miembros, groupId }
   }
 
   const handleCancel = () => {
-    setRating(evento.rating ?? 0)
-    setNote(evento.note ?? '')
-    setPhotoUrl(evento.photoUrl ?? '')
+    if (isCreate) {
+      onClose()
+      return
+    }
+    if (props.mode === 'view') {
+      onClose()
+      return
+    }
+    setRating(props.evento.rating ?? 0)
+    setNote(props.evento.note ?? '')
+    setPhotoUrl(props.evento.photoUrl ?? '')
     setIsEditing(false)
     setError('')
   }
@@ -111,7 +168,7 @@ export default function RecordModal({ open, onClose, evento, miembros, groupId }
           className={`${interactive ? 'cursor-pointer active:scale-110 transition-transform' : 'cursor-default'}`}
         >
           <Star
-            size={24}
+            size={28}
             strokeWidth={2.5}
             className={
               n <= value
@@ -124,13 +181,73 @@ export default function RecordModal({ open, onClose, evento, miembros, groupId }
     </div>
   )
 
+  if (!open) return null
+
+  const icono =
+    tipo === 'deposicion' ? (
+      <Trash2 size={20} strokeWidth={2.5} className="text-orange-500" />
+    ) : tipo === 'acto_sexual' ? (
+      <Flame size={20} strokeWidth={2.5} className="text-pink-500" />
+    ) : (
+      <Dumbbell size={20} strokeWidth={2.5} className="text-cyan-500" />
+    )
+
+  const tipoLabel = TIPO_LABEL[tipo] ?? tipo.toUpperCase()
+
+  let headerContent: React.ReactNode
+  if (isCreate) {
+    headerContent = (
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 border-2 border-black dark:border-white flex items-center justify-center bg-gray-100 dark:bg-gray-700">
+          {icono}
+        </div>
+        <h3 className="text-sm font-black uppercase tracking-wider text-black dark:text-white">
+          Nuevo Registro - {tipoLabel}
+        </h3>
+      </div>
+    )
+  } else {
+    const evento = props.evento
+    const miembro = props.miembros.find((m) => m.id === evento.userId)
+    const nombreUsuario = miembro
+      ? miembro.nickname || miembro.displayName.split(' ')[0]
+      : evento.userId
+    headerContent = (
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 border-2 border-black dark:border-white flex items-center justify-center bg-gray-100 dark:bg-gray-700">
+          {icono}
+        </div>
+        <div>
+          <h3 className="text-sm font-black uppercase tracking-wider text-black dark:text-white">
+            {tipoLabel}
+          </h3>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            {nombreUsuario} &middot; {formatoFecha(evento.timestamp)}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  const posStyle = getModalPosition(anchorRect)
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 select-none"
+      className="fixed inset-0 z-50 bg-black/50 select-none"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-5 sm:p-6 shadow-brutal-lg dark:shadow-brutal-lg-dark"
+        className="absolute w-full max-w-md border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-5 sm:p-6 shadow-brutal-lg dark:shadow-brutal-lg-dark"
+        style={{
+          ...posStyle,
+          ...(Object.keys(posStyle).length === 0
+            ? {
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+              }
+            : {}),
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -140,21 +257,105 @@ export default function RecordModal({ open, onClose, evento, miembros, groupId }
           <X size={20} strokeWidth={2.5} />
         </button>
 
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 border-2 border-black dark:border-white flex items-center justify-center bg-gray-100 dark:bg-gray-700">
-            {icono}
-          </div>
-          <div>
-            <h3 className="text-sm font-black uppercase tracking-wider text-black dark:text-white">
-              {tipoLabel}
-            </h3>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-              {nombreUsuario} &middot; {formatoFecha(evento.timestamp)}
-            </p>
-          </div>
-        </div>
+        <div className="mb-5">{headerContent}</div>
 
-        {!isEditing ? (
+        {isEditing ? (
+          <div className="space-y-4">
+            <div className="border-4 border-black dark:border-white p-4 bg-gray-50 dark:bg-gray-700">
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
+                Calificacion
+              </p>
+              {renderStars(rating, true)}
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
+                Nota
+              </label>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Escribe una nota..."
+                rows={3}
+                className="w-full py-3 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-bold text-sm placeholder:text-gray-400 focus:outline-none focus:ring-0 resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
+                Foto
+              </label>
+              <div className="flex gap-2">
+                <label className="flex-1 flex items-center justify-center gap-2 py-3 px-4 border-4 border-black dark:border-white bg-gray-100 dark:bg-gray-700 text-black dark:text-white font-bold text-xs uppercase tracking-wider cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                  <Camera size={16} strokeWidth={2.5} />
+                  Tomar Foto
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                </label>
+                <label className="flex-1 flex items-center justify-center gap-2 py-3 px-4 border-4 border-black dark:border-white bg-gray-100 dark:bg-gray-700 text-black dark:text-white font-bold text-xs uppercase tracking-wider cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                  <Edit size={16} strokeWidth={2.5} />
+                  Galeria
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+              {photoUrl && (
+                <div className="mt-3 border-4 border-black dark:border-white p-2">
+                  <img
+                    src={photoUrl}
+                    alt="Preview"
+                    className="w-full h-32 object-cover border-2 border-black dark:border-white"
+                  />
+                  <button
+                    onClick={() => setPhotoUrl('')}
+                    className="mt-2 flex items-center gap-1 text-red-600 font-black text-[10px] uppercase tracking-wider"
+                  >
+                    <Trash2 size={12} strokeWidth={2.5} />
+                    Eliminar foto
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {error && (
+              <p className="text-red-600 font-black text-xs uppercase tracking-wider">
+                {error}
+              </p>
+            )}
+
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="flex-1 flex items-center justify-center gap-2 py-3 border-4 border-black dark:border-white bg-emerald-300 dark:bg-emerald-500 text-black dark:text-gray-900 font-black uppercase tracking-wider text-xs shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50"
+              >
+                <Save size={16} strokeWidth={2.5} />
+                {saving
+                  ? 'Guardando...'
+                  : isCreate
+                    ? 'Registrar'
+                    : 'Guardar Cambios'}
+              </button>
+              <button
+                onClick={handleCancel}
+                className="flex-1 flex items-center justify-center gap-2 py-3 border-4 border-black dark:border-white bg-gray-200 dark:bg-gray-600 text-black dark:text-white font-black uppercase tracking-wider text-xs shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+              >
+                <X size={16} strokeWidth={2.5} />
+                {isCreate ? 'Cancelar' : 'Cancelar'}
+              </button>
+            </div>
+          </div>
+        ) : (
           <div className="space-y-4">
             <div className="border-4 border-black dark:border-white p-4 bg-gray-50 dark:bg-gray-700">
               <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
@@ -210,77 +411,6 @@ export default function RecordModal({ open, onClose, evento, miembros, groupId }
               >
                 <X size={16} strokeWidth={2.5} />
                 Cerrar
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="border-4 border-black dark:border-white p-4 bg-gray-50 dark:bg-gray-700">
-              <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
-                Calificacion
-              </p>
-              {renderStars(rating, true)}
-            </div>
-
-            <div>
-              <label className="block text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
-                Nota
-              </label>
-              <textarea
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                placeholder="Escribe una nota..."
-                rows={3}
-                className="w-full py-3 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-bold text-sm placeholder:text-gray-400 focus:outline-none focus:ring-0 resize-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
-                Foto
-              </label>
-              <label className="flex items-center justify-center gap-2 py-3 px-4 border-4 border-black dark:border-white bg-gray-100 dark:bg-gray-700 text-black dark:text-white font-bold text-xs uppercase tracking-wider cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                <Image size={16} strokeWidth={2.5} />
-                {photoUrl ? 'Cambiar imagen' : 'Seleccionar imagen'}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-              </label>
-              {photoUrl && (
-                <div className="mt-3 border-4 border-black dark:border-white p-2">
-                  <img
-                    src={photoUrl}
-                    alt="Preview"
-                    className="w-full h-32 object-cover border-2 border-black dark:border-white"
-                  />
-                </div>
-              )}
-            </div>
-
-            {error && (
-              <p className="text-red-600 font-black text-xs uppercase tracking-wider">
-                {error}
-              </p>
-            )}
-
-            <div className="flex gap-3 pt-2">
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="flex-1 flex items-center justify-center gap-2 py-3 border-4 border-black dark:border-white bg-emerald-300 dark:bg-emerald-500 text-black dark:text-gray-900 font-black uppercase tracking-wider text-xs shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50"
-              >
-                <Save size={16} strokeWidth={2.5} />
-                {saving ? 'Guardando...' : 'Guardar Cambios'}
-              </button>
-              <button
-                onClick={handleCancel}
-                className="flex-1 flex items-center justify-center gap-2 py-3 border-4 border-black dark:border-white bg-gray-200 dark:bg-gray-600 text-black dark:text-white font-black uppercase tracking-wider text-xs shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
-              >
-                <X size={16} strokeWidth={2.5} />
-                Cancelar
               </button>
             </div>
           </div>

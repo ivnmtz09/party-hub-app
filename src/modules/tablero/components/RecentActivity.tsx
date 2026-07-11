@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Trash2, Flame, Dumbbell, Check, X } from 'lucide-react'
+import { Trash2, Flame, Dumbbell, Check, X, Edit } from 'lucide-react'
 import type { Timestamp } from 'firebase/firestore'
 import type { Evento, Miembro } from '../../../firebase/services'
 import { eliminarEvento } from '../../../firebase/services'
@@ -30,7 +30,8 @@ interface Props {
 export default function RecentActivity({ eventos, miembros, userId, groupId, loading = false }: Props) {
   const [confirmingId, setConfirmingId] = useState<string | null>(null)
   const [loadingId, setLoadingId] = useState<string | null>(null)
-  const [selectedEvento, setSelectedEvento] = useState<Evento | null>(null)
+  const [editEvento, setEditEvento] = useState<Evento | null>(null)
+  const [editAnchor, setEditAnchor] = useState<{ x: number; y: number } | undefined>(undefined)
 
   const recientes = eventos.slice(0, 5)
 
@@ -53,6 +54,13 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
     }
   }
 
+  const handleEditClick = (ev: Evento, e: React.MouseEvent) => {
+    e.stopPropagation()
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    setEditAnchor({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 })
+    setEditEvento(ev)
+  }
+
   return (
     <section>
       <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-3">
@@ -73,6 +81,7 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
             const isOwn = ev.userId === userId
             const isConfirming = confirmingId === ev.id
             const isLoading = loadingId === ev.id
+            const hasDetails = ev.rating || ev.note || ev.photoUrl
             const icono =
               ev.tipo === 'deposicion' ? (
                 <Trash2 size={16} strokeWidth={2.5} className="text-orange-500" />
@@ -85,10 +94,7 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
             return (
               <div
                 key={ev.id}
-                onClick={() => {
-                  if (!isConfirming) setSelectedEvento(ev)
-                }}
-                className={`flex items-center gap-3 border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${!isConfirming ? 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors' : ''}`}
+                className="flex items-center gap-3 border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
               >
                 <div className="w-8 h-8 border-2 border-black dark:border-white flex items-center justify-center shrink-0 bg-gray-100 dark:bg-gray-700">
                   {icono}
@@ -101,23 +107,31 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
                   <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                     {ev.tipo === 'deposicion' ? 'Cagada' : ev.tipo === 'acto_sexual' ? 'Culeada' : 'Gym'} &middot;{' '}
                     {tiempoRelativo(ev.timestamp as Timestamp)}
+                    {hasDetails && (
+                      <span className="ml-1 text-yellow-500">&#9733;</span>
+                    )}
                   </p>
                 </div>
 
                 {isOwn && !isConfirming && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setConfirmingId(ev.id!)
-                    }}
-                    className="p-2 border-2 border-black bg-red-500 text-white hover:bg-red-600 transition-opacity shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                  >
-                    {isLoading ? (
-                      <span className="text-[10px] font-black">...</span>
-                    ) : (
-                      <Trash2 size={14} strokeWidth={2.5} />
-                    )}
-                  </button>
+                  <div className="flex gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      onClick={(e) => handleEditClick(ev, e)}
+                      className="p-2 border-2 border-black bg-yellow-400 text-black hover:bg-yellow-300 transition-opacity shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none min-w-[44px] min-h-[44px] flex items-center justify-center"
+                    >
+                      <Edit size={14} strokeWidth={2.5} />
+                    </button>
+                    <button
+                      onClick={() => setConfirmingId(ev.id!)}
+                      className="p-2 border-2 border-black bg-red-500 text-white hover:bg-red-600 transition-opacity shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none min-w-[44px] min-h-[44px] flex items-center justify-center"
+                    >
+                      {isLoading ? (
+                        <span className="text-[10px] font-black">...</span>
+                      ) : (
+                        <Trash2 size={14} strokeWidth={2.5} />
+                      )}
+                    </button>
+                  </div>
                 )}
 
                 {isOwn && isConfirming && (
@@ -139,19 +153,32 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
                     </button>
                   </div>
                 )}
+
+                {!isOwn && !isConfirming && ev.rating ? (
+                  <div className="shrink-0">
+                    <button
+                      onClick={(e) => handleEditClick(ev, e)}
+                      className="p-2 border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-700 text-black dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600 transition-opacity shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none min-w-[44px] min-h-[44px] flex items-center justify-center"
+                    >
+                      <Edit size={14} strokeWidth={2.5} />
+                    </button>
+                  </div>
+                ) : null}
               </div>
             )
           })}
         </div>
       )}
 
-      {selectedEvento && (
+      {editEvento && (
         <RecordModal
+          mode="view"
           open={true}
-          onClose={() => setSelectedEvento(null)}
-          evento={selectedEvento}
+          onClose={() => setEditEvento(null)}
+          evento={editEvento}
           miembros={miembros}
           groupId={groupId}
+          anchorRect={editAnchor}
         />
       )}
     </section>

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import {
   Trash2,
   Flame,
@@ -29,6 +29,7 @@ import CreateGroupModal from '../components/CreateGroupModal'
 import JoinGroupModal from '../components/JoinGroupModal'
 import GroupSettingsModal from '../components/GroupSettingsModal'
 import RecentActivity from '../components/RecentActivity'
+import RecordModal from '../components/RecordModal'
 import Skeleton from '../../../components/Skeleton'
 import { playCagadaSound, playCuleadaSound, playGymSound } from '../../../utils/audio'
 
@@ -50,6 +51,9 @@ export default function TableroPage() {
   const [errorMsg, setErrorMsg] = useState('')
   const [timeFilter, setTimeFilter] = useState<'este_mes' | 'mes_pasado' | 'esta_semana' | 'hoy'>('este_mes')
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false)
+  const [recordModalOpen, setRecordModalOpen] = useState(false)
+  const [recordModalTipo, setRecordModalTipo] = useState<'deposicion' | 'acto_sexual' | 'gym'>('deposicion')
+  const [recordModalAnchor, setRecordModalAnchor] = useState<{ x: number; y: number } | undefined>(undefined)
 
   const filteredEventos = useMemo(() => {
     const ahora = new Date()
@@ -143,15 +147,23 @@ export default function TableroPage() {
     setNotificationGroupId(activeGroupId)
   }, [activeGroupId, setNotificationGroupId])
 
-  const handleRegistrar = async (tipo: 'deposicion' | 'acto_sexual' | 'gym') => {
-    if (!user || !activeGroupId || isSubmitting) return
+  const handleRegistrar = useCallback((tipo: 'deposicion' | 'acto_sexual' | 'gym', e: React.MouseEvent) => {
+    if (!user || !activeGroupId) return
     if (tipo === 'deposicion') playCagadaSound()
     else if (tipo === 'acto_sexual') playCuleadaSound()
     else playGymSound()
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    setRecordModalTipo(tipo)
+    setRecordModalAnchor({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 })
+    setRecordModalOpen(true)
+  }, [user, activeGroupId])
+
+  const handleRecordSave = async (data: { rating: number; note: string; photoUrl: string }) => {
+    if (!user || !activeGroupId) return
     setIsSubmitting(true)
     setErrorMsg('')
     try {
-      await registrarEvento(activeGroupId, user.uid, tipo)
+      await registrarEvento(activeGroupId, user.uid, recordModalTipo, data)
     } catch {
       setErrorMsg('Error al registrar el evento')
       setTimeout(() => setErrorMsg(''), 3000)
@@ -326,7 +338,7 @@ export default function TableroPage() {
 
       <div className="flex flex-col gap-4 sm:flex-row">
         <button
-          onClick={() => handleRegistrar('deposicion')}
+          onClick={(e) => handleRegistrar('deposicion', e)}
           disabled={isSubmitting}
           className="flex-1 flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-orange-400 dark:bg-orange-500 text-black font-black uppercase tracking-tighter shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -335,7 +347,7 @@ export default function TableroPage() {
         </button>
 
         <button
-          onClick={() => handleRegistrar('acto_sexual')}
+          onClick={(e) => handleRegistrar('acto_sexual', e)}
           disabled={isSubmitting}
           className="flex-1 flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-pink-400 dark:bg-pink-500 text-black font-black uppercase tracking-tighter shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -344,7 +356,7 @@ export default function TableroPage() {
         </button>
 
         <button
-          onClick={() => handleRegistrar('gym')}
+          onClick={(e) => handleRegistrar('gym', e)}
           disabled={isSubmitting}
           className="flex-1 flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-cyan-400 dark:bg-cyan-500 text-black font-black uppercase tracking-tighter shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -421,6 +433,16 @@ export default function TableroPage() {
           userId={user?.uid ?? ''}
         />
       )}
+
+      <RecordModal
+        mode="create"
+        open={recordModalOpen}
+        onClose={() => setRecordModalOpen(false)}
+        tipo={recordModalTipo}
+        groupId={activeGroupId ?? ''}
+        anchorRect={recordModalAnchor}
+        onSave={handleRecordSave}
+      />
       </>
       )}
     </div>
