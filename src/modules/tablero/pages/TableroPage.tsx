@@ -9,6 +9,7 @@ import {
   Check,
   ChevronDown,
   Settings,
+  Filter,
 } from 'lucide-react'
 import { useAuth } from '../../../context/AuthContext'
 import { useNotification } from '../../../context/NotificationContext'
@@ -48,6 +49,7 @@ export default function TableroPage() {
   const [showSettingsModal, setShowSettingsModal] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
   const [timeFilter, setTimeFilter] = useState<'este_mes' | 'mes_pasado' | 'esta_semana' | 'hoy'>('este_mes')
+  const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false)
 
   const filteredEventos = useMemo(() => {
     const ahora = new Date()
@@ -270,26 +272,7 @@ export default function TableroPage() {
                   {g.nombre}
                 </button>
               ))}
-      </div>
-
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {(['este_mes', 'mes_pasado', 'esta_semana', 'hoy'] as const).map((f) => (
-          <button
-            key={f}
-            onClick={() => setTimeFilter(f)}
-            className={`shrink-0 px-3 py-2 border-2 border-black dark:border-white font-black text-xs uppercase tracking-wider transition-all ${
-              timeFilter === f
-                ? 'bg-yellow-400 text-black shadow-brutal-sm'
-                : 'bg-white dark:bg-gray-800 text-black dark:text-white'
-            }`}
-          >
-            {f === 'este_mes' && 'ESTE MES'}
-            {f === 'mes_pasado' && 'MES PASADO'}
-            {f === 'esta_semana' && 'ESTA SEMANA'}
-            {f === 'hoy' && 'HOY'}
-          </button>
-        ))}
-      </div>
+            </div>
           </>
         )}
       </div>
@@ -368,6 +351,45 @@ export default function TableroPage() {
           <Dumbbell size={28} strokeWidth={2.5} />
           <span className="text-xl">REGISTRAR GYM</span>
         </button>
+      </div>
+
+      <div className="relative w-full mb-4 z-10">
+        <button
+          onClick={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
+          className="w-full flex items-center justify-between gap-2 py-3 px-4 border-4 border-black dark:border-white bg-yellow-300 dark:bg-yellow-500 text-black dark:text-gray-900 font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+        >
+          <span>Filtro: {timeFilter.replace('_', ' ').toUpperCase()}</span>
+          <Filter size={20} strokeWidth={2.5} />
+        </button>
+        {isFilterMenuOpen && (
+          <>
+            <div
+              className="fixed inset-0 z-10"
+              onClick={() => setIsFilterMenuOpen(false)}
+            />
+            <div className="absolute top-full left-0 w-full bg-white dark:bg-gray-800 border-4 border-black dark:border-white shadow-brutal-sm dark:shadow-brutal-sm-dark mt-2 flex flex-col z-20">
+              {(['este_mes', 'mes_pasado', 'esta_semana', 'hoy'] as const).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => {
+                    setTimeFilter(f)
+                    setIsFilterMenuOpen(false)
+                  }}
+                  className={`w-full text-left py-3 px-4 font-bold uppercase tracking-wider text-sm border-b-2 border-black dark:border-white last:border-b-0 transition-colors ${
+                    timeFilter === f
+                      ? 'bg-yellow-200 dark:bg-yellow-400 text-black'
+                      : 'bg-white dark:bg-gray-800 text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {f === 'este_mes' && 'ESTE MES'}
+                  {f === 'mes_pasado' && 'MES PASADO'}
+                  {f === 'esta_semana' && 'ESTA SEMANA'}
+                  {f === 'hoy' && 'HOY'}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       <StatsChart miembros={miembros} eventos={filteredEventos} filterLabel={filterLabel} />
