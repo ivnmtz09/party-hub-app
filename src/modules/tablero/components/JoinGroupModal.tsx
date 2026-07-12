@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { X, LogIn, Loader2 } from 'lucide-react'
 import { unirseGrupo } from '../../../firebase/services'
 import { useAuth } from '../../../context/AuthContext'
+import { playCloseSound, playSuccessSound } from '../../../utils/audio'
 
 interface Props {
   open: boolean
@@ -22,6 +23,7 @@ export default function JoinGroupModal({ open, onClose }: Props) {
     setError('')
     try {
       await unirseGrupo(codigo.trim().toUpperCase(), user)
+      playSuccessSound()
       setCodigo('')
       onClose()
     } catch {
@@ -34,14 +36,14 @@ export default function JoinGroupModal({ open, onClose }: Props) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 select-none"
-      onClick={onClose}
+      onClick={() => { playCloseSound(); onClose() }}
     >
       <div
         className="relative w-full max-w-md border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-5 sm:p-6 shadow-brutal-lg dark:shadow-brutal-lg-dark"
         onClick={(e) => e.stopPropagation()}
       >
         <button
-          onClick={onClose}
+          onClick={() => { playCloseSound(); onClose() }}
           className="absolute top-3 right-3 p-1.5 border-2 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         >
           <X size={20} strokeWidth={2.5} />

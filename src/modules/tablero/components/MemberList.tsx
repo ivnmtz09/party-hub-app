@@ -3,6 +3,7 @@ import { Crown, ChevronDown, ChevronUp, Dumbbell, Trash2, Flame } from 'lucide-r
 import type { Timestamp } from 'firebase/firestore'
 import type { Miembro } from '../../../firebase/services'
 import UserAvatar from '../../../components/UserAvatar'
+import { playToggleOnSound, playToggleOffSound } from '../../../utils/audio'
 
 interface Props {
   miembros: Miembro[]
@@ -61,7 +62,7 @@ export default function MemberList({ miembros, adminId }: Props) {
   return (
     <section>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => { isOpen ? playToggleOffSound() : playToggleOnSound(); setIsOpen(!isOpen) }}
         className="w-full flex items-center justify-between py-3 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
       >
         <span>MIEMBROS DEL GRUPO</span>

@@ -150,3 +150,168 @@ export function playSuccessSound(): void {
     playNotes([523, 659, 784, 1047], ctx.currentTime, 0.12, 'square', 0.12, ctx)
   } catch { /* audio no disponible */ }
 }
+
+export function playClickSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.type = 'square'
+    osc.frequency.setValueAtTime(600, ctx.currentTime)
+    osc.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.04)
+    gain.gain.setValueAtTime(0.1, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 0.04)
+  } catch { /* audio no disponible */ }
+}
+
+export function playToggleOnSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    playNotes([400, 600], ctx.currentTime, 0.06, 'square', 0.1, ctx)
+  } catch { /* audio no disponible */ }
+}
+
+export function playToggleOffSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    playNotes([600, 400], ctx.currentTime, 0.06, 'square', 0.1, ctx)
+  } catch { /* audio no disponible */ }
+}
+
+export function playReactionSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    playNotes([880, 1100, 1320], ctx.currentTime, 0.06, 'sine', 0.12, ctx)
+  } catch { /* audio no disponible */ }
+}
+
+export function playCommentSendSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    playNotes([523, 784, 1047], ctx.currentTime, 0.08, 'sine', 0.1, ctx)
+  } catch { /* audio no disponible */ }
+}
+
+export function playCopySound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    playNotes([800, 1000], ctx.currentTime, 0.05, 'sine', 0.1, ctx)
+  } catch { /* audio no disponible */ }
+}
+
+export function playDeleteSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    playNotes([400, 250, 150], ctx.currentTime, 0.15, 'sawtooth', 0.1, ctx)
+  } catch { /* audio no disponible */ }
+}
+
+export function playCloseSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    playNotes([500, 350], ctx.currentTime, 0.06, 'square', 0.08, ctx)
+  } catch { /* audio no disponible */ }
+}
+
+export function playOpenSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    playNotes([350, 500], ctx.currentTime, 0.06, 'square', 0.08, ctx)
+  } catch { /* audio no disponible */ }
+}
+
+export function playStarSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(1200, ctx.currentTime)
+    osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.1)
+    gain.gain.setValueAtTime(0.1, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 0.1)
+  } catch { /* audio no disponible */ }
+}
+
+export function playShuffleSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    for (let i = 0; i < 5; i++) {
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.type = 'square'
+      const t = ctx.currentTime + i * 0.03
+      osc.frequency.setValueAtTime(300 + Math.random() * 400, t)
+      gain.gain.setValueAtTime(0.06, t)
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.03)
+      osc.start(t)
+      osc.stop(t + 0.03)
+    }
+  } catch { /* audio no disponible */ }
+}
+
+export function playSpinSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.type = 'sawtooth'
+    osc.frequency.setValueAtTime(200, ctx.currentTime)
+    osc.frequency.linearRampToValueAtTime(800, ctx.currentTime + 0.3)
+    osc.frequency.linearRampToValueAtTime(200, ctx.currentTime + 0.6)
+    gain.gain.setValueAtTime(0.12, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 0.6)
+  } catch { /* audio no disponible */ }
+}
+
+export function playVoteSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    playNotes([440, 550, 660], ctx.currentTime, 0.1, 'square', 0.1, ctx)
+  } catch { /* audio no disponible */ }
+}
+
+export function playSwitchSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(700, ctx.currentTime)
+    osc.frequency.exponentialRampToValueAtTime(900, ctx.currentTime + 0.05)
+    gain.gain.setValueAtTime(0.08, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 0.05)
+  } catch { /* audio no disponible */ }
+}

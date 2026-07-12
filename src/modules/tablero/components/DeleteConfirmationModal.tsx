@@ -1,4 +1,5 @@
 import { AlertTriangle, X } from 'lucide-react'
+import { playCloseSound, playDeleteSound } from '../../../utils/audio'
 
 interface Props {
   open: boolean
@@ -28,7 +29,7 @@ export default function DeleteConfirmationModal({
             </p>
           </div>
           <button
-            onClick={onClose}
+            onClick={() => { playCloseSound(); onClose() }}
             className="p-1.5 border-2 border-black dark:border-white bg-gray-200 dark:bg-gray-700 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
           >
             <X size={16} strokeWidth={2.5} />
@@ -41,13 +42,13 @@ export default function DeleteConfirmationModal({
 
         <div className="flex gap-3">
           <button
-            onClick={onClose}
+            onClick={() => { playCloseSound(); onClose() }}
             className="flex-1 py-3 border-4 border-black dark:border-white bg-gray-300 dark:bg-gray-700 text-black dark:text-white font-black uppercase tracking-wider text-sm shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
           >
             Cancelar
           </button>
           <button
-            onClick={onConfirm}
+            onClick={() => { playDeleteSound(); onConfirm() }}
             disabled={loading}
             className="flex-1 py-3 border-4 border-black dark:border-white bg-red-500 text-white font-black uppercase tracking-wider text-sm shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >

@@ -3,6 +3,7 @@ import { useAuth } from '../../../context/AuthContext'
 import GameHeader from '../../../components/GameHeader'
 import UserAvatar, { AVATAR_COLORS, ICON_OPTIONS, type AvatarType } from '../../../components/UserAvatar'
 import { Save, Check } from 'lucide-react'
+import { playClickSound, playSwitchSound, playSuccessSound } from '../../../utils/audio'
 
 export default function ProfilePage() {
   const { userProfile, updateUserProfile } = useAuth()
@@ -25,6 +26,7 @@ export default function ProfilePage() {
   const handleSave = async () => {
     setSaving(true)
     setSaved(false)
+    playSuccessSound()
     try {
       await updateUserProfile({ nickname: nickname.trim(), avatar, avatarType, avatarIcon })
       setSaved(true)
@@ -85,7 +87,7 @@ export default function ProfilePage() {
               ]).map((opt) => (
                 <button
                   key={opt.key}
-                  onClick={() => setAvatarType(opt.key)}
+                  onClick={() => { playSwitchSound(); setAvatarType(opt.key) }}
                   className={`flex-1 py-3 border-4 border-black dark:border-white font-black uppercase tracking-wider text-sm transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
                     avatarType === opt.key
                       ? 'bg-yellow-400 dark:bg-yellow-500 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]'
@@ -109,7 +111,7 @@ export default function ProfilePage() {
                   return (
                     <button
                       key={opt.id}
-                      onClick={() => setAvatarIcon(opt.id)}
+                      onClick={() => { playClickSound(); setAvatarIcon(opt.id) }}
                       className={`w-full aspect-square border-4 border-black dark:border-white flex items-center justify-center transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
                         avatarIcon === opt.id
                           ? 'bg-yellow-400 dark:bg-yellow-500 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]'
@@ -132,7 +134,7 @@ export default function ProfilePage() {
               {AVATAR_COLORS.map((color) => (
                 <button
                   key={color}
-                  onClick={() => setAvatar(color)}
+                  onClick={() => { playClickSound(); setAvatar(color) }}
                   className={`w-full aspect-square border-4 border-black dark:border-white flex items-center justify-center transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
                     avatar === color
                       ? 'shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]'

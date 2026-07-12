@@ -22,6 +22,7 @@ import { useTheme } from "../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
 import useLockBodyScroll from "../hooks/useLockBodyScroll";
 import UserAvatar from "./UserAvatar";
+import { playCloseSound, playClickSound, playToggleOnSound, playSwitchSound, playDeleteSound } from "../utils/audio";
 
 interface Props {
   open: boolean;
@@ -93,7 +94,7 @@ export default function SideDrawer({ open, onClose }: Props) {
               Menu
             </h2>
             <button
-              onClick={onClose}
+              onClick={() => { playCloseSound(); onClose() }}
               className="p-1 border-2 border-black dark:border-white bg-white dark:bg-gray-900 shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
             >
               <X size={20} strokeWidth={2.5} />
@@ -121,6 +122,7 @@ export default function SideDrawer({ open, onClose }: Props) {
 
             <button
               onClick={() => {
+                playClickSound();
                 onClose();
                 navigate("/perfil");
               }}
@@ -131,7 +133,7 @@ export default function SideDrawer({ open, onClose }: Props) {
             </button>
 
             <button
-              onClick={() => setShowManual(!showManual)}
+              onClick={() => { playToggleOnSound(); setShowManual(!showManual) }}
               className="w-full flex items-center gap-3 px-3 py-3 border-2 border-black dark:border-white bg-white dark:bg-gray-800 font-black uppercase tracking-wider text-sm text-black dark:text-white shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
             >
               <HelpCircle size={20} strokeWidth={2.5} />
@@ -186,7 +188,7 @@ export default function SideDrawer({ open, onClose }: Props) {
             )}
 
             <button
-              onClick={toggleTheme}
+              onClick={() => { playSwitchSound(); toggleTheme() }}
               className="w-full flex items-center gap-3 px-3 py-3 border-2 border-black dark:border-white bg-white dark:bg-gray-800 font-black uppercase tracking-wider text-sm text-black dark:text-white shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
             >
               {theme === "dark" ? (
@@ -200,7 +202,7 @@ export default function SideDrawer({ open, onClose }: Props) {
 
           <div className="p-4 border-t-4 border-black dark:border-white space-y-3 shrink-0">
             <button
-              onClick={() => setShowConfirmLogout(true)}
+              onClick={() => { playDeleteSound(); setShowConfirmLogout(true) }}
               className="w-full flex items-center justify-center gap-3 px-3 py-3 border-2 border-black dark:border-white bg-red-500 text-white font-black uppercase tracking-wider text-sm shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
             >
               <LogOut size={20} strokeWidth={2.5} />
@@ -245,13 +247,13 @@ export default function SideDrawer({ open, onClose }: Props) {
             </p>
             <div className="flex gap-3">
               <button
-                onClick={() => setShowConfirmLogout(false)}
+                onClick={() => { playCloseSound(); setShowConfirmLogout(false) }}
                 className="flex-1 py-3 border-4 border-black bg-gray-200 dark:bg-gray-700 text-black dark:text-white font-black uppercase tracking-wider text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
               >
                 Cancelar
               </button>
               <button
-                onClick={() => { setShowConfirmLogout(false); logout(); }}
+                onClick={() => { playDeleteSound(); setShowConfirmLogout(false); logout(); }}
                 className="flex-1 py-3 border-4 border-black bg-red-500 text-white font-black uppercase tracking-wider text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
               >
                 Cerrar sesion

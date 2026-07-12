@@ -3,6 +3,7 @@ import { Star, Pencil, Save, X, Camera, Edit, Trash2, Heart, Flame, Smile, Skull
 import type { Evento, ReactionType, CommentData } from '../../../firebase/services'
 import { updateActivityRecord, uploadRecordPhoto, toggleReaction, addComment, subscribeToComments } from '../../../firebase/services'
 import { useAuth } from '../../../context/AuthContext'
+import { playReactionSound, playToggleOnSound, playToggleOffSound, playCommentSendSound, playCloseSound, playStarSound, playDeleteSound, playSuccessSound, playClickSound } from '../../../utils/audio'
 
 interface Props {
   evento: Evento
@@ -45,6 +46,7 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
 
   const handleToggleReaction = async (reactionType: ReactionType) => {
     if (!currentUserId || !evento.id) return
+    playReactionSound()
     try {
       await toggleReaction(groupId, evento.id, currentUserId, reactionType)
     } catch {
@@ -56,6 +58,7 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
     if (!currentUserId || !evento.id || !commentText.trim()) return
     const text = commentText.trim()
     setCommentText('')
+    playCommentSendSound()
     try {
       await addComment(groupId, evento.id, {
         userId: currentUserId,
@@ -77,7 +80,7 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
           key={n}
           type="button"
           disabled={!interactive}
-          onClick={() => interactive && setRating(n)}
+          onClick={() => { if (interactive) { playStarSound(); setRating(n) } }}
           className={`${interactive ? 'cursor-pointer active:scale-110 transition-transform' : 'cursor-default'}`}
         >
           <Star
@@ -115,6 +118,7 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
     setError('')
     try {
       await updateActivityRecord(groupId, evento.id!, { rating, note, photoUrl })
+      playSuccessSound()
       setIsEditing(false)
     } catch {
       setError('Error al guardar')
@@ -124,6 +128,7 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
   }
 
   const handleCancel = () => {
+    playCloseSound()
     setRating(evento.rating ?? 0)
     setNote(evento.note ?? '')
     setPhotoUrl(evento.photoUrl ?? '')
@@ -140,7 +145,7 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
           </p>
           {isOwner && (
             <button
-              onClick={() => setIsEditing(true)}
+              onClick={() => { playClickSound(); setIsEditing(true) }}
               className="flex items-center gap-1 px-2 py-1 border-2 border-black dark:border-white bg-yellow-300 dark:bg-yellow-500 text-black dark:text-gray-900 font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
             >
               <Pencil size={10} strokeWidth={2.5} />
@@ -200,7 +205,7 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
           })}
 
           <button
-            onClick={() => setShowComments(!showComments)}
+            onClick={() => { showComments ? playToggleOffSound() : playToggleOnSound(); setShowComments(!showComments) }}
             className={`flex items-center gap-1 px-2 py-1 border-2 border-black dark:border-white font-black text-[10px] uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
               showComments
                 ? 'bg-blue-400 dark:bg-blue-500 text-black'
@@ -270,7 +275,7 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
         )}
 
         <button
-          onClick={onClose}
+          onClick={() => { playCloseSound(); onClose() }}
           className="w-full flex items-center justify-center gap-1 py-2 border-2 border-black dark:border-white bg-gray-200 dark:bg-gray-700 text-black dark:text-white font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
         >
           <X size={12} strokeWidth={2.5} />
@@ -341,7 +346,7 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
               className="w-full h-24 object-cover border border-black dark:border-white"
             />
             <button
-              onClick={() => setPhotoUrl('')}
+              onClick={() => { playDeleteSound(); setPhotoUrl('') }}
               className="mt-1 flex items-center gap-1 text-red-600 font-black text-[10px] uppercase tracking-wider"
             >
               <Trash2 size={10} strokeWidth={2.5} />

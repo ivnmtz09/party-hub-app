@@ -10,7 +10,7 @@ import {
   Save,
 } from 'lucide-react'
 import { uploadRecordPhoto } from '../../../firebase/services'
-import { playCagadaSound, playCuleadaSound, playGymSound, playSuccessSound } from '../../../utils/audio'
+import { playCagadaSound, playCuleadaSound, playGymSound, playSuccessSound, playCloseSound, playStarSound, playToggleOffSound, playDeleteSound } from '../../../utils/audio'
 
 interface Props {
   groupId: string
@@ -88,7 +88,7 @@ export default function RecordInlineForm({ onClose, onSave }: Props) {
           </div>
         )}
         <button
-          onClick={onClose}
+          onClick={() => { playCloseSound(); onClose() }}
           className="p-1.5 border-2 border-black dark:border-white bg-gray-200 dark:bg-gray-600 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
         >
           <X size={14} strokeWidth={2.5} />
@@ -114,7 +114,7 @@ export default function RecordInlineForm({ onClose, onSave }: Props) {
       ) : (
         <div className="space-y-3">
           <button
-            onClick={() => { setSelectedTipo(null); setRating(0); setNote(''); setPhotoUrl(''); setError(''); }}
+            onClick={() => { playToggleOffSound(); setSelectedTipo(null); setRating(0); setNote(''); setPhotoUrl(''); setError(''); }}
             className="inline-flex items-center gap-1.5 py-1.5 px-3 border-2 border-black dark:border-white bg-yellow-300 dark:bg-yellow-400 text-black font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
           >
             Cambiar tipo
@@ -129,7 +129,7 @@ export default function RecordInlineForm({ onClose, onSave }: Props) {
                 <button
                   key={n}
                   type="button"
-                  onClick={() => setRating(n)}
+                  onClick={() => { playStarSound(); setRating(n) }}
                   className="cursor-pointer active:scale-110 transition-transform"
                 >
                   <Star
@@ -195,7 +195,7 @@ export default function RecordInlineForm({ onClose, onSave }: Props) {
                   className="w-full h-24 object-cover border-2 border-black dark:border-white"
                 />
                 <button
-                  onClick={() => setPhotoUrl('')}
+                  onClick={() => { playDeleteSound(); setPhotoUrl('') }}
                   className="mt-1 flex items-center gap-1 text-red-600 font-black text-[10px] uppercase tracking-wider"
                 >
                   <Trash2 size={10} strokeWidth={2.5} />
@@ -221,7 +221,7 @@ export default function RecordInlineForm({ onClose, onSave }: Props) {
               {saving ? 'Guardando...' : 'Registrar'}
             </button>
             <button
-              onClick={onClose}
+              onClick={() => { playCloseSound(); onClose() }}
               className="flex-1 flex items-center justify-center gap-1.5 py-2.5 border-4 border-black dark:border-white bg-gray-200 dark:bg-gray-600 text-black dark:text-white font-black uppercase tracking-wider text-xs shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
             >
               <X size={14} strokeWidth={2.5} />

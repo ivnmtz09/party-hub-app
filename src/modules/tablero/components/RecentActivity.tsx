@@ -5,6 +5,7 @@ import type { Evento, Miembro } from '../../../firebase/services'
 import { eliminarEvento } from '../../../firebase/services'
 import Skeleton from '../../../components/Skeleton'
 import ActivityDetailOrEdit from './ActivityDetailOrEdit'
+import { playOpenSound, playDeleteSound, playCloseSound } from '../../../utils/audio'
 
 function tiempoRelativo(ts: Timestamp | null): string {
   if (!ts) return ''
@@ -114,7 +115,7 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
 
                   <div className="flex gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
                     <button
-                      onClick={() => toggleExpanded(ev.id!)}
+                      onClick={() => { playOpenSound(); toggleExpanded(ev.id!) }}
                       className={`p-2 border-2 border-black dark:border-white transition-opacity shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none min-w-[44px] min-h-[44px] flex items-center justify-center ${
                         isExpanded
                           ? 'bg-blue-400 dark:bg-blue-500 text-black'
@@ -126,7 +127,7 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
 
                     {isOwn && !isConfirming && (
                       <button
-                        onClick={() => setConfirmingId(ev.id!)}
+                        onClick={() => { playDeleteSound(); setConfirmingId(ev.id!) }}
                         className="p-2 border-2 border-black bg-red-500 text-white hover:bg-red-600 transition-opacity shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none min-w-[44px] min-h-[44px] flex items-center justify-center"
                       >
                         {isLoading ? (
@@ -140,14 +141,14 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
                     {isOwn && isConfirming && (
                       <div className="flex gap-1.5" onClick={(e) => e.stopPropagation()}>
                         <button
-                          onClick={() => setConfirmingId(null)}
+                          onClick={() => { playCloseSound(); setConfirmingId(null) }}
                           className="flex items-center gap-1 px-2 py-2 border-2 border-black bg-gray-300 dark:bg-gray-600 text-black dark:text-white font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all min-w-[44px] min-h-[44px]"
                         >
                           <X size={12} strokeWidth={2.5} />
                           Cancelar
                         </button>
                         <button
-                          onClick={() => handleDelete(ev.id!)}
+                          onClick={() => { playDeleteSound(); handleDelete(ev.id!) }}
                           disabled={isLoading}
                           className="flex items-center gap-1 px-2 py-2 border-2 border-black bg-red-500 text-white font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 min-w-[44px] min-h-[44px]"
                         >

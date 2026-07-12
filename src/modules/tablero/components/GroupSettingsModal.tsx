@@ -16,6 +16,7 @@ import {
   type Grupo,
   type Miembro,
 } from '../../../firebase/services'
+import { playCloseSound, playSuccessSound, playDeleteSound } from '../../../utils/audio'
 
 interface Props {
   open: boolean
@@ -50,6 +51,7 @@ export default function GroupSettingsModal({
     setError('')
     try {
       await actualizarNombreGrupo(group.id, nombre.trim())
+      playSuccessSound()
     } catch {
       setError('Error al guardar el nombre')
     } finally {
@@ -106,14 +108,14 @@ export default function GroupSettingsModal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 select-none"
-      onClick={onClose}
+      onClick={() => { playCloseSound(); onClose() }}
     >
       <div
         className="relative w-full max-w-md border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-5 sm:p-6 shadow-brutal-lg dark:shadow-brutal-lg-dark max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <button
-          onClick={onClose}
+          onClick={() => { playCloseSound(); onClose() }}
           className="absolute top-3 right-3 p-1.5 border-2 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         >
           <X size={20} strokeWidth={2.5} />
@@ -176,7 +178,7 @@ export default function GroupSettingsModal({
                     </div>
                     {m.id !== group.adminId && (
                       <button
-                        onClick={() => handleExpel(m.id)}
+                        onClick={() => { playDeleteSound(); handleExpel(m.id) }}
                         disabled={expellingId === m.id}
                         className="p-1.5 border-2 border-black dark:border-white bg-red-300 dark:bg-red-500 text-black dark:text-gray-900 shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       >
@@ -193,7 +195,7 @@ export default function GroupSettingsModal({
             </div>
 
             <button
-              onClick={handleDeleteGroup}
+              onClick={() => { playDeleteSound(); handleDeleteGroup() }}
               disabled={deleting}
               className="w-full flex items-center justify-center gap-2 py-4 border-4 border-black dark:border-white bg-red-500 dark:bg-red-600 text-white font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -236,7 +238,7 @@ export default function GroupSettingsModal({
             </div>
 
             <button
-              onClick={handleLeaveGroup}
+              onClick={() => { playDeleteSound(); handleLeaveGroup() }}
               disabled={leaving}
               className="w-full flex items-center justify-center gap-2 py-4 border-4 border-black dark:border-white bg-red-300 dark:bg-red-500 text-black dark:text-gray-900 font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >

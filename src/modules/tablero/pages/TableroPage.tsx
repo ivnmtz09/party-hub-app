@@ -29,6 +29,7 @@ import GroupSettingsModal from '../components/GroupSettingsModal'
 import RecentActivity from '../components/RecentActivity'
 import RecordInlineForm from '../components/RecordInlineForm'
 import Skeleton from '../../../components/Skeleton'
+import { playOpenSound, playCloseSound, playClickSound, playCopySound } from '../../../utils/audio'
 
 export default function TableroPage() {
   const { user } = useAuth()
@@ -188,14 +189,14 @@ export default function TableroPage() {
         </p>
         <div className="space-y-4">
           <button
-            onClick={() => setShowCreateModal(true)}
+            onClick={() => { playOpenSound(); setShowCreateModal(true) }}
             className="w-full flex items-center justify-center gap-3 py-6 border-4 border-black dark:border-white bg-emerald-300 dark:bg-emerald-500 text-black dark:text-gray-900 font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all text-lg"
           >
             <Plus size={24} strokeWidth={2.5} />
             Crear Nuevo Grupo
           </button>
           <button
-            onClick={() => setShowJoinModal(true)}
+            onClick={() => { playOpenSound(); setShowJoinModal(true) }}
             className="w-full flex items-center justify-center gap-3 py-6 border-4 border-black dark:border-white bg-blue-300 dark:bg-blue-500 text-black dark:text-gray-900 font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all text-lg"
           >
             <LogIn size={24} strokeWidth={2.5} />
@@ -232,7 +233,7 @@ export default function TableroPage() {
       <>
       <div className="relative">
         <button
-          onClick={() => setShowDropdown(!showDropdown)}
+          onClick={() => { showDropdown ? playCloseSound() : playOpenSound(); setShowDropdown(!showDropdown) }}
           className="w-full flex items-center justify-between gap-2 py-3 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
         >
           <span className="truncate">
@@ -256,6 +257,7 @@ export default function TableroPage() {
                 <button
                   key={g.id}
                   onClick={() => {
+                    playClickSound()
                     setActiveGroupId(g.id)
                     setShowDropdown(false)
                   }}
@@ -276,7 +278,7 @@ export default function TableroPage() {
       <div className="flex gap-2">
         {activeGroup && (
           <button
-            onClick={handleCopyCode}
+            onClick={() => { playCopySound(); handleCopyCode() }}
             className="flex-1 flex items-center justify-center gap-2 py-2 border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-700 text-black dark:text-white font-bold text-xs uppercase tracking-wider shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
           >
             {copied ? (
@@ -294,20 +296,20 @@ export default function TableroPage() {
         )}
         {activeGroup && (
           <button
-            onClick={() => setShowSettingsModal(true)}
+            onClick={() => { playOpenSound(); setShowSettingsModal(true) }}
             className="p-2 border-2 border-black dark:border-white bg-gray-200 dark:bg-gray-600 text-black dark:text-white shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
           >
             <Settings size={18} strokeWidth={2.5} />
           </button>
         )}
         <button
-          onClick={() => setShowCreateModal(true)}
+          onClick={() => { playOpenSound(); setShowCreateModal(true) }}
           className="p-2 border-2 border-black dark:border-white bg-emerald-200 dark:bg-emerald-400 text-black dark:text-gray-900 shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
         >
           <Plus size={18} strokeWidth={2.5} />
         </button>
         <button
-          onClick={() => setShowJoinModal(true)}
+          onClick={() => { playOpenSound(); setShowJoinModal(true) }}
           className="p-2 border-2 border-black dark:border-white bg-blue-200 dark:bg-blue-400 text-black dark:text-gray-900 shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
         >
           <LogIn size={18} strokeWidth={2.5} />
@@ -321,7 +323,7 @@ export default function TableroPage() {
       )}
 
       <button
-        onClick={() => setShowInlineForm(!showInlineForm)}
+        onClick={() => { showInlineForm ? playCloseSound() : playOpenSound(); setShowInlineForm(!showInlineForm) }}
         disabled={isSubmitting}
         className={`w-full flex items-center justify-center gap-3 py-6 border-4 border-black dark:border-white bg-emerald-400 dark:bg-emerald-500 text-black font-black uppercase tracking-wider shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed text-lg ${showInlineForm ? 'border-b-0 rounded-b-none' : ''}`}
       >
@@ -340,7 +342,7 @@ export default function TableroPage() {
 
       <div className="relative w-full mb-4 z-10">
         <button
-          onClick={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
+          onClick={() => { isFilterMenuOpen ? playCloseSound() : playOpenSound(); setIsFilterMenuOpen(!isFilterMenuOpen) }}
           className="w-full flex items-center justify-between gap-2 py-3 px-4 border-4 border-black dark:border-white bg-yellow-300 dark:bg-yellow-500 text-black dark:text-gray-900 font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
         >
           <span>Filtro: {timeFilter.replace('_', ' ').toUpperCase()}</span>
@@ -357,6 +359,7 @@ export default function TableroPage() {
                 <button
                   key={f}
                   onClick={() => {
+                    playClickSound()
                     setTimeFilter(f)
                     setIsFilterMenuOpen(false)
                   }}

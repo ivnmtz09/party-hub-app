@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Star, Save, X, Camera, Edit, Trash2, Trash2Icon, Flame, Dumbbell } from 'lucide-react'
 import { registrarEvento, uploadRecordPhoto } from '../../../firebase/services'
+import { playStarSound, playDeleteSound, playSuccessSound, playCloseSound, playClickSound } from '../../../utils/audio'
 
 interface Props {
   groupId: string
@@ -23,7 +24,7 @@ export default function ActivityCreateForm({ groupId, userId, onClose }: Props) 
           key={n}
           type="button"
           disabled={!interactive}
-          onClick={() => interactive && setRating(n)}
+          onClick={() => { if (interactive) { playStarSound(); setRating(n) } }}
           className={`${interactive ? 'cursor-pointer active:scale-110 transition-transform' : 'cursor-default'}`}
         >
           <Star
@@ -57,6 +58,7 @@ export default function ActivityCreateForm({ groupId, userId, onClose }: Props) 
     setError('')
     try {
       await registrarEvento(groupId, userId, tipo, { rating, note, photoUrl })
+      playSuccessSound()
       onClose()
     } catch {
       setError('Error al registrar')
@@ -84,7 +86,7 @@ export default function ActivityCreateForm({ groupId, userId, onClose }: Props) 
             <button
               key={key}
               type="button"
-              onClick={() => setTipo(key)}
+              onClick={() => { playClickSound(); setTipo(key) }}
               className={`flex-1 flex flex-col items-center gap-1 py-2 px-1 border-2 border-black dark:border-white font-black text-[9px] uppercase tracking-wider transition-all ${
                 tipo === key
                   ? `${color} text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`
@@ -153,7 +155,7 @@ export default function ActivityCreateForm({ groupId, userId, onClose }: Props) 
               className="w-full h-24 object-cover border border-black dark:border-white"
             />
             <button
-              onClick={() => setPhotoUrl('')}
+              onClick={() => { playDeleteSound(); setPhotoUrl('') }}
               className="mt-1 flex items-center gap-1 text-red-600 font-black text-[10px] uppercase tracking-wider"
             >
               <Trash2 size={10} strokeWidth={2.5} />
@@ -179,7 +181,7 @@ export default function ActivityCreateForm({ groupId, userId, onClose }: Props) 
           {saving ? 'Guardando...' : 'Registrar'}
         </button>
         <button
-          onClick={onClose}
+          onClick={() => { playCloseSound(); onClose() }}
           className="flex-1 flex items-center justify-center gap-1 py-2 border-2 border-black dark:border-white bg-gray-200 dark:bg-gray-700 text-black dark:text-white font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
         >
           <X size={12} strokeWidth={2.5} />

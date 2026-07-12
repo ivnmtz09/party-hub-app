@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ChevronDown, ChevronUp, Dumbbell } from 'lucide-react'
 import type { Timestamp } from 'firebase/firestore'
 import type { Miembro, Evento } from '../../../firebase/services'
+import { playToggleOnSound, playToggleOffSound } from '../../../utils/audio'
 
 function tiempoDesde(ts: Timestamp | null): string {
   if (!ts) return '—'
@@ -31,7 +32,7 @@ export default function StatsSection({ miembros, eventos }: Props) {
   return (
     <div className="space-y-3">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => { isOpen ? playToggleOffSound() : playToggleOnSound(); setIsOpen(!isOpen) }}
         className="w-full flex items-center justify-between py-3 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
       >
         <span>ESTADISTICAS</span>

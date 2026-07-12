@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { LogIn, Square, CheckSquare, X, Swords, BarChart2, Users } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import BrandLogo from './BrandLogo'
+import { playToggleOnSound, playOpenSound, playClickSound, playCloseSound } from '../utils/audio'
 
 const TERMINOS = `1. PRIVACIDAD: Tu cuenta de Google solo se usa para autenticacion y gestion de perfil. No vendemos tus datos.
 2. RESPONSABILIDAD: Esta es una aplicacion de entretenimiento. El contenido generado (juegos, votaciones, registros) es responsabilidad absoluta de los usuarios.
@@ -76,7 +77,7 @@ export default function LoginPage() {
         <div className="flex flex-col gap-4 w-full max-w-xs">
           <label className="flex items-start gap-3 cursor-pointer">
             <button
-              onClick={() => setAccepted(!accepted)}
+              onClick={() => { playToggleOnSound(); setAccepted(!accepted) }}
               className="mt-0.5 shrink-0"
               type="button"
             >
@@ -89,7 +90,7 @@ export default function LoginPage() {
             <span className="text-xs font-bold uppercase tracking-wider text-black dark:text-white leading-relaxed">
               Acepto los{' '}
               <button
-                onClick={(e) => { e.preventDefault(); setShowTerminos(true) }}
+                onClick={(e) => { e.preventDefault(); playOpenSound(); setShowTerminos(true) }}
                 className="underline underline-offset-2 text-cyan-700 dark:text-cyan-400 hover:no-underline font-black"
                 type="button"
               >
@@ -100,7 +101,7 @@ export default function LoginPage() {
           </label>
 
           <button
-            onClick={handleLogin}
+            onClick={() => { playClickSound(); handleLogin() }}
             disabled={busy || !accepted}
             className="w-full flex items-center justify-center gap-2 py-4 border-4 border-black dark:border-white bg-cyan-400 dark:bg-cyan-500 text-black dark:text-gray-900 font-black uppercase tracking-wider text-sm shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50"
           >
@@ -124,7 +125,7 @@ export default function LoginPage() {
                 Terminos de Uso
               </p>
               <button
-                onClick={() => setShowTerminos(false)}
+                onClick={() => { playCloseSound(); setShowTerminos(false) }}
                 className="p-1 border-2 border-black bg-gray-200 dark:bg-gray-700 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
               >
                 <X size={16} strokeWidth={2.5} />
@@ -138,7 +139,7 @@ export default function LoginPage() {
               ))}
             </div>
             <button
-              onClick={() => setShowTerminos(false)}
+              onClick={() => { playCloseSound(); setShowTerminos(false) }}
               className="w-full py-3 border-4 border-black bg-cyan-400 dark:bg-cyan-500 text-black font-black uppercase tracking-wider text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
             >
               Cerrar
