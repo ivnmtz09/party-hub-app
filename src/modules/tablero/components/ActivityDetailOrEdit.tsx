@@ -11,13 +11,15 @@ interface Props {
   onClose: () => void
 }
 
-const REACTION_OPTIONS: { type: ReactionType; icon: typeof Heart }[] = [
-  { type: 'heart', icon: Heart },
-  { type: 'flame', icon: Flame },
-  { type: 'smile', icon: Smile },
-  { type: 'skull', icon: Skull },
-  { type: 'frown', icon: Frown },
-]
+const REACTION_CONFIG: Record<ReactionType, { icon: typeof Heart; activeBg: string }> = {
+  heart: { icon: Heart, activeBg: 'bg-red-500' },
+  flame: { icon: Flame, activeBg: 'bg-orange-500' },
+  smile: { icon: Smile, activeBg: 'bg-yellow-200' },
+  skull: { icon: Skull, activeBg: 'bg-gray-400' },
+  frown: { icon: Frown, activeBg: 'bg-blue-400' },
+}
+
+const REACTION_TYPES: ReactionType[] = ['heart', 'flame', 'smile', 'skull', 'frown']
 
 export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose }: Props) {
   const { user, userProfile } = useAuth()
@@ -177,7 +179,8 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
         )}
 
         <div className="flex items-center gap-1 flex-wrap pt-1 border-t-2 border-gray-200 dark:border-gray-700">
-          {REACTION_OPTIONS.map(({ type, icon: Icon }) => {
+          {REACTION_TYPES.map((type) => {
+            const { icon: Icon, activeBg } = REACTION_CONFIG[type]
             const count = Object.values(reactions).filter((r) => r === type).length
             const isActive = currentUserId && reactions[currentUserId] === type
             return (
@@ -186,11 +189,11 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
                 onClick={() => handleToggleReaction(type)}
                 className={`flex items-center gap-1 px-2 py-1 border-2 border-black dark:border-white font-black text-[10px] uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
                   isActive
-                    ? 'bg-yellow-400 text-black'
+                    ? `${activeBg} text-black`
                     : 'bg-white dark:bg-gray-800 text-black dark:text-white'
                 }`}
               >
-                <Icon size={12} strokeWidth={2.5} className={isActive ? 'text-red-500' : ''} />
+                <Icon size={12} strokeWidth={2.5} />
                 {count > 0 && <span>{count}</span>}
               </button>
             )
