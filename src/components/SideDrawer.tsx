@@ -60,6 +60,7 @@ export default function SideDrawer({ open, onClose }: Props) {
   const navigate = useNavigate();
   const overlayRef = useRef<HTMLDivElement>(null);
   const [showManual, setShowManual] = useState(false);
+  const [showConfirmLogout, setShowConfirmLogout] = useState(false);
 
   useLockBodyScroll(open);
 
@@ -199,7 +200,7 @@ export default function SideDrawer({ open, onClose }: Props) {
 
           <div className="p-4 border-t-4 border-black dark:border-white space-y-3 shrink-0">
             <button
-              onClick={logout}
+              onClick={() => setShowConfirmLogout(true)}
               className="w-full flex items-center justify-center gap-3 px-3 py-3 border-2 border-black dark:border-white bg-red-500 text-white font-black uppercase tracking-wider text-sm shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
             >
               <LogOut size={20} strokeWidth={2.5} />
@@ -227,6 +228,38 @@ export default function SideDrawer({ open, onClose }: Props) {
           </div>
         </div>
       </div>
+
+      {showConfirmLogout && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
+          <div className="w-full max-w-sm border-4 border-black bg-white dark:bg-gray-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 flex items-center justify-center border-2 border-black bg-red-500 text-white">
+                <LogOut size={20} strokeWidth={2.5} />
+              </div>
+              <p className="text-lg font-black uppercase tracking-tighter text-black dark:text-white">
+                Cerrar sesion
+              </p>
+            </div>
+            <p className="text-sm font-bold text-gray-600 dark:text-gray-400">
+              Estas seguro de que quieres cerrar sesion? Tendras que volver a iniciar con Google.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowConfirmLogout(false)}
+                className="flex-1 py-3 border-4 border-black bg-gray-200 dark:bg-gray-700 text-black dark:text-white font-black uppercase tracking-wider text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => { setShowConfirmLogout(false); logout(); }}
+                className="flex-1 py-3 border-4 border-black bg-red-500 text-white font-black uppercase tracking-wider text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
+              >
+                Cerrar sesion
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

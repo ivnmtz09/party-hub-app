@@ -42,7 +42,7 @@ export default function SplashScreen() {
           ))}
         </div>
 
-        <p className="mt-8 text-xl font-black uppercase tracking-widest text-black dark:text-white animate-pulse">
+        <p className="mt-8 text-xl font-black uppercase tracking-widest text-center text-black dark:text-white animate-pulse">
           {randomMessage}
         </p>
       </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { LogIn, Square, CheckSquare, X, Swords, BarChart2, Users } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import BrandLogo from './BrandLogo'
 
 const TERMINOS = `1. PRIVACIDAD: Tu cuenta de Google solo se usa para autenticacion y gestion de perfil. No vendemos tus datos.
 2. RESPONSABILIDAD: Esta es una aplicacion de entretenimiento. El contenido generado (juegos, votaciones, registros) es responsabilidad absoluta de los usuarios.
@@ -48,11 +49,7 @@ export default function LoginPage() {
       <div className="w-full max-w-lg flex flex-col items-center gap-8">
 
         <div className="flex flex-col items-center gap-4">
-          <div className="inline-block bg-yellow-400 border-4 border-black p-2 transform -rotate-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <h1 className="text-6xl font-black uppercase tracking-tighter leading-none text-black">
-              PARTY HUB
-            </h1>
-          </div>
+          <BrandLogo size="lg" />
           <p className="text-xs font-black uppercase tracking-widest text-center text-black/70 dark:text-gray-400 max-w-xs">
             El centro de control para tu grupo de amigos
           </p>
