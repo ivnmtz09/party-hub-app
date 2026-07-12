@@ -29,11 +29,24 @@ App de fiestas con diseno **Neobrutalism** — juegos de deduccion social y tabl
 - Modal de ajustes: editar nombre, expulsar miembros, eliminar/abandonar grupo
 - Grafico de barras comparativo (Deposiciones vs Actos Sexuales por miembro)
 
+### Tablero Social — Features Avanzadas
+- **Reacciones por usuario**: toggle unico con iconos semanticos (corazon, fuego, sonrisa, calavera, triste). Colores activos individualizados
+- **Comentarios por registro**: agregar texto con avatar, timestamp relativo, lista expandible con toggle
+- **Avatares con figuras/letras**: cada miembro tiene avatar con color de fondo, icono de forma o inicial del nombre
+- **Paginacion con limite dinamico**: carga inicial de 5 registros, boton "Ver mas..." con limite de 20 registros. Query de Firestore con `limit()` en tiempo real
+- **Tarjetas apiladas**: efecto visual de pila con sombra decreciente e interactividad hover (`translate-y-2`)
+- **Detalles de registro**: expandir inline para ver rating (1-5 estrellas), notas y foto con Lightbox fullscreen
+
 ### El Impostor
 - Asignacion aleatoria de roles (Impostor / Investigador) y palabras
 - 120 palabras en 6 categorias
 - Fases: Asignacion -> Debate -> Votacion -> Resultados
 - Diseno FlipCard para revelacion de roles
+
+### Sistema de Sonidos Interactivos
+- **13 sonidos custom**: click, toggle on/off, reaccion, comentario, copiar, eliminar, abrir/cerrar modal, estrella, shuffle, spin, voto, switch
+- Hook `useAudio()` para pre-carga de sonidos en memoria
+- Cada sonido se ejecuta inmediatamente al interactuar (botones, modales, reacciones, forms)
 
 ## Scripts
 
@@ -60,11 +73,11 @@ VITE_FIREBASE_APP_ID=
 
 ```
 src/
-├── components/          # Componentes globales (Login, Splash, SideDrawer)
+├── components/          # Componentes globales (Login, Splash, SideDrawer, UserAvatar, Skeleton)
 ├── context/             # AuthContext, ThemeContext
 ├── firebase/
 │   ├── config.ts        # Init Firebase
-│   └── services.ts      # Firestore: grupos, miembros, eventos, graficos
+│   └── services.ts      # Firestore: grupos, miembros, eventos, graficos, reacciones, comentarios
 ├── layouts/
 │   └── MainLayout.tsx   # Header sticky + bottom nav brutalista
 ├── modules/
@@ -77,17 +90,31 @@ src/
 │   │   └── types/       # Word, PlayerRole, GameState
 │   └── tablero/
 │       ├── components/
-│       │   ├── MemberList.tsx       # Lista con avatar, rol (ADMIN/INVITADO) y stats
-│       │   ├── StatsSection.tsx     # Timeline de ultimos eventos
-│       │   ├── StatsChart.tsx       # Grafico de barras (recharts)
-│       │   ├── CreateGroupModal.tsx # Modal creacion de grupo
-│       │   ├── JoinGroupModal.tsx   # Modal union por codigo
-│       │   └── GroupSettingsModal.tsx # Ajustes: nombre, expulsar, eliminar/abandonar
+│       │   ├── ActivityDetailOrEdit.tsx  # Detalle con reacciones, comentarios y Lightbox
+│       │   ├── MemberList.tsx            # Lista con avatar, rol (ADMIN/INVITADO) y stats
+│       │   ├── RecordInlineForm.tsx      # Formulario inline de creacion de registros
+│       │   ├── RecentActivity.tsx        # Timeline paginada con avatares y tarjetas apiladas
+│       │   ├── StatsChart.tsx            # Grafico de barras (recharts)
+│       │   ├── StatsSection.tsx          # Timeline de ultimos eventos
+│       │   ├── CreateGroupModal.tsx      # Modal creacion de grupo
+│       │   ├── JoinGroupModal.tsx        # Modal union por codigo
+│       │   └── GroupSettingsModal.tsx    # Ajustes: nombre, expulsar, eliminar/abandonar
 │       └── pages/
-│           └── TableroPage.tsx      # Pagina principal del tablero multigrupo
+│           └── TableroPage.tsx           # Pagina principal del tablero multigrupo
 ├── routes/
 │   └── index.tsx        # Router con nested layouts y proteccion de rutas
+├── utils/
+│   └── audio.ts         # Sistema de sonidos (playClickSound, playReactionSound, etc.)
 ├── App.tsx
 ├── index.css            # Tailwind directives + animaciones custom
 └── main.tsx             # Entry point
 ```
+
+## Iconos de reacciones
+
+Cada reaccion tiene un color activo semantico unico:
+- **Corazon** (me encanta) -> rojo `red-500`
+- **Fuego** (caliente) -> naranja `orange-500`
+- **Sonrisa** (bien) -> amarillo `yellow-200`
+- **Calavera** (malo) -> gris `gray-400`
+- **Triste** (triste) -> azul `blue-400`
