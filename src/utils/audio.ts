@@ -142,3 +142,11 @@ export function playGymSound(): void {
     osc.stop(ctx.currentTime + 0.35)
   } catch { /* audio no disponible */ }
 }
+
+export function playSuccessSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    playNotes([523, 659, 784, 1047], ctx.currentTime, 0.12, 'square', 0.12, ctx)
+  } catch { /* audio no disponible */ }
+}

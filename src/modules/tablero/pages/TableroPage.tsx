@@ -1,8 +1,5 @@
-import { useEffect, useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
-  Trash2,
-  Flame,
-  Dumbbell,
   Plus,
   LogIn,
   Copy,
@@ -10,6 +7,7 @@ import {
   ChevronDown,
   Settings,
   Filter,
+  X,
 } from 'lucide-react'
 import { useAuth } from '../../../context/AuthContext'
 import { useNotification } from '../../../context/NotificationContext'
@@ -29,9 +27,8 @@ import CreateGroupModal from '../components/CreateGroupModal'
 import JoinGroupModal from '../components/JoinGroupModal'
 import GroupSettingsModal from '../components/GroupSettingsModal'
 import RecentActivity from '../components/RecentActivity'
-import RecordModal from '../components/RecordModal'
+import RecordInlineForm from '../components/RecordInlineForm'
 import Skeleton from '../../../components/Skeleton'
-import { playCagadaSound, playCuleadaSound, playGymSound } from '../../../utils/audio'
 
 export default function TableroPage() {
   const { user } = useAuth()
@@ -51,9 +48,7 @@ export default function TableroPage() {
   const [errorMsg, setErrorMsg] = useState('')
   const [timeFilter, setTimeFilter] = useState<'este_mes' | 'mes_pasado' | 'esta_semana' | 'hoy'>('este_mes')
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false)
-  const [recordModalOpen, setRecordModalOpen] = useState(false)
-  const [recordModalTipo, setRecordModalTipo] = useState<'deposicion' | 'acto_sexual' | 'gym'>('deposicion')
-  const [recordModalAnchor, setRecordModalAnchor] = useState<{ x: number; y: number } | undefined>(undefined)
+  const [showInlineForm, setShowInlineForm] = useState(false)
 
   const filteredEventos = useMemo(() => {
     const ahora = new Date()
@@ -147,23 +142,12 @@ export default function TableroPage() {
     setNotificationGroupId(activeGroupId)
   }, [activeGroupId, setNotificationGroupId])
 
-  const handleRegistrar = useCallback((tipo: 'deposicion' | 'acto_sexual' | 'gym', e: React.MouseEvent) => {
-    if (!user || !activeGroupId) return
-    if (tipo === 'deposicion') playCagadaSound()
-    else if (tipo === 'acto_sexual') playCuleadaSound()
-    else playGymSound()
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-    setRecordModalTipo(tipo)
-    setRecordModalAnchor({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 })
-    setRecordModalOpen(true)
-  }, [user, activeGroupId])
-
-  const handleRecordSave = async (data: { rating: number; note: string; photoUrl: string }) => {
+  const handleRecordSave = async (tipo: 'deposicion' | 'acto_sexual' | 'gym', data: { rating: number; note: string; photoUrl: string }) => {
     if (!user || !activeGroupId) return
     setIsSubmitting(true)
     setErrorMsg('')
     try {
-      await registrarEvento(activeGroupId, user.uid, recordModalTipo, data)
+      await registrarEvento(activeGroupId, user.uid, tipo, data)
     } catch {
       setErrorMsg('Error al registrar el evento')
       setTimeout(() => setErrorMsg(''), 3000)
@@ -336,34 +320,23 @@ export default function TableroPage() {
         </p>
       )}
 
-      <div className="flex flex-col gap-4 sm:flex-row">
-        <button
-          onClick={(e) => handleRegistrar('deposicion', e)}
-          disabled={isSubmitting}
-          className="flex-1 flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-orange-400 dark:bg-orange-500 text-black font-black uppercase tracking-tighter shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <Trash2 size={28} strokeWidth={2.5} />
-          <span className="text-xl">REGISTRAR CAGADA</span>
-        </button>
+      <button
+        onClick={() => setShowInlineForm(!showInlineForm)}
+        disabled={isSubmitting}
+        className={`w-full flex items-center justify-center gap-3 py-6 border-4 border-black dark:border-white bg-emerald-400 dark:bg-emerald-500 text-black font-black uppercase tracking-wider shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed text-lg ${showInlineForm ? 'border-b-0 rounded-b-none' : ''}`}
+      >
+        {showInlineForm ? <X size={24} strokeWidth={2.5} /> : <Plus size={24} strokeWidth={2.5} />}
+        {showInlineForm ? 'CERRAR' : 'CREAR NUEVO REGISTRO'}
+      </button>
 
-        <button
-          onClick={(e) => handleRegistrar('acto_sexual', e)}
-          disabled={isSubmitting}
-          className="flex-1 flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-pink-400 dark:bg-pink-500 text-black font-black uppercase tracking-tighter shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <Flame size={28} strokeWidth={2.5} />
-          <span className="text-xl">REGISTRAR CULEADA</span>
-        </button>
-
-        <button
-          onClick={(e) => handleRegistrar('gym', e)}
-          disabled={isSubmitting}
-          className="flex-1 flex flex-col items-center gap-2 py-6 border-4 border-black dark:border-white bg-cyan-400 dark:bg-cyan-500 text-black font-black uppercase tracking-tighter shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <Dumbbell size={28} strokeWidth={2.5} />
-          <span className="text-xl">REGISTRAR GYM</span>
-        </button>
-      </div>
+      {showInlineForm && (
+        <RecordInlineForm
+          groupId={activeGroupId ?? ''}
+          userId={user?.uid ?? ''}
+          onClose={() => setShowInlineForm(false)}
+          onSave={handleRecordSave}
+        />
+      )}
 
       <div className="relative w-full mb-4 z-10">
         <button
@@ -434,15 +407,6 @@ export default function TableroPage() {
         />
       )}
 
-      <RecordModal
-        mode="create"
-        open={recordModalOpen}
-        onClose={() => setRecordModalOpen(false)}
-        tipo={recordModalTipo}
-        groupId={activeGroupId ?? ''}
-        anchorRect={recordModalAnchor}
-        onSave={handleRecordSave}
-      />
       </>
       )}
     </div>

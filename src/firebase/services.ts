@@ -293,9 +293,9 @@ export async function updateActivityRecord(
 
 export function uploadRecordPhoto(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
-    const MAX_SIZE = 1 * 1024 * 1024
+    const MAX_SIZE = 5 * 1024 * 1024
     if (file.size > MAX_SIZE) {
-      reject(new Error('La imagen no debe superar 1MB'))
+      reject(new Error('La imagen no debe superar 5MB'))
       return
     }
     const reader = new FileReader()

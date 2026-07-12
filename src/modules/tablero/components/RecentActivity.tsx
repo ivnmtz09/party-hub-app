@@ -1,11 +1,10 @@
 import { useState } from 'react'
-import { Trash2, Flame, Dumbbell, Check, X, Eye, Plus } from 'lucide-react'
+import { Trash2, Flame, Dumbbell, Check, X, Eye } from 'lucide-react'
 import type { Timestamp } from 'firebase/firestore'
 import type { Evento, Miembro } from '../../../firebase/services'
 import { eliminarEvento } from '../../../firebase/services'
 import Skeleton from '../../../components/Skeleton'
 import ActivityDetailOrEdit from './ActivityDetailOrEdit'
-import ActivityCreateForm from './ActivityCreateForm'
 
 function tiempoRelativo(ts: Timestamp | null): string {
   if (!ts) return ''
@@ -32,7 +31,6 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
   const [confirmingId, setConfirmingId] = useState<string | null>(null)
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [isCreating, setIsCreating] = useState(false)
 
   const recientes = eventos.slice(0, 5)
 
@@ -61,30 +59,15 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
 
   return (
     <section>
-      <div className="flex items-center justify-between mb-3">
+      <div className="mb-3">
         <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
           Actividad Reciente
         </h3>
-        <button
-          onClick={() => setIsCreating(!isCreating)}
-          className="flex items-center gap-1 px-3 py-1.5 border-2 border-black dark:border-white bg-emerald-300 dark:bg-emerald-500 text-black dark:text-gray-900 font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
-        >
-          <Plus size={12} strokeWidth={2.5} />
-          Nuevo Registro
-        </button>
       </div>
-
-      {isCreating && (
-        <ActivityCreateForm
-          groupId={groupId}
-          userId={userId}
-          onClose={() => setIsCreating(false)}
-        />
-      )}
 
       {loading ? (
         <Skeleton variant="listItem" count={5} />
-      ) : recientes.length === 0 && !isCreating ? (
+      ) : recientes.length === 0 ? (
         <div className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
           <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center">
             No hay registros aun
