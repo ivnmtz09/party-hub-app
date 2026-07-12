@@ -10,6 +10,7 @@ import {
   query,
   where,
   orderBy,
+  limit,
   onSnapshot,
   serverTimestamp,
   increment,
@@ -211,6 +212,20 @@ export function observarEventos(
 ): () => void {
   const ref = collection(db, 'grupos', groupId, 'eventos')
   const q = query(ref, orderBy('timestamp', 'desc'))
+  return onSnapshot(q, (snap) => {
+    const lista: Evento[] = []
+    snap.forEach((d) => lista.push({ id: d.id, ...d.data() } as Evento))
+    callback(lista)
+  })
+}
+
+export function observarEventosConLimite(
+  groupId: string,
+  maxResults: number,
+  callback: EventoCallback,
+): () => void {
+  const ref = collection(db, 'grupos', groupId, 'eventos')
+  const q = query(ref, orderBy('timestamp', 'desc'), limit(maxResults))
   return onSnapshot(q, (snap) => {
     const lista: Evento[] = []
     snap.forEach((d) => lista.push({ id: d.id, ...d.data() } as Evento))

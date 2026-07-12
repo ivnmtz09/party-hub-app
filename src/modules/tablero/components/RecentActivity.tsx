@@ -1,11 +1,12 @@
-import { useState } from 'react'
-import { Trash2, Flame, Dumbbell, Check, X, Eye } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Trash2, Flame, Dumbbell, Check, X, Eye, ChevronDown } from 'lucide-react'
 import type { Timestamp } from 'firebase/firestore'
 import type { Evento, Miembro } from '../../../firebase/services'
-import { eliminarEvento } from '../../../firebase/services'
+import { eliminarEvento, observarEventosConLimite } from '../../../firebase/services'
+import { ICON_OPTIONS } from '../../../components/UserAvatar'
 import Skeleton from '../../../components/Skeleton'
 import ActivityDetailOrEdit from './ActivityDetailOrEdit'
-import { playOpenSound, playDeleteSound, playCloseSound } from '../../../utils/audio'
+import { playOpenSound, playDeleteSound, playCloseSound, playClickSound } from '../../../utils/audio'
 
 function tiempoRelativo(ts: Timestamp | null): string {
   if (!ts) return ''
@@ -21,26 +22,36 @@ function tiempoRelativo(ts: Timestamp | null): string {
 }
 
 interface Props {
-  eventos: Evento[]
   miembros: Miembro[]
   userId: string
   groupId: string
-  loading?: boolean
 }
 
-export default function RecentActivity({ eventos, miembros, userId, groupId, loading = false }: Props) {
+export default function RecentActivity({ miembros, userId, groupId }: Props) {
+  const [visibleLimit, setVisibleLimit] = useState(5)
+  const [eventos, setEventos] = useState<Evento[]>([])
   const [confirmingId, setConfirmingId] = useState<string | null>(null)
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  const recientes = eventos.slice(0, 5)
+  useEffect(() => {
+    setLoading(true)
+    const unsub = observarEventosConLimite(groupId, visibleLimit, (lista) => {
+      setEventos(lista)
+      setLoading(false)
+    })
+    return unsub
+  }, [groupId, visibleLimit])
 
-  const getMemberName = (uid: string): string =>
-    (() => {
-      const m = miembros.find((x) => x.id === uid)
-      if (!m) return uid
-      return (m.nickname || m.displayName.split(' ')[0]) ?? uid
-    })()
+  const getMember = (uid: string): Miembro | undefined =>
+    miembros.find((x) => x.id === uid)
+
+  const getMemberName = (uid: string): string => {
+    const m = getMember(uid)
+    if (!m) return uid
+    return (m.nickname || m.displayName.split(' ')[0]) ?? uid
+  }
 
   const handleDelete = async (eventId: string) => {
     setLoadingId(eventId)
@@ -58,6 +69,35 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
     setExpandedId((prev) => (prev === id ? null : id))
   }
 
+  const shouldShowMore = eventos.length === visibleLimit && visibleLimit < 20
+
+  const renderAvatar = (miembro: Miembro | undefined) => {
+    if (!miembro) {
+      return (
+        <div className="w-10 h-10 flex-shrink-0 border-2 border-black dark:border-white flex items-center justify-center bg-gray-200 dark:bg-gray-700">
+          <span className="font-black text-xs text-black dark:text-white">?</span>
+        </div>
+      )
+    }
+    const IconComp = miembro.avatarType === 'shape'
+      ? ICON_OPTIONS.find((o) => o.id === miembro.avatarIcon)?.icon
+      : null
+    return (
+      <div
+        className="w-10 h-10 flex-shrink-0 border-2 border-black dark:border-white flex items-center justify-center"
+        style={{ backgroundColor: miembro.avatar || '#fbbf24' }}
+      >
+        {miembro.avatarType === 'shape' && IconComp ? (
+          <IconComp size={18} strokeWidth={2.5} className="text-black" />
+        ) : (
+          <span className="font-black text-sm text-black">
+            {(miembro.nickname || miembro.displayName || '?').charAt(0).toUpperCase()}
+          </span>
+        )}
+      </div>
+    )
+  }
+
   return (
     <section>
       <div className="mb-3">
@@ -68,20 +108,21 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
 
       {loading ? (
         <Skeleton variant="listItem" count={5} />
-      ) : recientes.length === 0 ? (
+      ) : eventos.length === 0 ? (
         <div className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
           <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center">
             No hay registros aun
           </p>
         </div>
       ) : (
-        <div className="space-y-2">
-          {recientes.map((ev) => {
+        <div>
+          {eventos.map((ev, index) => {
             const isOwn = ev.userId === userId
             const isConfirming = confirmingId === ev.id
             const isLoading = loadingId === ev.id
             const isExpanded = expandedId === ev.id
             const hasDetails = ev.rating || ev.note || ev.photoUrl
+            const member = getMember(ev.userId)
             const icono =
               ev.tipo === 'deposicion' ? (
                 <Trash2 size={16} strokeWidth={2.5} className="text-orange-500" />
@@ -92,10 +133,16 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
               )
 
             return (
-              <div key={ev.id}>
+              <div
+                key={ev.id}
+                className="relative -mt-3 first:mt-0 transition-transform hover:-translate-y-2 hover:z-20"
+                style={{ zIndex: 20 - index }}
+              >
                 <div
                   className={`flex items-center gap-3 border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${isExpanded ? 'border-b-0 rounded-b-none' : ''}`}
                 >
+                  {renderAvatar(member)}
+
                   <div className="w-8 h-8 border-2 border-black dark:border-white flex items-center justify-center shrink-0 bg-gray-100 dark:bg-gray-700">
                     {icono}
                   </div>
@@ -171,6 +218,16 @@ export default function RecentActivity({ eventos, miembros, userId, groupId, loa
               </div>
             )
           })}
+
+          {shouldShowMore && (
+            <button
+              onClick={() => { playClickSound(); setVisibleLimit((prev) => Math.min(prev + 5, 20)) }}
+              className="w-full flex items-center justify-center gap-2 mt-6 py-3 border-4 border-black dark:border-white bg-cyan-300 dark:bg-cyan-500 text-black dark:text-gray-900 font-black uppercase tracking-wider shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
+            >
+              <ChevronDown size={16} strokeWidth={2.5} />
+              Ver mas...
+            </button>
+          )}
         </div>
       )}
     </section>

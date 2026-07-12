@@ -385,11 +385,9 @@ export default function TableroPage() {
       <MemberList miembros={miembros} adminId={activeGroup?.adminId} />
 
       <RecentActivity
-        eventos={eventos}
         miembros={miembros}
         userId={user?.uid ?? ''}
         groupId={activeGroupId ?? ''}
-        loading={contentLoading}
       />
 
       <CreateGroupModal
