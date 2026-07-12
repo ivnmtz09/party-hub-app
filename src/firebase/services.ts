@@ -53,6 +53,20 @@ export interface Evento {
   rating?: number
   note?: string
   photoUrl?: string
+  reactions?: Record<string, ReactionType>
+}
+
+export type ReactionType = 'heart' | 'flame' | 'smile' | 'skull' | 'frown'
+
+export interface CommentData {
+  id: string
+  userId: string
+  nickname: string
+  text: string
+  createdAt: Timestamp | null
+  avatarColor: string
+  avatarType: 'letter' | 'shape'
+  avatarIcon: string
 }
 
 type EventoCallback = (eventos: Evento[]) => void
@@ -302,6 +316,59 @@ export function uploadRecordPhoto(file: File): Promise<string> {
     reader.onload = () => resolve(reader.result as string)
     reader.onerror = () => reject(new Error('Error al leer el archivo'))
     reader.readAsDataURL(file)
+  })
+}
+
+/* ───── Reacciones ───── */
+
+export async function toggleReaction(
+  groupId: string,
+  recordId: string,
+  userId: string,
+  reactionType: ReactionType,
+): Promise<void> {
+  const eventoRef = doc(db, 'grupos', groupId, 'eventos', recordId)
+  const snap = await getDoc(eventoRef)
+  if (!snap.exists()) throw new Error('Registro no encontrado')
+
+  const data = snap.data()
+  const reactions = (data.reactions ?? {}) as Record<string, string>
+
+  if (reactions[userId] === reactionType) {
+    const updated = { ...reactions }
+    delete updated[userId]
+    await updateDoc(eventoRef, { reactions: updated })
+  } else {
+    await updateDoc(eventoRef, { reactions: { ...reactions, [userId]: reactionType } })
+  }
+}
+
+/* ───── Comentarios ───── */
+
+export async function addComment(
+  groupId: string,
+  recordId: string,
+  commentData: Omit<CommentData, 'id' | 'createdAt'>,
+): Promise<string> {
+  const commentsRef = collection(db, 'grupos', groupId, 'eventos', recordId, 'comments')
+  const docRef = await addDoc(commentsRef, {
+    ...commentData,
+    createdAt: serverTimestamp(),
+  })
+  return docRef.id
+}
+
+export function subscribeToComments(
+  groupId: string,
+  recordId: string,
+  callback: (comments: CommentData[]) => void,
+): () => void {
+  const commentsRef = collection(db, 'grupos', groupId, 'eventos', recordId, 'comments')
+  const q = query(commentsRef, orderBy('createdAt', 'asc'))
+  return onSnapshot(q, (snap) => {
+    const lista: CommentData[] = []
+    snap.forEach((d) => lista.push({ id: d.id, ...d.data() } as CommentData))
+    callback(lista)
   })
 }
 

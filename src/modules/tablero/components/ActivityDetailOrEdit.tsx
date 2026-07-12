@@ -1,7 +1,8 @@
-import { useState } from 'react'
-import { Star, Pencil, Save, X, Camera, Edit, Trash2 } from 'lucide-react'
-import type { Evento } from '../../../firebase/services'
-import { updateActivityRecord, uploadRecordPhoto } from '../../../firebase/services'
+import { useState, useEffect } from 'react'
+import { Star, Pencil, Save, X, Camera, Edit, Trash2, Heart, Flame, Smile, Skull, Frown, MessageSquare, Send } from 'lucide-react'
+import type { Evento, ReactionType, CommentData } from '../../../firebase/services'
+import { updateActivityRecord, uploadRecordPhoto, toggleReaction, addComment, subscribeToComments } from '../../../firebase/services'
+import { useAuth } from '../../../context/AuthContext'
 
 interface Props {
   evento: Evento
@@ -10,13 +11,62 @@ interface Props {
   onClose: () => void
 }
 
+const REACTION_OPTIONS: { type: ReactionType; icon: typeof Heart }[] = [
+  { type: 'heart', icon: Heart },
+  { type: 'flame', icon: Flame },
+  { type: 'smile', icon: Smile },
+  { type: 'skull', icon: Skull },
+  { type: 'frown', icon: Frown },
+]
+
 export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose }: Props) {
+  const { user, userProfile } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const [rating, setRating] = useState(evento.rating ?? 0)
   const [note, setNote] = useState(evento.note ?? '')
   const [photoUrl, setPhotoUrl] = useState(evento.photoUrl ?? '')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  const [showComments, setShowComments] = useState(false)
+  const [comments, setComments] = useState<CommentData[]>([])
+  const [commentText, setCommentText] = useState('')
+
+  const reactions = evento.reactions ?? {}
+  const currentUserId = user?.uid
+
+  useEffect(() => {
+    if (!showComments || !evento.id) return
+    const unsub = subscribeToComments(groupId, evento.id, setComments)
+    return unsub
+  }, [showComments, groupId, evento.id])
+
+  const handleToggleReaction = async (reactionType: ReactionType) => {
+    if (!currentUserId || !evento.id) return
+    try {
+      await toggleReaction(groupId, evento.id, currentUserId, reactionType)
+    } catch {
+      /* error silencioso */
+    }
+  }
+
+  const handleSendComment = async () => {
+    if (!currentUserId || !evento.id || !commentText.trim()) return
+    const text = commentText.trim()
+    setCommentText('')
+    try {
+      await addComment(groupId, evento.id, {
+        userId: currentUserId,
+        nickname: userProfile?.nickname || user?.displayName || 'Anonimo',
+        text,
+        avatarColor: userProfile?.avatar || '#fbbf24',
+        avatarType: userProfile?.avatarType || 'letter',
+        avatarIcon: userProfile?.avatarIcon || 'Gamepad2',
+      })
+    } catch {
+      setCommentText(text)
+    }
+  }
 
   const renderStars = (value: number, interactive = false) => (
     <div className="flex gap-1">
@@ -124,6 +174,96 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
           <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 text-center py-1 uppercase tracking-wider">
             Sin detalles adicionales
           </p>
+        )}
+
+        <div className="flex items-center gap-1 flex-wrap pt-1 border-t-2 border-gray-200 dark:border-gray-700">
+          {REACTION_OPTIONS.map(({ type, icon: Icon }) => {
+            const count = Object.values(reactions).filter((r) => r === type).length
+            const isActive = currentUserId && reactions[currentUserId] === type
+            return (
+              <button
+                key={type}
+                onClick={() => handleToggleReaction(type)}
+                className={`flex items-center gap-1 px-2 py-1 border-2 border-black dark:border-white font-black text-[10px] uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
+                  isActive
+                    ? 'bg-yellow-400 text-black'
+                    : 'bg-white dark:bg-gray-800 text-black dark:text-white'
+                }`}
+              >
+                <Icon size={12} strokeWidth={2.5} className={isActive ? 'text-red-500' : ''} />
+                {count > 0 && <span>{count}</span>}
+              </button>
+            )
+          })}
+
+          <button
+            onClick={() => setShowComments(!showComments)}
+            className={`flex items-center gap-1 px-2 py-1 border-2 border-black dark:border-white font-black text-[10px] uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
+              showComments
+                ? 'bg-blue-400 dark:bg-blue-500 text-black'
+                : 'bg-white dark:bg-gray-800 text-black dark:text-white'
+            }`}
+          >
+            <MessageSquare size={12} strokeWidth={2.5} />
+            {comments.length > 0 && <span>{comments.length}</span>}
+          </button>
+        </div>
+
+        {showComments && (
+          <div className="border-2 border-black dark:border-white bg-white dark:bg-gray-800 p-3 space-y-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            {comments.length === 0 ? (
+              <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 text-center uppercase tracking-wider py-2">
+                Sin comentarios
+              </p>
+            ) : (
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {comments.map((c) => {
+                  const initials = c.nickname.slice(0, 2).toUpperCase()
+                  return (
+                    <div key={c.id} className="flex items-start gap-2 border-2 border-black dark:border-white p-2 bg-gray-50 dark:bg-gray-900">
+                      <div
+                        className="w-7 h-7 shrink-0 border-2 border-black dark:border-white flex items-center justify-center text-[10px] font-black text-black"
+                        style={{ backgroundColor: c.avatarColor }}
+                      >
+                        {initials}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                          {c.nickname}
+                        </p>
+                        <p className="text-xs font-bold text-black dark:text-white break-words">
+                          {c.text}
+                        </p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault()
+                    handleSendComment()
+                  }
+                }}
+                placeholder="Escribe un comentario..."
+                className="flex-1 py-2 px-3 border-2 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-bold text-xs placeholder:text-gray-400 focus:outline-none focus:ring-0"
+              />
+              <button
+                onClick={handleSendComment}
+                disabled={!commentText.trim()}
+                className="px-3 py-2 border-2 border-black dark:border-white bg-emerald-300 dark:bg-emerald-500 text-black dark:text-gray-900 font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Send size={12} strokeWidth={2.5} />
+              </button>
+            </div>
+          </div>
         )}
 
         <button
