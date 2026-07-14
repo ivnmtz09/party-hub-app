@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Trash2, Flame, Dumbbell, Check, X, Eye, ChevronDown } from 'lucide-react'
+import { doc, updateDoc } from 'firebase/firestore'
+import { ref, deleteObject } from 'firebase/storage'
 import type { Timestamp } from 'firebase/firestore'
 import type { Evento, Miembro } from '../../../firebase/services'
 import { eliminarEvento, observarEventosConLimite } from '../../../firebase/services'
+import { db, storage } from '../../../firebase/config'
 import { ICON_OPTIONS } from '../../../components/UserAvatar'
 import Skeleton from '../../../components/Skeleton'
 import ActivityDetailOrEdit from './ActivityDetailOrEdit'
@@ -43,6 +46,22 @@ export default function RecentActivity({ miembros, userId, groupId }: Props) {
     })
     return unsub
   }, [groupId, visibleLimit])
+
+  useEffect(() => {
+    const expirationTime = 72 * 60 * 60 * 1000
+    for (const item of eventos) {
+      if (!item.photoUrl) continue
+      const recordTime = item.timestamp?.toDate
+        ? item.timestamp.toDate().getTime()
+        : new Date(item.timestamp as unknown as string).getTime()
+      if (Date.now() - recordTime > expirationTime) {
+        deleteObject(ref(storage, item.photoUrl)).catch(() => {})
+        updateDoc(doc(db, 'grupos', groupId, 'eventos', item.id!), {
+          photoUrl: null,
+        }).catch(() => {})
+      }
+    }
+  }, [eventos, groupId])
 
   const getMember = (uid: string): Miembro | undefined =>
     miembros.find((x) => x.id === uid)

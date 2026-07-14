@@ -18,7 +18,8 @@ import {
   arrayRemove,
   type Timestamp,
 } from 'firebase/firestore'
-import { db } from './config'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { db, storage } from './config'
 import type { User } from 'firebase/auth'
 
 export interface Grupo {
@@ -320,18 +321,11 @@ export async function updateActivityRecord(
   await updateDoc(eventoRef, data)
 }
 
-export function uploadRecordPhoto(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const MAX_SIZE = 5 * 1024 * 1024
-    if (file.size > MAX_SIZE) {
-      reject(new Error('La imagen no debe superar 5MB'))
-      return
-    }
-    const reader = new FileReader()
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = () => reject(new Error('Error al leer el archivo'))
-    reader.readAsDataURL(file)
-  })
+export async function uploadRecordPhoto(file: File): Promise<string> {
+  const fileRef = ref(storage, `records/${Date.now()}_${file.name}`)
+  const snapshot = await uploadBytes(fileRef, file)
+  const url = await getDownloadURL(snapshot.ref)
+  return url
 }
 
 /* ───── Reacciones ───── */

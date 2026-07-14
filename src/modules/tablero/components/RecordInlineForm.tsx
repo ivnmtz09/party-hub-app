@@ -9,6 +9,7 @@ import {
   Dumbbell,
   Save,
 } from 'lucide-react'
+import imageCompression from 'browser-image-compression'
 import { uploadRecordPhoto } from '../../../firebase/services'
 import { playCagadaSound, playCuleadaSound, playGymSound, playSuccessSound, playCloseSound, playStarSound, playToggleOffSound, playDeleteSound } from '../../../utils/audio'
 
@@ -31,6 +32,7 @@ export default function RecordInlineForm({ onClose, onSave }: Props) {
   const [note, setNote] = useState('')
   const [photoUrl, setPhotoUrl] = useState('')
   const [saving, setSaving] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -44,12 +46,21 @@ export default function RecordInlineForm({ onClose, onSave }: Props) {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+    if (file.size > 20 * 1024 * 1024) {
+      alert('Maximo 20MB')
+      return
+    }
     setError('')
+    setIsUploading(true)
     try {
-      const url = await uploadRecordPhoto(file)
+      const options = { maxSizeMB: 0.9, maxWidthOrHeight: 1920, useWebWorker: true }
+      const compressedFile = await imageCompression(file, options)
+      const url = await uploadRecordPhoto(compressedFile)
       setPhotoUrl(url)
     } catch (err) {
-      setError((err as Error).message)
+      setError((err as Error).message || 'Error comprimiendo la imagen.')
+    } finally {
+      setIsUploading(false)
     }
   }
 
@@ -161,7 +172,7 @@ export default function RecordInlineForm({ onClose, onSave }: Props) {
 
           <div>
             <label className="block text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1">
-              Foto (max 5MB)
+              Foto (max 20MB, se comprime automaticamente)
             </label>
             <div className="flex gap-2">
               <label className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 border-4 border-black dark:border-white bg-gray-100 dark:bg-gray-700 text-black dark:text-white font-bold text-[10px] uppercase tracking-wider cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
@@ -214,11 +225,11 @@ export default function RecordInlineForm({ onClose, onSave }: Props) {
           <div className="flex gap-2 pt-1">
             <button
               onClick={handleSave}
-              disabled={saving}
+              disabled={saving || isUploading}
               className="flex-1 flex items-center justify-center gap-1.5 py-2.5 border-4 border-black dark:border-white bg-emerald-300 dark:bg-emerald-500 text-black dark:text-gray-900 font-black uppercase tracking-wider text-xs shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50"
             >
               <Save size={14} strokeWidth={2.5} />
-              {saving ? 'Guardando...' : 'Registrar'}
+              {isUploading ? 'Procesando...' : saving ? 'Guardando...' : 'Registrar'}
             </button>
             <button
               onClick={() => { playCloseSound(); onClose() }}
