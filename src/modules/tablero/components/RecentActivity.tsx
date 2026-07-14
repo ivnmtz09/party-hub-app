@@ -134,8 +134,8 @@ export default function RecentActivity({ miembros, userId, groupId }: Props) {
           </p>
         </div>
       ) : (
-        <div>
-          {eventos.map((ev, index) => {
+        <div className="flex flex-col gap-4">
+          {eventos.map((ev) => {
             const isOwn = ev.userId === userId
             const isConfirming = confirmingId === ev.id
             const isLoading = loadingId === ev.id
@@ -152,13 +152,9 @@ export default function RecentActivity({ miembros, userId, groupId }: Props) {
               )
 
             return (
-              <div
-                key={ev.id}
-                className="relative -mt-3 first:mt-0 transition-transform hover:-translate-y-2 hover:z-20"
-                style={{ zIndex: 20 - index }}
-              >
+              <div key={ev.id}>
                 <div
-                  className={`flex items-center gap-3 border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${isExpanded ? 'border-b-0 rounded-b-none' : ''}`}
+                  className={`flex items-center gap-3 w-full bg-white dark:bg-gray-800 border-4 border-black dark:border-white shadow-[4px_4px_0px_rgba(0,0,0,1)] p-3 ${isExpanded ? 'border-b-0 rounded-b-none' : ''}`}
                 >
                   {renderAvatar(member)}
 
