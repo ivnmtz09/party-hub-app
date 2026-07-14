@@ -3,6 +3,7 @@ import {
   Plus,
   FolderPlus,
   LogIn,
+  LogOut,
   Copy,
   Check,
   ChevronDown,
@@ -10,6 +11,10 @@ import {
   Filter,
   X,
   Loader2,
+  Crown,
+  Save,
+  UserMinus,
+  Trash2,
 } from 'lucide-react'
 import { useAuth } from '../../../context/AuthContext'
 import { useNotification } from '../../../context/NotificationContext'
@@ -20,6 +25,10 @@ import {
   observarEventos,
   asegurarMiembro,
   crearGrupo,
+  actualizarNombreGrupo,
+  eliminarGrupo,
+  expulsarMiembro,
+  abandonarGrupo,
   type Grupo,
   type Miembro,
   type Evento,
@@ -27,11 +36,10 @@ import {
 import MemberList from '../components/MemberList'
 import StatsChart from '../components/StatsChart'
 import JoinGroupModal from '../components/JoinGroupModal'
-import GroupSettingsModal from '../components/GroupSettingsModal'
 import RecentActivity from '../components/RecentActivity'
 import RecordInlineForm from '../components/RecordInlineForm'
 import Skeleton from '../../../components/Skeleton'
-import { playOpenSound, playCloseSound, playClickSound, playCopySound, playSuccessSound } from '../../../utils/audio'
+import { playOpenSound, playCloseSound, playClickSound, playCopySound, playSuccessSound, playDeleteSound } from '../../../utils/audio'
 
 export default function TableroPage() {
   const { user } = useAuth()
@@ -43,13 +51,18 @@ export default function TableroPage() {
   const [initialized, setInitialized] = useState(false)
   const [contentLoading, setContentLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isCreatingGroup, setIsCreatingGroup] = useState(false)
+  const [activeGroupAction, setActiveGroupAction] = useState<'create' | 'config' | 'leave' | null>(null)
   const [newGroupName, setNewGroupName] = useState('')
   const [creatingGroupLoading, setCreatingGroupLoading] = useState(false)
   const [showJoinModal, setShowJoinModal] = useState(false)
   const [showDropdown, setShowDropdown] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [showSettingsModal, setShowSettingsModal] = useState(false)
+  const [groupNameEdit, setGroupNameEdit] = useState('')
+  const [savingName, setSavingName] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [leaving, setLeaving] = useState(false)
+  const [expellingId, setExpellingId] = useState<string | null>(null)
   const [errorMsg, setErrorMsg] = useState('')
   const [timeFilter, setTimeFilter] = useState<'este_mes' | 'mes_pasado' | 'esta_semana' | 'hoy'>('este_mes')
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false)
@@ -176,11 +189,69 @@ export default function TableroPage() {
       await crearGrupo(newGroupName.trim(), user)
       playSuccessSound()
       setNewGroupName('')
-      setIsCreatingGroup(false)
+      setActiveGroupAction(null)
     } catch {
       /* error silencioso */
     } finally {
       setCreatingGroupLoading(false)
+    }
+  }
+
+  const handleSaveGroupName = async () => {
+    if (!activeGroup || !groupNameEdit.trim() || groupNameEdit.trim() === activeGroup.nombre) return
+    setSavingName(true)
+    setErrorMsg('')
+    try {
+      await actualizarNombreGrupo(activeGroup.id, groupNameEdit.trim())
+      playSuccessSound()
+    } catch {
+      setErrorMsg('Error al guardar el nombre')
+    } finally {
+      setSavingName(false)
+    }
+  }
+
+  const handleExpelMember = async (miembroId: string) => {
+    if (!activeGroup || miembroId === activeGroup.adminId) return
+    setExpellingId(miembroId)
+    setErrorMsg('')
+    try {
+      await expulsarMiembro(activeGroup.id, miembroId)
+    } catch {
+      setErrorMsg('Error al expulsar al miembro')
+    } finally {
+      setExpellingId(null)
+    }
+  }
+
+  const handleDeleteGroup = async () => {
+    if (!activeGroup) return
+    if (!confirmDelete) {
+      setConfirmDelete(true)
+      return
+    }
+    setDeleting(true)
+    setErrorMsg('')
+    try {
+      await eliminarGrupo(activeGroup.id)
+      setConfirmDelete(false)
+      setActiveGroupAction(null)
+    } catch {
+      setErrorMsg('Error al eliminar el grupo')
+      setDeleting(false)
+    }
+  }
+
+  const handleLeaveGroup = async () => {
+    if (!activeGroup || !user) return
+    setLeaving(true)
+    setErrorMsg('')
+    try {
+      await abandonarGrupo(activeGroup.id, user.uid)
+      setActiveGroupAction(null)
+    } catch {
+      setErrorMsg('Error al abandonar el grupo')
+      setLeaving(false)
     }
   }
 
@@ -208,7 +279,7 @@ export default function TableroPage() {
         </p>
         <div className="space-y-4">
           <button
-            onClick={() => { playOpenSound(); setIsCreatingGroup(!isCreatingGroup) }}
+            onClick={() => { playOpenSound(); setActiveGroupAction(prev => prev === 'create' ? null : 'create') }}
             className="w-full flex items-center justify-center gap-3 py-6 border-4 border-black dark:border-white bg-emerald-300 dark:bg-emerald-500 text-black dark:text-gray-900 font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all text-lg"
           >
             <Plus size={24} strokeWidth={2.5} />
@@ -223,7 +294,7 @@ export default function TableroPage() {
           </button>
         </div>
 
-        {isCreatingGroup && (
+        {activeGroupAction === 'create' && (
           <div className="w-full p-4 border-4 border-black bg-white dark:bg-gray-800 shadow-[4px_4px_0px_rgba(0,0,0,1)] flex flex-col gap-3">
             <h3 className="font-black text-lg">NUEVO GRUPO</h3>
             <input
@@ -338,27 +409,27 @@ export default function TableroPage() {
         )}
         {activeGroup && (
           <button
-            onClick={() => { playOpenSound(); setShowSettingsModal(true) }}
+            onClick={() => { playOpenSound(); setActiveGroupAction(prev => prev === 'config' ? null : 'config'); setGroupNameEdit(activeGroup.nombre); setConfirmDelete(false) }}
             className="p-2 border-2 border-black dark:border-white bg-gray-200 dark:bg-gray-600 text-black dark:text-white shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
           >
             <Settings size={18} strokeWidth={2.5} />
           </button>
         )}
         <button
-          onClick={() => { playOpenSound(); setIsCreatingGroup(!isCreatingGroup) }}
+          onClick={() => { playOpenSound(); setActiveGroupAction(prev => prev === 'create' ? null : 'create') }}
           className="p-2 border-2 border-black dark:border-white bg-purple-400 dark:bg-purple-500 text-black dark:text-gray-900 shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
         >
           <FolderPlus size={18} strokeWidth={2.5} />
         </button>
         <button
-          onClick={() => { playOpenSound(); setShowJoinModal(true) }}
-          className="p-2 border-2 border-black dark:border-white bg-blue-200 dark:bg-blue-400 text-black dark:text-gray-900 shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+          onClick={() => { playOpenSound(); setActiveGroupAction(prev => prev === 'leave' ? null : 'leave') }}
+          className="p-2 border-2 border-black dark:border-white bg-red-300 dark:bg-red-500 text-black dark:text-gray-900 shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
         >
-          <LogIn size={18} strokeWidth={2.5} />
+          <LogOut size={18} strokeWidth={2.5} />
         </button>
       </div>
 
-      {isCreatingGroup && (
+      {activeGroupAction === 'create' && (
         <div className="w-full mt-4 p-4 border-4 border-black bg-white dark:bg-gray-800 shadow-[4px_4px_0px_rgba(0,0,0,1)] flex flex-col gap-3">
           <h3 className="font-black text-lg">NUEVO GRUPO</h3>
           <input
@@ -382,6 +453,118 @@ export default function TableroPage() {
               'CREAR GRUPO'
             )}
           </button>
+        </div>
+      )}
+
+      {activeGroupAction === 'config' && activeGroup && (
+        <div className="w-full mt-4 p-4 border-4 border-black bg-white dark:bg-gray-800 shadow-[4px_4px_0px_rgba(0,0,0,1)] flex flex-col gap-4">
+          <h3 className="font-black text-lg">AJUSTES DE GRUPO</h3>
+
+          {activeGroup.adminId === user?.uid && (
+            <div>
+              <label className="block text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
+                Nombre del Grupo
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={groupNameEdit}
+                  onChange={(e) => setGroupNameEdit(e.target.value)}
+                  className="flex-1 py-2 px-3 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-bold uppercase tracking-wider placeholder:text-gray-400 focus:outline-none focus:ring-0 text-sm"
+                />
+                <button
+                  onClick={handleSaveGroupName}
+                  disabled={savingName || !groupNameEdit.trim() || groupNameEdit.trim() === activeGroup.nombre}
+                  className="p-2 border-2 border-black dark:border-white bg-cyan-300 dark:bg-cyan-400 text-black dark:text-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {savingName ? (
+                    <Loader2 size={16} className="animate-spin" strokeWidth={2.5} />
+                  ) : (
+                    <Save size={16} strokeWidth={2.5} />
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div>
+            <label className="block text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
+              Miembros
+            </label>
+            <div className="space-y-2">
+              {[...miembros].sort((a) => a.id === activeGroup.adminId ? -1 : 1).map((m) => (
+                <div
+                  key={m.id}
+                  className="flex items-center justify-between border-2 border-black dark:border-white bg-white dark:bg-gray-800 p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                >
+                  <div className="flex items-center gap-2">
+                    {m.id === activeGroup.adminId && (
+                      <Crown size={14} strokeWidth={2.5} className="text-yellow-600 dark:text-yellow-300 shrink-0" />
+                    )}
+                    <span className="font-bold text-sm uppercase tracking-wider text-black dark:text-white">
+                      {m.nickname || m.displayName.split(' ')[0]}
+                    </span>
+                  </div>
+                  {m.id !== activeGroup.adminId && activeGroup.adminId === user?.uid && (
+                    <button
+                      onClick={() => { playDeleteSound(); handleExpelMember(m.id) }}
+                      disabled={expellingId === m.id}
+                      className="p-1.5 border-2 border-black dark:border-white bg-red-300 dark:bg-red-500 text-black dark:text-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {expellingId === m.id ? (
+                        <Loader2 size={14} className="animate-spin" strokeWidth={2.5} />
+                      ) : (
+                        <UserMinus size={14} strokeWidth={2.5} />
+                      )}
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {activeGroup.adminId === user?.uid && (
+            <button
+              onClick={() => { playDeleteSound(); handleDeleteGroup() }}
+              disabled={deleting}
+              className="w-full flex items-center justify-center gap-2 py-3 border-4 border-black dark:border-white bg-red-500 dark:bg-red-600 text-white font-black uppercase tracking-wider shadow-[4px_4px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            >
+              {deleting ? (
+                <Loader2 size={18} className="animate-spin" strokeWidth={2.5} />
+              ) : confirmDelete ? (
+                <>
+                  <Trash2 size={18} strokeWidth={2.5} />
+                  CONFIRMAR ELIMINACION
+                </>
+              ) : (
+                <>
+                  <Trash2 size={18} strokeWidth={2.5} />
+                  ELIMINAR GRUPO
+                </>
+              )}
+            </button>
+          )}
+        </div>
+      )}
+
+      {activeGroupAction === 'leave' && (
+        <div className="w-full mt-4 p-4 border-4 border-black bg-red-400 shadow-[4px_4px_0px_rgba(0,0,0,1)] flex flex-col gap-3">
+          <h3 className="font-black text-black text-lg">¿SEGURO QUE QUIERES SALIR?</h3>
+          <div className="flex gap-2">
+            <button
+              onClick={() => { playCloseSound(); setActiveGroupAction(null) }}
+              className="flex-1 py-2 border-2 border-black bg-white font-black uppercase tracking-wider text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+            >
+              CANCELAR
+            </button>
+            <button
+              onClick={() => { playDeleteSound(); handleLeaveGroup() }}
+              disabled={leaving}
+              className="flex-1 py-2 border-2 border-black bg-black text-white font-black uppercase tracking-wider text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {leaving ? 'Saliendo...' : 'SI, SALIR'}
+            </button>
+          </div>
         </div>
       )}
 
@@ -463,15 +646,6 @@ export default function TableroPage() {
         open={showJoinModal}
         onClose={() => setShowJoinModal(false)}
       />
-      {activeGroup && (
-        <GroupSettingsModal
-          open={showSettingsModal}
-          onClose={() => setShowSettingsModal(false)}
-          group={activeGroup}
-          miembros={miembros}
-          userId={user?.uid ?? ''}
-        />
-      )}
 
       </>
       )}
