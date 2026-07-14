@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import {
   Plus,
+  FolderPlus,
   LogIn,
   Copy,
   Check,
@@ -8,6 +9,7 @@ import {
   Settings,
   Filter,
   X,
+  Loader2,
 } from 'lucide-react'
 import { useAuth } from '../../../context/AuthContext'
 import { useNotification } from '../../../context/NotificationContext'
@@ -17,19 +19,19 @@ import {
   registrarEvento,
   observarEventos,
   asegurarMiembro,
+  crearGrupo,
   type Grupo,
   type Miembro,
   type Evento,
 } from '../../../firebase/services'
 import MemberList from '../components/MemberList'
 import StatsChart from '../components/StatsChart'
-import CreateGroupModal from '../components/CreateGroupModal'
 import JoinGroupModal from '../components/JoinGroupModal'
 import GroupSettingsModal from '../components/GroupSettingsModal'
 import RecentActivity from '../components/RecentActivity'
 import RecordInlineForm from '../components/RecordInlineForm'
 import Skeleton from '../../../components/Skeleton'
-import { playOpenSound, playCloseSound, playClickSound, playCopySound } from '../../../utils/audio'
+import { playOpenSound, playCloseSound, playClickSound, playCopySound, playSuccessSound } from '../../../utils/audio'
 
 export default function TableroPage() {
   const { user } = useAuth()
@@ -41,7 +43,9 @@ export default function TableroPage() {
   const [initialized, setInitialized] = useState(false)
   const [contentLoading, setContentLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [isCreatingGroup, setIsCreatingGroup] = useState(false)
+  const [newGroupName, setNewGroupName] = useState('')
+  const [creatingGroupLoading, setCreatingGroupLoading] = useState(false)
   const [showJoinModal, setShowJoinModal] = useState(false)
   const [showDropdown, setShowDropdown] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -165,6 +169,21 @@ export default function TableroPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const handleCreateGroup = async () => {
+    if (!user || !newGroupName.trim()) return
+    setCreatingGroupLoading(true)
+    try {
+      await crearGrupo(newGroupName.trim(), user)
+      playSuccessSound()
+      setNewGroupName('')
+      setIsCreatingGroup(false)
+    } catch {
+      /* error silencioso */
+    } finally {
+      setCreatingGroupLoading(false)
+    }
+  }
+
   const activeGroup = grupos.find((g) => g.id === activeGroupId)
 
   if (!initialized) {
@@ -189,7 +208,7 @@ export default function TableroPage() {
         </p>
         <div className="space-y-4">
           <button
-            onClick={() => { playOpenSound(); setShowCreateModal(true) }}
+            onClick={() => { playOpenSound(); setIsCreatingGroup(!isCreatingGroup) }}
             className="w-full flex items-center justify-center gap-3 py-6 border-4 border-black dark:border-white bg-emerald-300 dark:bg-emerald-500 text-black dark:text-gray-900 font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all text-lg"
           >
             <Plus size={24} strokeWidth={2.5} />
@@ -204,10 +223,33 @@ export default function TableroPage() {
           </button>
         </div>
 
-        <CreateGroupModal
-          open={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
-        />
+        {isCreatingGroup && (
+          <div className="w-full p-4 border-4 border-black bg-white dark:bg-gray-800 shadow-[4px_4px_0px_rgba(0,0,0,1)] flex flex-col gap-3">
+            <h3 className="font-black text-lg">NUEVO GRUPO</h3>
+            <input
+              type="text"
+              value={newGroupName}
+              onChange={(e) => setNewGroupName(e.target.value)}
+              placeholder="Nombre del Grupo"
+              className="w-full py-2 px-3 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-bold uppercase tracking-wider placeholder:text-gray-400 focus:outline-none focus:ring-0 text-sm"
+            />
+            <button
+              onClick={handleCreateGroup}
+              disabled={creatingGroupLoading || !newGroupName.trim()}
+              className="w-full bg-yellow-400 dark:bg-yellow-500 font-black border-2 border-black p-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider text-sm"
+            >
+              {creatingGroupLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Loader2 size={16} className="animate-spin" strokeWidth={2.5} />
+                  Creando...
+                </span>
+              ) : (
+                'CREAR GRUPO'
+              )}
+            </button>
+          </div>
+        )}
+
         <JoinGroupModal
           open={showJoinModal}
           onClose={() => setShowJoinModal(false)}
@@ -303,10 +345,10 @@ export default function TableroPage() {
           </button>
         )}
         <button
-          onClick={() => { playOpenSound(); setShowCreateModal(true) }}
-          className="p-2 border-2 border-black dark:border-white bg-emerald-200 dark:bg-emerald-400 text-black dark:text-gray-900 shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+          onClick={() => { playOpenSound(); setIsCreatingGroup(!isCreatingGroup) }}
+          className="p-2 border-2 border-black dark:border-white bg-purple-400 dark:bg-purple-500 text-black dark:text-gray-900 shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
         >
-          <Plus size={18} strokeWidth={2.5} />
+          <FolderPlus size={18} strokeWidth={2.5} />
         </button>
         <button
           onClick={() => { playOpenSound(); setShowJoinModal(true) }}
@@ -315,6 +357,33 @@ export default function TableroPage() {
           <LogIn size={18} strokeWidth={2.5} />
         </button>
       </div>
+
+      {isCreatingGroup && (
+        <div className="w-full mt-4 p-4 border-4 border-black bg-white dark:bg-gray-800 shadow-[4px_4px_0px_rgba(0,0,0,1)] flex flex-col gap-3">
+          <h3 className="font-black text-lg">NUEVO GRUPO</h3>
+          <input
+            type="text"
+            value={newGroupName}
+            onChange={(e) => setNewGroupName(e.target.value)}
+            placeholder="Nombre del Grupo"
+            className="w-full py-2 px-3 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-bold uppercase tracking-wider placeholder:text-gray-400 focus:outline-none focus:ring-0 text-sm"
+          />
+          <button
+            onClick={handleCreateGroup}
+            disabled={creatingGroupLoading || !newGroupName.trim()}
+            className="w-full bg-yellow-400 dark:bg-yellow-500 font-black border-2 border-black p-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider text-sm"
+          >
+            {creatingGroupLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <Loader2 size={16} className="animate-spin" strokeWidth={2.5} />
+                Creando...
+              </span>
+            ) : (
+              'CREAR GRUPO'
+            )}
+          </button>
+        </div>
+      )}
 
       {errorMsg && (
         <p className="text-red-600 font-black text-sm text-center uppercase tracking-wider bg-red-100 dark:bg-red-900/30 border-2 border-red-600 py-2 px-4">
@@ -390,10 +459,6 @@ export default function TableroPage() {
         groupId={activeGroupId ?? ''}
       />
 
-      <CreateGroupModal
-        open={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-      />
       <JoinGroupModal
         open={showJoinModal}
         onClose={() => setShowJoinModal(false)}
