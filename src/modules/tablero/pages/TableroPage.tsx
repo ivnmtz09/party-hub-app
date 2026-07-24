@@ -67,6 +67,7 @@ export default function TableroPage() {
   const [timeFilter, setTimeFilter] = useState<'este_mes' | 'mes_pasado' | 'esta_semana' | 'hoy'>('este_mes')
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false)
   const [showInlineForm, setShowInlineForm] = useState(false)
+  const [showApologyBanner, setShowApologyBanner] = useState(false)
 
   const filteredEventos = useMemo(() => {
     const ahora = new Date()
@@ -159,6 +160,23 @@ export default function TableroPage() {
   useEffect(() => {
     setNotificationGroupId(activeGroupId)
   }, [activeGroupId, setNotificationGroupId])
+
+  useEffect(() => {
+    if (!user) return
+    const seenKey = `apology_banner_seen_${user.uid}`
+    if (localStorage.getItem(seenKey)) return
+    const creationDate = user.metadata?.creationTime
+    if (!creationDate) return
+    if (new Date(creationDate) < new Date('2026-07-24T00:00:00')) {
+      setShowApologyBanner(true)
+    }
+  }, [user])
+
+  const dismissApologyBanner = () => {
+    if (!user) return
+    localStorage.setItem(`apology_banner_seen_${user.uid}`, '1')
+    setShowApologyBanner(false)
+  }
 
   const handleRecordSave = async (tipo: 'deposicion' | 'acto_sexual' | 'gym', data: { rating: number; note: string; photoUrl: string }) => {
     if (!user || !activeGroupId) return
@@ -257,20 +275,41 @@ export default function TableroPage() {
 
   const activeGroup = grupos.find((g) => g.id === activeGroupId)
 
+  const apologyOverlay = showApologyBanner ? (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="w-full max-w-sm bg-yellow-300 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-6 flex flex-col items-center gap-4">
+        <h2 className="text-2xl font-black uppercase tracking-wider text-black text-center">
+          Estamos de vuelta
+        </h2>
+        <p className="text-sm font-bold text-black text-center leading-relaxed">
+          Disculpen las molestias. La caida se debio al fin de la beta. Ya esta solucionado y todo vuelve a funcionar normalmente.
+        </p>
+        <button
+          onClick={dismissApologyBanner}
+          className="w-full py-3 border-4 border-black bg-cyan-300 font-black uppercase tracking-wider text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
+        >
+          ENTENDIDO
+        </button>
+      </div>
+    </div>
+  ) : null
+
   if (!initialized) {
-    return (
+    return (<>
+      {apologyOverlay}
       <div className="w-full max-w-md mx-auto p-4 space-y-4 animate-fade-in-up">
         <div className="h-10 border-4 border-black dark:border-white bg-gray-300 dark:bg-gray-700 animate-pulse shadow-brutal dark:shadow-brutal-dark" />
         <Skeleton variant="card" count={2} />
         <div className="h-8 w-40 border-4 border-black dark:border-white bg-gray-300 dark:bg-gray-700 animate-pulse" />
         <Skeleton variant="listItem" count={3} />
       </div>
-    )
+    </>)
   }
 
   if (grupos.length === 0) {
-    return (
-      <div className="w-full max-w-md mx-auto p-4 space-y-6 animate-fade-in-up">
+    return (<>
+      {apologyOverlay}
+    <div className="w-full max-w-md mx-auto p-4 space-y-6 animate-fade-in-up">
         <h2 className="text-2xl font-black uppercase tracking-wider text-black dark:text-white text-center">
           Tablero Social
         </h2>
@@ -326,10 +365,11 @@ export default function TableroPage() {
           onClose={() => setShowJoinModal(false)}
         />
       </div>
-    )
+    </>)
   }
 
-  return (
+  return (<>
+    {apologyOverlay}
     <div className="w-full max-w-md mx-auto p-4 space-y-6 animate-fade-in-up">
       {contentLoading ? (
         <>
@@ -650,5 +690,5 @@ export default function TableroPage() {
       </>
       )}
     </div>
-  )
+    </>)
 }
