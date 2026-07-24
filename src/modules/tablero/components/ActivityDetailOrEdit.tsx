@@ -3,7 +3,7 @@ import { Star, Pencil, Save, X, Camera, Edit, Trash2, Heart, Flame, Smile, Skull
 import type { Evento, ReactionType, CommentData } from '../../../firebase/services'
 import { updateActivityRecord, uploadRecordPhoto, toggleReaction, addComment, subscribeToComments } from '../../../firebase/services'
 import { useAuth } from '../../../context/AuthContext'
-import { playReactionSound, playToggleOnSound, playToggleOffSound, playCommentSendSound, playCloseSound, playStarSound, playDeleteSound, playSuccessSound, playClickSound } from '../../../utils/audio'
+import { playReactionSound, playCommentSendSound, playCloseSound, playStarSound, playDeleteSound, playSuccessSound, playClickSound } from '../../../utils/audio'
 
 interface Props {
   evento: Evento
@@ -31,18 +31,18 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
-  const [showComments, setShowComments] = useState(false)
   const [comments, setComments] = useState<CommentData[]>([])
+  const [visibleCommentsLimit, setVisibleCommentsLimit] = useState(5)
   const [commentText, setCommentText] = useState('')
 
   const reactions = evento.reactions ?? {}
   const currentUserId = user?.uid
 
   useEffect(() => {
-    if (!showComments || !evento.id) return
+    if (!evento.id) return
     const unsub = subscribeToComments(groupId, evento.id, setComments)
     return unsub
-  }, [showComments, groupId, evento.id])
+  }, [groupId, evento.id])
 
   const handleToggleReaction = async (reactionType: ReactionType) => {
     if (!currentUserId || !evento.id) return
@@ -204,75 +204,77 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
             )
           })}
 
-          <button
-            onClick={() => { showComments ? playToggleOffSound() : playToggleOnSound(); setShowComments(!showComments) }}
-            className={`flex items-center gap-1 px-2 py-1 border-2 border-black dark:border-white font-black text-[10px] uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
-              showComments
-                ? 'bg-blue-400 dark:bg-blue-500 text-black'
-                : 'bg-white dark:bg-gray-800 text-black dark:text-white'
-            }`}
-          >
-            <MessageSquare size={12} strokeWidth={2.5} />
-            {comments.length > 0 && <span>{comments.length}</span>}
-          </button>
+          {comments.length > 0 && (
+            <span className="flex items-center gap-1 px-2 py-1 border-2 border-black dark:border-white font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-white dark:bg-gray-800 text-black dark:text-white">
+              <MessageSquare size={12} strokeWidth={2.5} />
+              {comments.length}
+            </span>
+          )}
         </div>
 
-        {showComments && (
-          <div className="border-2 border-black dark:border-white bg-white dark:bg-gray-800 p-3 space-y-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            {comments.length === 0 ? (
-              <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 text-center uppercase tracking-wider py-2">
-                Sin comentarios
-              </p>
-            ) : (
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {comments.map((c) => {
-                  const initials = c.nickname.slice(0, 2).toUpperCase()
-                  return (
-                    <div key={c.id} className="flex items-start gap-2 border-2 border-black dark:border-white p-2 bg-gray-50 dark:bg-gray-900">
-                      <div
-                        className="w-7 h-7 shrink-0 border-2 border-black dark:border-white flex items-center justify-center text-[10px] font-black text-black"
-                        style={{ backgroundColor: c.avatarColor }}
-                      >
-                        {initials}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                          {c.nickname}
-                        </p>
-                        <p className="text-xs font-bold text-black dark:text-white break-words">
-                          {c.text}
-                        </p>
-                      </div>
+        <div className="border-2 border-black dark:border-white bg-white dark:bg-gray-800 p-3 space-y-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+          {comments.length === 0 ? (
+            <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 text-center uppercase tracking-wider py-2">
+              Sin comentarios
+            </p>
+          ) : (
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {comments.slice(0, visibleCommentsLimit).map((c) => {
+                const initials = c.nickname.slice(0, 2).toUpperCase()
+                return (
+                  <div key={c.id} className="flex items-start gap-2 border-2 border-black dark:border-white p-2 bg-gray-50 dark:bg-gray-900">
+                    <div
+                      className="w-7 h-7 shrink-0 border-2 border-black dark:border-white flex items-center justify-center text-[10px] font-black text-black"
+                      style={{ backgroundColor: c.avatarColor }}
+                    >
+                      {initials}
                     </div>
-                  )
-                })}
-              </div>
-            )}
-
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault()
-                    handleSendComment()
-                  }
-                }}
-                placeholder="Escribe un comentario..."
-                className="flex-1 py-2 px-3 border-2 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-bold text-xs placeholder:text-gray-400 focus:outline-none focus:ring-0"
-              />
-              <button
-                onClick={handleSendComment}
-                disabled={!commentText.trim()}
-                className="px-3 py-2 border-2 border-black dark:border-white bg-emerald-300 dark:bg-emerald-500 text-black dark:text-gray-900 font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Send size={12} strokeWidth={2.5} />
-              </button>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        {c.nickname}
+                      </p>
+                      <p className="text-xs font-bold text-black dark:text-white break-words">
+                        {c.text}
+                      </p>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
+          )}
+
+          {comments.length > visibleCommentsLimit && (
+            <button
+              onClick={() => setVisibleCommentsLimit((prev) => prev + 5)}
+              className="w-full mt-2 text-sm font-black border-2 border-black bg-gray-200 py-1 hover:bg-gray-300 uppercase tracking-wider text-[10px]"
+            >
+              VER MAS COMENTARIOS...
+            </button>
+          )}
+
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault()
+                  handleSendComment()
+                }
+              }}
+              placeholder="Escribe un comentario..."
+              className="flex-1 py-2 px-3 border-2 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-bold text-xs placeholder:text-gray-400 focus:outline-none focus:ring-0"
+            />
+            <button
+              onClick={handleSendComment}
+              disabled={!commentText.trim()}
+              className="px-3 py-2 border-2 border-black dark:border-white bg-emerald-300 dark:bg-emerald-500 text-black dark:text-gray-900 font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Send size={12} strokeWidth={2.5} />
+            </button>
           </div>
-        )}
+        </div>
 
         <button
           onClick={() => { playCloseSound(); onClose() }}
