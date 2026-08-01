@@ -22,6 +22,13 @@ const REACTION_CONFIG: Record<ReactionType, { icon: typeof Heart; activeBg: stri
 
 const REACTION_TYPES: ReactionType[] = ['heart', 'flame', 'smile', 'skull', 'frown']
 
+const TIPO_BADGE: Record<Evento['tipo'], { label: string; color: string }> = {
+  deposicion: { label: 'CAGADA', color: 'bg-orange-400 dark:bg-orange-500' },
+  acto_sexual: { label: 'CULEADA', color: 'bg-pink-400 dark:bg-pink-500' },
+  gym: { label: 'GYM', color: 'bg-cyan-400 dark:bg-cyan-500' },
+  meada: { label: 'MEADA', color: 'bg-yellow-400 dark:bg-yellow-500' },
+}
+
 export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose }: Props) {
   const { user, userProfile } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
@@ -140,9 +147,9 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
     return (
       <div className="border-2 border-black dark:border-white p-4 mt-2 bg-gray-50 dark:bg-gray-900 space-y-3">
         <div className="flex items-center justify-between">
-          <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-            Calificacion
-          </p>
+          <span className={`px-2 py-1 border-2 border-black dark:border-white ${TIPO_BADGE[evento.tipo].color} text-black font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}>
+            {TIPO_BADGE[evento.tipo].label}
+          </span>
           {isOwner && (
             <button
               onClick={() => { playClickSound(); setIsEditing(true) }}
@@ -154,7 +161,12 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
           )}
         </div>
 
-        {renderStars(rating)}
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1">
+            Calificacion
+          </p>
+          {renderStars(rating)}
+        </div>
 
         {note && (
           <div className="border-l-4 border-black dark:border-white pl-3 py-1">

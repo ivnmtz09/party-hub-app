@@ -42,15 +42,17 @@ export interface Miembro {
   deposiciones: number
   actosSexuales: number
   gym: number
+  meadas: number
   ultimaDeposicion: Timestamp | null
   ultimoActoSexual: Timestamp | null
   ultimoGym: Timestamp | null
+  ultimaMeada: Timestamp | null
 }
 
 export interface Evento {
   id?: string
   userId: string
-  tipo: 'deposicion' | 'acto_sexual' | 'gym'
+  tipo: 'deposicion' | 'acto_sexual' | 'gym' | 'meada'
   timestamp: Timestamp
   rating?: number
   note?: string
@@ -108,6 +110,8 @@ export async function crearGrupo(nombreGrupo: string, user: User): Promise<strin
     ultimaDeposicion: null,
     ultimoActoSexual: null,
     ultimoGym: null,
+    meadas: 0,
+    ultimaMeada: null,
   })
 
   return docRef.id
@@ -147,6 +151,8 @@ export async function unirseGrupo(codigo: string, user: User): Promise<string> {
       ultimaDeposicion: null,
       ultimoActoSexual: null,
       ultimoGym: null,
+      meadas: 0,
+      ultimaMeada: null,
     })
   }
 
@@ -172,9 +178,11 @@ export async function asegurarMiembro(user: User, groupId: string): Promise<void
       deposiciones: 0,
       actosSexuales: 0,
       gym: 0,
+      meadas: 0,
       ultimaDeposicion: null,
       ultimoActoSexual: null,
       ultimoGym: null,
+      ultimaMeada: null,
     })
   } else {
     await updateDoc(miembroRef, data)
@@ -237,7 +245,7 @@ export function observarEventosConLimite(
 export async function registrarEvento(
   groupId: string,
   userId: string,
-  tipo: 'deposicion' | 'acto_sexual' | 'gym',
+  tipo: 'deposicion' | 'acto_sexual' | 'gym' | 'meada',
   meta?: { rating?: number; note?: string; photoUrl?: string },
 ) {
   const eventoRef = collection(db, 'grupos', groupId, 'eventos')
@@ -260,6 +268,9 @@ export async function registrarEvento(
   } else if (tipo === 'acto_sexual') {
     updates.actosSexuales = increment(1)
     updates.ultimoActoSexual = serverTimestamp()
+  } else if (tipo === 'meada') {
+    updates.meadas = increment(1)
+    updates.ultimaMeada = serverTimestamp()
   } else {
     updates.gym = increment(1)
     updates.ultimoGym = serverTimestamp()
@@ -305,6 +316,8 @@ export async function eliminarEvento(groupId: string, eventId: string): Promise<
     await updateDoc(miembroRef, { deposiciones: increment(-1) })
   } else if (evento.tipo === 'acto_sexual') {
     await updateDoc(miembroRef, { actosSexuales: increment(-1) })
+  } else if (evento.tipo === 'meada') {
+    await updateDoc(miembroRef, { meadas: increment(-1) })
   } else {
     await updateDoc(miembroRef, { gym: increment(-1) })
   }

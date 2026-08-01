@@ -147,6 +147,8 @@ export default function RecentActivity({ miembros, userId, groupId }: Props) {
                 <Trash2 size={16} strokeWidth={2.5} className="text-orange-500" />
               ) : ev.tipo === 'acto_sexual' ? (
                 <Flame size={16} strokeWidth={2.5} className="text-pink-500" />
+              ) : ev.tipo === 'meada' ? (
+                <span className="text-[9px] font-black text-yellow-600 dark:text-yellow-400">[ M ]</span>
               ) : (
                 <Dumbbell size={16} strokeWidth={2.5} className="text-cyan-500" />
               )
@@ -158,7 +160,7 @@ export default function RecentActivity({ miembros, userId, groupId }: Props) {
                 >
                   {renderAvatar(member)}
 
-                  <div className="w-8 h-8 border-2 border-black dark:border-white flex items-center justify-center shrink-0 bg-gray-100 dark:bg-gray-700">
+                  <div className={`w-8 h-8 border-2 border-black dark:border-white flex items-center justify-center shrink-0 ${ev.tipo === 'meada' ? 'bg-yellow-400 dark:bg-yellow-500' : 'bg-gray-100 dark:bg-gray-700'}`}>
                     {icono}
                   </div>
 
@@ -167,7 +169,7 @@ export default function RecentActivity({ miembros, userId, groupId }: Props) {
                       {getMemberName(ev.userId)}
                     </p>
                     <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                      {ev.tipo === 'deposicion' ? 'Cagada' : ev.tipo === 'acto_sexual' ? 'Culeada' : 'Gym'} &middot;{' '}
+                      {ev.tipo === 'deposicion' ? 'Cagada' : ev.tipo === 'acto_sexual' ? 'Culeada' : ev.tipo === 'meada' ? 'Meada' : 'Gym'} &middot;{' '}
                       {tiempoRelativo(ev.timestamp as Timestamp)}
                       {hasDetails && (
                         <span className="ml-1 text-yellow-500">&#9733;</span>

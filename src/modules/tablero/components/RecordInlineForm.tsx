@@ -7,27 +7,29 @@ import {
   Trash2,
   Flame,
   Dumbbell,
+  Droplets,
   Save,
 } from 'lucide-react'
 import imageCompression from 'browser-image-compression'
 import { uploadRecordPhoto } from '../../../firebase/services'
-import { playCagadaSound, playCuleadaSound, playGymSound, playSuccessSound, playCloseSound, playStarSound, playToggleOffSound, playDeleteSound } from '../../../utils/audio'
+import { playCagadaSound, playCuleadaSound, playGymSound, playMeadaSound, playSuccessSound, playCloseSound, playStarSound, playToggleOffSound, playDeleteSound } from '../../../utils/audio'
 
 interface Props {
   groupId: string
   userId: string
   onClose: () => void
-  onSave: (tipo: 'deposicion' | 'acto_sexual' | 'gym', data: { rating: number; note: string; photoUrl: string }) => Promise<void>
+  onSave: (tipo: 'deposicion' | 'acto_sexual' | 'gym' | 'meada', data: { rating: number; note: string; photoUrl: string }) => Promise<void>
 }
 
 const TIPO_OPTIONS = [
   { tipo: 'deposicion' as const, label: 'CAGADA', icon: Trash2, color: 'bg-orange-400 dark:bg-orange-500', ring: 'ring-orange-400 dark:ring-orange-500' },
   { tipo: 'acto_sexual' as const, label: 'CULEADA', icon: Flame, color: 'bg-pink-400 dark:bg-pink-500', ring: 'ring-pink-400 dark:ring-pink-500' },
   { tipo: 'gym' as const, label: 'GYM', icon: Dumbbell, color: 'bg-cyan-400 dark:bg-cyan-500', ring: 'ring-cyan-400 dark:ring-cyan-500' },
+  { tipo: 'meada' as const, label: 'MEADA', icon: Droplets, color: 'bg-yellow-400 dark:bg-yellow-500', ring: 'ring-yellow-400 dark:ring-yellow-500' },
 ]
 
 export default function RecordInlineForm({ onClose, onSave }: Props) {
-  const [selectedTipo, setSelectedTipo] = useState<'deposicion' | 'acto_sexual' | 'gym' | null>(null)
+  const [selectedTipo, setSelectedTipo] = useState<'deposicion' | 'acto_sexual' | 'gym' | 'meada' | null>(null)
   const [rating, setRating] = useState(0)
   const [note, setNote] = useState('')
   const [photoUrl, setPhotoUrl] = useState('')
@@ -37,9 +39,10 @@ export default function RecordInlineForm({ onClose, onSave }: Props) {
   const fileRef = useRef<HTMLInputElement>(null)
   const previewUrl = useMemo(() => (rawFile ? URL.createObjectURL(rawFile) : ''), [rawFile])
 
-  const handleSelectTipo = (tipo: 'deposicion' | 'acto_sexual' | 'gym') => {
+  const handleSelectTipo = (tipo: 'deposicion' | 'acto_sexual' | 'gym' | 'meada') => {
     if (tipo === 'deposicion') playCagadaSound()
     else if (tipo === 'acto_sexual') playCuleadaSound()
+    else if (tipo === 'meada') playMeadaSound()
     else playGymSound()
     setSelectedTipo(tipo)
   }

@@ -178,7 +178,7 @@ export default function TableroPage() {
     setShowApologyBanner(false)
   }
 
-  const handleRecordSave = async (tipo: 'deposicion' | 'acto_sexual' | 'gym', data: { rating: number; note: string; photoUrl: string }) => {
+  const handleRecordSave = async (tipo: 'deposicion' | 'acto_sexual' | 'gym' | 'meada', data: { rating: number; note: string; photoUrl: string }) => {
     if (!user || !activeGroupId) return
     setIsSubmitting(true)
     setErrorMsg('')

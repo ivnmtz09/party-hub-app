@@ -123,6 +123,14 @@ export function playCuleadaSound(): void {
   } catch { /* audio no disponible */ }
 }
 
+export function playMeadaSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    playNotes([440, 330, 220], ctx.currentTime, 0.12, 'triangle', 0.12, ctx)
+  } catch { /* audio no disponible */ }
+}
+
 export function playGymSound(): void {
   const ctx = getCtx()
   if (!ctx) return

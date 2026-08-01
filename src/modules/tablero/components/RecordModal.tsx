@@ -22,7 +22,7 @@ interface PropsCreate {
   mode: 'create'
   open: boolean
   onClose: () => void
-  tipo: 'deposicion' | 'acto_sexual' | 'gym'
+  tipo: 'deposicion' | 'acto_sexual' | 'gym' | 'meada'
   groupId: string
   anchorRect?: AnchorRect
   onSave: (data: { rating: number; note: string; photoUrl: string }) => Promise<void>
@@ -59,6 +59,7 @@ const TIPO_LABEL: Record<string, string> = {
   deposicion: 'CAGADA',
   acto_sexual: 'CULEADA',
   gym: 'GYM',
+  meada: 'MEADA',
 }
 
 function getModalPosition(anchor?: AnchorRect) {
@@ -188,6 +189,8 @@ export default function RecordModal(props: Props) {
       <Trash2 size={20} strokeWidth={2.5} className="text-orange-500" />
     ) : tipo === 'acto_sexual' ? (
       <Flame size={20} strokeWidth={2.5} className="text-pink-500" />
+    ) : tipo === 'meada' ? (
+      <span className="text-[11px] font-black text-yellow-600 dark:text-yellow-400">[ M ]</span>
     ) : (
       <Dumbbell size={20} strokeWidth={2.5} className="text-cyan-500" />
     )

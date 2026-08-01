@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Star, Save, X, Camera, Edit, Trash2, Trash2Icon, Flame, Dumbbell } from 'lucide-react'
+import { Star, Save, X, Camera, Edit, Trash2, Trash2Icon, Flame, Dumbbell, Droplets } from 'lucide-react'
 import { registrarEvento, uploadRecordPhoto } from '../../../firebase/services'
 import { playStarSound, playDeleteSound, playSuccessSound, playCloseSound, playClickSound } from '../../../utils/audio'
 
@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default function ActivityCreateForm({ groupId, userId, onClose }: Props) {
-  const [tipo, setTipo] = useState<'deposicion' | 'acto_sexual' | 'gym'>('deposicion')
+  const [tipo, setTipo] = useState<'deposicion' | 'acto_sexual' | 'gym' | 'meada'>('deposicion')
   const [rating, setRating] = useState(0)
   const [note, setNote] = useState('')
   const [photoUrl, setPhotoUrl] = useState('')
@@ -82,6 +82,7 @@ export default function ActivityCreateForm({ groupId, userId, onClose }: Props) 
             { key: 'deposicion' as const, label: 'CAGADA', Icon: Trash2Icon, color: 'bg-orange-400 dark:bg-orange-500' },
             { key: 'acto_sexual' as const, label: 'CULEADA', Icon: Flame, color: 'bg-pink-400 dark:bg-pink-500' },
             { key: 'gym' as const, label: 'GYM', Icon: Dumbbell, color: 'bg-cyan-400 dark:bg-cyan-500' },
+            { key: 'meada' as const, label: 'MEADA', Icon: Droplets, color: 'bg-yellow-400 dark:bg-yellow-500' },
           ]).map(({ key, label, Icon, color }) => (
             <button
               key={key}

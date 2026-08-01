@@ -23,7 +23,7 @@ import type { Evento } from '../firebase/services'
 interface Toast {
   id: string
   message: string
-  type: 'deposicion' | 'acto_sexual' | 'gym'
+  type: 'deposicion' | 'acto_sexual' | 'gym' | 'meada'
   leaving: boolean
 }
 
@@ -37,6 +37,7 @@ const TOAST_COLORS = {
   deposicion: 'bg-yellow-300 dark:bg-yellow-400',
   acto_sexual: 'bg-green-400 dark:bg-green-500',
   gym: 'bg-blue-400 dark:bg-blue-500',
+  meada: 'bg-yellow-400 dark:bg-yellow-500',
 } as const
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
@@ -76,7 +77,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           }
         }
 
-        const label = data.tipo === 'deposicion' ? 'UNA CAGADA' : data.tipo === 'acto_sexual' ? 'UNA CULEADA' : 'UN GYM'
+        const label = data.tipo === 'deposicion' ? 'UNA CAGADA' : data.tipo === 'acto_sexual' ? 'UNA CULEADA' : data.tipo === 'meada' ? 'UNA MEADA' : 'UN GYM'
         const toastId = change.doc.id
         const newToast: Toast = {
           id: toastId,
