@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Star, Pencil, Save, X, Camera, Edit, Trash2, Heart, Flame, Smile, Skull, Frown, MessageSquare, Send } from 'lucide-react'
-import type { Evento, ReactionType, CommentData } from '../../../firebase/services'
-import { updateActivityRecord, uploadRecordPhoto, toggleReaction, addComment, subscribeToComments } from '../../../firebase/services'
+import type { Evento, ReactionType, CommentData, Miembro } from '../../../firebase/services'
+import { updateActivityRecord, uploadRecordPhoto, toggleReaction, addComment, subscribeToComments, observarMiembros } from '../../../firebase/services'
 import { useAuth } from '../../../context/AuthContext'
 import { playReactionSound, playCommentSendSound, playCloseSound, playStarSound, playDeleteSound, playSuccessSound, playClickSound } from '../../../utils/audio'
 
@@ -41,6 +41,8 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
   const [comments, setComments] = useState<CommentData[]>([])
   const [visibleCommentsLimit, setVisibleCommentsLimit] = useState(5)
   const [commentText, setCommentText] = useState('')
+  const [showReactions, setShowReactions] = useState(false)
+  const [miembros, setMiembros] = useState<Miembro[]>([])
 
   const reactions = evento.reactions ?? {}
   const currentUserId = user?.uid
@@ -50,6 +52,19 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
     const unsub = subscribeToComments(groupId, evento.id, setComments)
     return unsub
   }, [groupId, evento.id])
+
+  useEffect(() => {
+    const unsub = observarMiembros(groupId, setMiembros)
+    return unsub
+  }, [groupId])
+
+  const reactionUsers = Object.entries(reactions).map(([userId, tipo]) => {
+    const miembro = miembros.find((m) => m.id === userId)
+    const nombre = miembro
+      ? miembro.nickname || miembro.displayName.split(' ')[0]
+      : userId
+    return { userId, tipo: tipo as ReactionType, nombre }
+  })
 
   const handleToggleReaction = async (reactionType: ReactionType) => {
     if (!currentUserId || !evento.id) return
@@ -223,6 +238,66 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
             </span>
           )}
         </div>
+
+        <button
+          onClick={() => { playClickSound(); setShowReactions(true) }}
+          className="flex items-center gap-1 px-2 py-1 border-2 border-black dark:border-white bg-cyan-300 dark:bg-cyan-500 text-black font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+        >
+          VER REACCIONES
+        </button>
+
+        {showReactions && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+            onClick={() => setShowReactions(false)}
+          >
+            <div
+              className="w-full max-w-xs bg-white dark:bg-gray-800 border-4 border-black dark:border-white shadow-[8px_8px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_rgba(255,255,255,1)] p-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-3 border-b-4 border-black dark:border-white pb-2">
+                <p className="text-xs font-black uppercase tracking-widest text-black dark:text-white">
+                  REACCIONES
+                </p>
+                <span className="text-[10px] font-black text-gray-500 dark:text-gray-400">
+                  {reactionUsers.length}
+                </span>
+              </div>
+
+              {reactionUsers.length === 0 ? (
+                <p className="text-sm font-black uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center py-6">
+                  Nadie ha reaccionado aun
+                </p>
+              ) : (
+                <div className="max-h-56 overflow-y-auto">
+                  {reactionUsers.map(({ userId, tipo, nombre }) => {
+                    const ReactionIcon = REACTION_CONFIG[tipo]?.icon
+                    return (
+                      <div
+                        key={userId}
+                        className="flex items-center justify-between border-b-2 border-black dark:border-white py-2 last:border-b-0"
+                      >
+                        <p className="font-black text-lg uppercase text-black dark:text-white truncate">
+                          {nombre}
+                        </p>
+                        {ReactionIcon && (
+                          <ReactionIcon size={16} strokeWidth={2.5} className="text-black dark:text-white shrink-0" />
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
+              <button
+                onClick={() => { playCloseSound(); setShowReactions(false) }}
+                className="w-full mt-4 py-2 bg-red-500 border-2 border-black text-black font-black text-xs uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 active:translate-y-0.5 active:shadow-none transition-all"
+              >
+                CERRAR
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="border-2 border-black dark:border-white bg-white dark:bg-gray-800 p-3 space-y-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
           {comments.length === 0 ? (
