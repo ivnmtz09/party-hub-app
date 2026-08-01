@@ -41,7 +41,7 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
   const [comments, setComments] = useState<CommentData[]>([])
   const [visibleCommentsLimit, setVisibleCommentsLimit] = useState(5)
   const [commentText, setCommentText] = useState('')
-  const [showReactions, setShowReactions] = useState(false)
+  const [showReactionsList, setShowReactionsList] = useState(false)
   const [miembros, setMiembros] = useState<Miembro[]>([])
 
   const reactions = evento.reactions ?? {}
@@ -216,18 +216,33 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
             const count = Object.values(reactions).filter((r) => r === type).length
             const isActive = currentUserId && reactions[currentUserId] === type
             return (
-              <button
+              <span
                 key={type}
-                onClick={() => handleToggleReaction(type)}
-                className={`flex items-center gap-1 px-2 py-1 border-2 border-black dark:border-white font-black text-[10px] uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
-                  isActive
-                    ? `${activeBg} text-black`
-                    : 'bg-white dark:bg-gray-800 text-black dark:text-white'
-                }`}
+                className="inline-flex items-center gap-1"
               >
-                <Icon size={12} strokeWidth={2.5} />
-                {count > 0 && <span>{count}</span>}
-              </button>
+                <button
+                  onClick={() => handleToggleReaction(type)}
+                  className={`flex items-center gap-1 px-2 py-1 border-2 border-black dark:border-white font-black text-[10px] uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
+                    isActive
+                      ? `${activeBg} text-black`
+                      : 'bg-white dark:bg-gray-800 text-black dark:text-white'
+                  }`}
+                >
+                  <Icon size={12} strokeWidth={2.5} />
+                </button>
+                {count > 0 && (
+                  <button
+                    onClick={() => { playClickSound(); setShowReactionsList((prev) => !prev) }}
+                    className={`px-2 py-1 border-2 border-black dark:border-white font-black text-[10px] uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
+                      showReactionsList
+                        ? 'bg-blue-400 dark:bg-blue-500 text-black'
+                        : 'bg-white dark:bg-gray-800 text-black dark:text-white'
+                    }`}
+                  >
+                    {count}
+                  </button>
+                )}
+              </span>
             )
           })}
 
@@ -239,63 +254,27 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
           )}
         </div>
 
-        <button
-          onClick={() => { playClickSound(); setShowReactions(true) }}
-          className="flex items-center gap-1 px-2 py-1 border-2 border-black dark:border-white bg-cyan-300 dark:bg-cyan-500 text-black font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
-        >
-          VER REACCIONES
-        </button>
-
-        {showReactions && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-            onClick={() => setShowReactions(false)}
-          >
-            <div
-              className="w-full max-w-xs bg-white dark:bg-gray-800 border-4 border-black dark:border-white shadow-[8px_8px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_rgba(255,255,255,1)] p-4"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between mb-3 border-b-4 border-black dark:border-white pb-2">
-                <p className="text-xs font-black uppercase tracking-widest text-black dark:text-white">
-                  REACCIONES
-                </p>
-                <span className="text-[10px] font-black text-gray-500 dark:text-gray-400">
-                  {reactionUsers.length}
-                </span>
+        {showReactionsList && (
+          <div className="mt-3 p-3 bg-gray-100 dark:bg-gray-800 border-2 border-black dark:border-white">
+            <h4 className="font-black text-sm uppercase mb-2 border-b-2 border-black dark:border-white pb-1 text-black dark:text-white">
+              Han reaccionado:
+            </h4>
+            {reactionUsers.length === 0 ? (
+              <p className="font-bold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                Aun no hay reacciones
+              </p>
+            ) : (
+              <div>
+                {reactionUsers.map(({ userId, nombre }) => (
+                  <span
+                    key={userId}
+                    className="inline-block bg-yellow-300 dark:bg-yellow-500 border border-black dark:border-white font-bold text-xs px-2 py-1 mr-2 mb-2 text-black"
+                  >
+                    {nombre}
+                  </span>
+                ))}
               </div>
-
-              {reactionUsers.length === 0 ? (
-                <p className="text-sm font-black uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center py-6">
-                  Nadie ha reaccionado aun
-                </p>
-              ) : (
-                <div className="max-h-56 overflow-y-auto">
-                  {reactionUsers.map(({ userId, tipo, nombre }) => {
-                    const ReactionIcon = REACTION_CONFIG[tipo]?.icon
-                    return (
-                      <div
-                        key={userId}
-                        className="flex items-center justify-between border-b-2 border-black dark:border-white py-2 last:border-b-0"
-                      >
-                        <p className="font-black text-lg uppercase text-black dark:text-white truncate">
-                          {nombre}
-                        </p>
-                        {ReactionIcon && (
-                          <ReactionIcon size={16} strokeWidth={2.5} className="text-black dark:text-white shrink-0" />
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-
-              <button
-                onClick={() => { playCloseSound(); setShowReactions(false) }}
-                className="w-full mt-4 py-2 bg-red-500 border-2 border-black text-black font-black text-xs uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 active:translate-y-0.5 active:shadow-none transition-all"
-              >
-                CERRAR
-              </button>
-            </div>
+            )}
           </div>
         )}
 
