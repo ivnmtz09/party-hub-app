@@ -372,6 +372,7 @@ export async function toggleReaction(
         actorName: perfil?.nickname || 'Alguien',
         type: 'reaction',
         activityId: recordId,
+        activityType: data.tipo as string,
       })
     }
   }
@@ -400,6 +401,7 @@ export async function addComment(
         actorName: commentData.nickname,
         type: 'comment',
         activityId: recordId,
+        activityType: evento.tipo,
       })
     }
   }
@@ -430,6 +432,7 @@ export interface Notificacion {
   actorName: string
   type: 'reaction' | 'comment'
   activityId: string
+  activityType: string
   createdAt: Timestamp | null
   read: boolean
 }

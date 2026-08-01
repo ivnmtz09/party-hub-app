@@ -5,10 +5,26 @@ import { observarNotificaciones, marcarNotificacionLeida } from '../firebase/ser
 import { useAuth } from '../context/AuthContext'
 import { playOpenSound, playCloseSound, playClickSound } from '../utils/audio'
 
-function textoNotificacion(n: Notificacion): string {
-  return n.type === 'reaction'
-    ? `${n.actorName} reacciono a tu registro`
-    : `${n.actorName} comento en tu registro`
+const ACTIVITY_LABEL: Record<string, string> = {
+  deposicion: 'cagada',
+  acto_sexual: 'culeada',
+  meada: 'meada',
+  gym: 'gym',
+}
+
+function textoNotificacion(n: Notificacion) {
+  const actividad = ACTIVITY_LABEL[n.activityType] ?? n.activityType
+  return n.type === 'reaction' ? (
+    <p className="text-xs font-bold text-black dark:text-white">
+      <span className="font-black">{n.actorName}</span> reacciono a tu{' '}
+      <span className="font-black">{actividad}</span>
+    </p>
+  ) : (
+    <p className="text-xs font-bold text-black dark:text-white">
+      <span className="font-black">{n.actorName}</span> comento en tu{' '}
+      <span className="font-black">{actividad}</span>
+    </p>
+  )
 }
 
 export default function NotificationBell() {
@@ -83,15 +99,11 @@ export default function NotificationBell() {
                   <button
                     key={n.id}
                     onClick={() => handleClickNotificacion(n)}
-                    className={`w-full text-left p-3 border-b-2 border-black dark:border-white last:border-b-0 hover:bg-cyan-200 dark:hover:bg-cyan-600 transition-colors ${
-                      n.read ? 'opacity-60' : 'opacity-100'
-                    }`}
+                    className="w-full flex items-start justify-between gap-2 p-4 border-b-4 border-black dark:border-white last:border-b-0 bg-white dark:bg-gray-800 hover:bg-yellow-400 dark:hover:bg-yellow-500 hover:text-black transition-colors text-left"
                   >
-                    <p className="text-xs font-black text-black dark:text-white">
-                      {textoNotificacion(n)}
-                    </p>
+                    {textoNotificacion(n)}
                     {!n.read && (
-                      <span className="mt-1 inline-block w-2.5 h-2.5 border-2 border-black bg-red-500" />
+                      <span className="mt-1 w-3 h-3 shrink-0 border-2 border-black bg-red-500 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]" />
                     )}
                   </button>
                 ))}
