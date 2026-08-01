@@ -148,7 +148,7 @@ export default function RecentActivity({ miembros, userId, groupId }: Props) {
               ) : ev.tipo === 'acto_sexual' ? (
                 <Flame size={16} strokeWidth={2.5} className="text-pink-500" />
               ) : ev.tipo === 'meada' ? (
-                <Droplet size={16} strokeWidth={2.5} className="text-black" />
+                <Droplet size={16} strokeWidth={2.5} className="text-yellow-400 dark:text-yellow-500" />
               ) : (
                 <Dumbbell size={16} strokeWidth={2.5} className="text-cyan-500" />
               )
@@ -160,7 +160,7 @@ export default function RecentActivity({ miembros, userId, groupId }: Props) {
                 >
                   {renderAvatar(member)}
 
-                  <div className={`w-8 h-8 border-2 border-black dark:border-white flex items-center justify-center shrink-0 ${ev.tipo === 'meada' ? 'bg-yellow-400 dark:bg-yellow-500' : 'bg-gray-100 dark:bg-gray-700'}`}>
+                  <div className="w-8 h-8 border-2 border-black dark:border-white flex items-center justify-center shrink-0 bg-gray-100 dark:bg-gray-700">
                     {icono}
                   </div>
 
