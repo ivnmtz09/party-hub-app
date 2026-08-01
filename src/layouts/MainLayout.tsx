@@ -3,6 +3,7 @@ import { Outlet, NavLink } from 'react-router-dom'
 import { Menu, Gamepad2, LayoutDashboard } from 'lucide-react'
 import SideDrawer from '../components/SideDrawer'
 import BrandLogo from '../components/BrandLogo'
+import NotificationBell from '../components/NotificationBell'
 
 const navItems = [
   { to: '/arcade', label: 'Arcade', icon: Gamepad2 },
@@ -23,7 +24,7 @@ export default function MainLayout() {
             <Menu size={22} strokeWidth={2.5} />
           </button>
           <BrandLogo size="sm" />
-          <div className="w-10" />
+          <NotificationBell />
         </div>
       </header>
 

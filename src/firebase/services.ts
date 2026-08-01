@@ -362,6 +362,18 @@ export async function toggleReaction(
     await updateDoc(eventoRef, { reactions: updated })
   } else {
     await updateDoc(eventoRef, { reactions: { ...reactions, [userId]: reactionType } })
+
+    const receptorId = data.userId as string | undefined
+    if (receptorId && receptorId !== userId) {
+      const perfil = await getUserProfile(userId)
+      await crearNotificacion({
+        userId: receptorId,
+        actorId: userId,
+        actorName: perfil?.nickname || 'Alguien',
+        type: 'reaction',
+        activityId: recordId,
+      })
+    }
   }
 }
 
@@ -377,6 +389,21 @@ export async function addComment(
     ...commentData,
     createdAt: serverTimestamp(),
   })
+
+  const eventoSnap = await getDoc(doc(db, 'grupos', groupId, 'eventos', recordId))
+  if (eventoSnap.exists()) {
+    const evento = eventoSnap.data() as Evento
+    if (evento.userId && evento.userId !== commentData.userId) {
+      await crearNotificacion({
+        userId: evento.userId,
+        actorId: commentData.userId,
+        actorName: commentData.nickname,
+        type: 'comment',
+        activityId: recordId,
+      })
+    }
+  }
+
   return docRef.id
 }
 
@@ -392,6 +419,52 @@ export function subscribeToComments(
     snap.forEach((d) => lista.push({ id: d.id, ...d.data() } as CommentData))
     callback(lista)
   })
+}
+
+/* ───── Notificaciones ───── */
+
+export interface Notificacion {
+  id?: string
+  userId: string
+  actorId: string
+  actorName: string
+  type: 'reaction' | 'comment'
+  activityId: string
+  createdAt: Timestamp | null
+  read: boolean
+}
+
+async function crearNotificacion(
+  data: Omit<Notificacion, 'id' | 'createdAt' | 'read'>,
+): Promise<void> {
+  const notifRef = collection(db, 'notifications')
+  await addDoc(notifRef, {
+    ...data,
+    createdAt: serverTimestamp(),
+    read: false,
+  })
+}
+
+export function observarNotificaciones(
+  userId: string,
+  callback: (notificaciones: Notificacion[]) => void,
+): () => void {
+  const notifRef = collection(db, 'notifications')
+  const q = query(notifRef, where('userId', '==', userId))
+  return onSnapshot(q, (snap) => {
+    const lista: Notificacion[] = []
+    snap.forEach((d) => lista.push({ id: d.id, ...d.data() } as Notificacion))
+    lista.sort((a, b) => {
+      const ta = a.createdAt?.toMillis?.() ?? 0
+      const tb = b.createdAt?.toMillis?.() ?? 0
+      return tb - ta
+    })
+    callback(lista)
+  })
+}
+
+export async function marcarNotificacionLeida(notifId: string): Promise<void> {
+  await updateDoc(doc(db, 'notifications', notifId), { read: true })
 }
 
 /* ───── Perfil de Usuario ───── */
