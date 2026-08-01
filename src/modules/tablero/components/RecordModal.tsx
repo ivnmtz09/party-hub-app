@@ -8,6 +8,7 @@ import {
   Trash2,
   Flame,
   Dumbbell,
+  Droplet,
 } from 'lucide-react'
 import type { Timestamp } from 'firebase/firestore'
 import type { Evento, Miembro } from '../../../firebase/services'
@@ -190,7 +191,7 @@ export default function RecordModal(props: Props) {
     ) : tipo === 'acto_sexual' ? (
       <Flame size={20} strokeWidth={2.5} className="text-pink-500" />
     ) : tipo === 'meada' ? (
-      <span className="text-[11px] font-black text-yellow-600 dark:text-yellow-400">[ M ]</span>
+      <Droplet size={20} strokeWidth={2.5} className="text-yellow-500 dark:text-yellow-400" />
     ) : (
       <Dumbbell size={20} strokeWidth={2.5} className="text-cyan-500" />
     )

@@ -21,12 +21,14 @@ export default function StatsChart({ miembros, eventos, filterLabel }: Props) {
     const eventosUsuario = eventos.filter((e) => e.userId === m.id)
     const cagadas = eventosUsuario.filter((e) => e.tipo === 'deposicion').length
     const culeadas = eventosUsuario.filter((e) => e.tipo === 'acto_sexual').length
+    const meadas = eventosUsuario.filter((e) => e.tipo === 'meada').length
     const gimnasio = eventosUsuario.filter((e) => e.tipo === 'gym').length
 
     return {
       name: m.nickname || m.displayName.split(' ')[0],
       CAGADAS: cagadas,
       CULEADAS: culeadas,
+      MEADAS: meadas,
       GYM: gimnasio,
     }
   })
@@ -47,7 +49,7 @@ export default function StatsChart({ miembros, eventos, filterLabel }: Props) {
     >
       <div className="flex flex-col gap-1 mb-4">
         <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-          Cagadas vs Culeadas vs Gym
+          Cagadas vs Culeadas vs Meadas vs Gym
         </h3>
         <div className="inline-block self-start bg-yellow-300 dark:bg-yellow-400 text-black border-2 border-black dark:border-white px-2.5 py-1 text-xs font-black uppercase tracking-widest shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
           ESTADÍSTICAS DE {displayTitle}
@@ -102,6 +104,14 @@ export default function StatsChart({ miembros, eventos, filterLabel }: Props) {
             strokeWidth={2}
           >
             <LabelList className="fill-black dark:fill-white font-black text-sm" dataKey="CULEADAS" offset={10} position="right" />
+          </Bar>
+          <Bar
+            dataKey="MEADAS"
+            fill="#facc15"
+            stroke="#000"
+            strokeWidth={2}
+          >
+            <LabelList className="fill-black dark:fill-white font-black text-sm" dataKey="MEADAS" offset={10} position="right" />
           </Bar>
           <Bar
             dataKey="GYM"

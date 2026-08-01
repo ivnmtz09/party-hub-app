@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Trash2, Flame, Dumbbell, Check, X, Eye, ChevronDown } from 'lucide-react'
+import { Trash2, Flame, Dumbbell, Droplet, Check, X, Eye, ChevronDown } from 'lucide-react'
 import { doc, updateDoc } from 'firebase/firestore'
 import { ref, deleteObject } from 'firebase/storage'
 import type { Timestamp } from 'firebase/firestore'
@@ -148,7 +148,7 @@ export default function RecentActivity({ miembros, userId, groupId }: Props) {
               ) : ev.tipo === 'acto_sexual' ? (
                 <Flame size={16} strokeWidth={2.5} className="text-pink-500" />
               ) : ev.tipo === 'meada' ? (
-                <span className="text-[9px] font-black text-yellow-600 dark:text-yellow-400">[ M ]</span>
+                <Droplet size={16} strokeWidth={2.5} className="text-black" />
               ) : (
                 <Dumbbell size={16} strokeWidth={2.5} className="text-cyan-500" />
               )
