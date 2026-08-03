@@ -3,8 +3,13 @@ import {
   ArrowUp,
   ArrowDown,
   Banknote,
+  BookOpen,
+  Clock,
+  CloudRain,
+  Coins,
   Droplet,
   Hamburger,
+  Leaf,
   Moon,
 } from 'lucide-react'
 import {
@@ -34,6 +39,11 @@ const SUCESOS = [
   { type: 'comi_chatarra', label: 'COMÍ CHATARRA', icon: Hamburger, bg: 'bg-orange-400 dark:bg-orange-500 text-black dark:text-gray-900' },
   { type: 'gaste_plata', label: 'GASTÉ PLATA', icon: Banknote, bg: 'bg-yellow-300 dark:bg-yellow-500 text-black' },
   { type: 'dormi_bien', label: 'DORMÍ BIEN', icon: Moon, bg: 'bg-cyan-300 dark:bg-cyan-500 text-black dark:text-gray-900' },
+  { type: 'gane_plata', label: 'GANÉ PLATA', icon: Coins, bg: 'bg-green-400 dark:bg-green-500 text-black dark:text-gray-900' },
+  { type: 'comi_saludable', label: 'COMÍ SALUDABLE', icon: Leaf, bg: 'bg-lime-400 dark:bg-lime-500 text-black' },
+  { type: 'dormi_mal', label: 'DORMÍ MAL', icon: CloudRain, bg: 'bg-slate-400 dark:bg-slate-500 text-black dark:text-gray-900' },
+  { type: 'hice_deberes', label: 'HICE DEBERES', icon: BookOpen, bg: 'bg-blue-300 dark:bg-blue-400 text-black' },
+  { type: 'procrastine', label: 'PROCRASTINÉ', icon: Clock, bg: 'bg-pink-400 dark:bg-pink-500 text-black dark:text-gray-900' },
 ] as const
 
 const SUCESO_LABEL: Record<string, string> = {
@@ -43,6 +53,11 @@ const SUCESO_LABEL: Record<string, string> = {
   comi_chatarra: 'COMÍ CHATARRA',
   gaste_plata: 'GASTÉ PLATA',
   dormi_bien: 'DORMÍ BIEN',
+  gane_plata: 'GANÉ PLATA',
+  comi_saludable: 'COMÍ SALUDABLE',
+  dormi_mal: 'DORMÍ MAL',
+  hice_deberes: 'HICE DEBERES',
+  procrastine: 'PROCRASTINÉ',
 }
 
 function tiempoRelativo(ts: Timestamp | null): string {
@@ -82,10 +97,16 @@ export default function MuralPage() {
   useEffect(() => {
     if (!groupId) return
     setLoading(true)
-    const unsub = observarEventosMural(groupId, (lista) => {
-      setEventos(lista)
-      setLoading(false)
-    })
+    const unsub = observarEventosMural(
+      groupId,
+      (lista) => {
+        setEventos(lista)
+        setLoading(false)
+      },
+      () => {
+        setLoading(false)
+      },
+    )
     return unsub
   }, [groupId])
 
@@ -210,7 +231,7 @@ export default function MuralPage() {
                     )}
                   />
                   <CartesianGrid horizontal={false} vertical={true} strokeDasharray="4 4" stroke="#9ca3af" opacity={0.6} />
-                  <Bar dataKey="total" fill="#3b82f6" stroke="#000" strokeWidth={2} radius={[0, 0, 0, 0]}>
+                  <Bar dataKey="total" fill="#60a5fa" stroke="#000" strokeWidth={2} radius={[0, 0, 0, 0]}>
                     <LabelList className="fill-black dark:fill-white font-black text-sm" dataKey="total" offset={10} position="right" />
                   </Bar>
                 </BarChart>
@@ -225,13 +246,13 @@ export default function MuralPage() {
           Sucesos Rápidos
         </h3>
         <div className="grid grid-cols-2 gap-3">
-          {SUCESOS.map((suceso, index) => {
+          {SUCESOS.map((suceso) => {
             const Icon = suceso.icon
             return (
               <button
                 key={suceso.type}
                 onClick={() => handleSuceso(suceso.type)}
-                className={`flex items-center justify-center gap-2 py-4 px-3 border-4 border-black ${suceso.bg} font-black uppercase tracking-wider text-xs shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none active:translate-y-1 active:shadow-none transition-all ${index === SUCESOS.length - 1 ? 'col-span-2' : ''}`}
+                className={`flex items-center justify-center gap-2 py-4 px-3 border-4 border-black ${suceso.bg} font-black uppercase tracking-wider text-xs shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none active:translate-y-1 active:shadow-none transition-all`}
               >
                 <Icon size={18} strokeWidth={2.5} />
                 {suceso.label}
@@ -250,8 +271,8 @@ export default function MuralPage() {
             <Skeleton variant="listItem" count={5} />
           ) : feedEventos.length === 0 ? (
             <div className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[4px_4px_0px_rgba(0,0,0,1)]">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center">
-                Aun no hay sucesos
+              <p className="text-xs font-black uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center">
+                AUN NO HAY ACTIVIDAD HOY
               </p>
             </div>
           ) : (

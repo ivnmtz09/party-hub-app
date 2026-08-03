@@ -1228,6 +1228,7 @@ export async function registrarEventoMural(
 export function observarEventosMural(
   groupId: string,
   callback: (eventos: MuralEvent[]) => void,
+  onError?: (error: Error) => void,
 ): () => void {
   const muralRef = collection(db, 'mural_events')
   const q = query(
@@ -1236,9 +1237,16 @@ export function observarEventosMural(
     orderBy('createdAt', 'desc'),
     limit(100),
   )
-  return onSnapshot(q, (snap) => {
-    const lista: MuralEvent[] = []
-    snap.forEach((d) => lista.push({ id: d.id, ...d.data() } as MuralEvent))
-    callback(lista)
-  })
+  return onSnapshot(
+    q,
+    (snap) => {
+      const lista: MuralEvent[] = []
+      snap.forEach((d) => lista.push({ id: d.id, ...d.data() } as MuralEvent))
+      callback(lista)
+    },
+    (error) => {
+      console.error('Error al cargar mural_events:', error)
+      if (onError) onError(error)
+    },
+  )
 }
