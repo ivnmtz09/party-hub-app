@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import {
   X,
   Star,
@@ -12,7 +12,8 @@ import {
 } from 'lucide-react'
 import type { Timestamp } from 'firebase/firestore'
 import type { Evento, Miembro } from '../../../firebase/services'
-import { updateActivityRecord, uploadRecordPhoto } from '../../../firebase/services'
+import { updateActivityRecord } from '../../../firebase/services'
+import { useNeoToast } from '../../../components/NeoToast'
 
 interface AnchorRect {
   x: number
@@ -80,6 +81,7 @@ function getModalPosition(anchor?: AnchorRect) {
 
 export default function RecordModal(props: Props) {
   const { open, onClose, groupId, anchorRect } = props
+  const { showToast } = useNeoToast()
 
   const isCreate = props.mode === 'create'
   const tipo = isCreate ? props.tipo : props.evento.tipo
@@ -96,7 +98,6 @@ export default function RecordModal(props: Props) {
   )
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (!open) return
@@ -114,16 +115,8 @@ export default function RecordModal(props: Props) {
     setError('')
   }, [open])
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setError('')
-    try {
-      const url = await uploadRecordPhoto(file)
-      setPhotoUrl(url)
-    } catch (err) {
-      setError((err as Error).message)
-    }
+  const handlePhotoDisabledClick = () => {
+    showToast('SUBIDA DE IMÁGENES TEMPORALMENTE DESHABILITADA')
   }
 
   const handleSave = async () => {
@@ -287,31 +280,25 @@ export default function RecordModal(props: Props) {
 
             <div>
               <label className="block text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
-                Foto
+                Foto (subida deshabilitada)
               </label>
               <div className="flex gap-2">
-                <label className="flex-1 flex items-center justify-center gap-2 py-3 px-4 border-4 border-black dark:border-white bg-gray-100 dark:bg-gray-700 text-black dark:text-white font-bold text-xs uppercase tracking-wider cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                <button
+                  type="button"
+                  onClick={handlePhotoDisabledClick}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 border-4 border-black dark:border-white bg-gray-300 dark:bg-gray-700 text-black dark:text-white font-bold text-xs uppercase tracking-wider cursor-not-allowed opacity-70 transition-colors"
+                >
                   <Camera size={16} strokeWidth={2.5} />
                   Tomar Foto
-                  <input
-                    ref={fileRef}
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
-                </label>
-                <label className="flex-1 flex items-center justify-center gap-2 py-3 px-4 border-4 border-black dark:border-white bg-gray-100 dark:bg-gray-700 text-black dark:text-white font-bold text-xs uppercase tracking-wider cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePhotoDisabledClick}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 border-4 border-black dark:border-white bg-gray-300 dark:bg-gray-700 text-black dark:text-white font-bold text-xs uppercase tracking-wider cursor-not-allowed opacity-70 transition-colors"
+                >
                   <Edit size={16} strokeWidth={2.5} />
                   Galeria
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
-                </label>
+                </button>
               </div>
               {photoUrl && (
                 <div className="mt-3 border-4 border-black dark:border-white p-2">

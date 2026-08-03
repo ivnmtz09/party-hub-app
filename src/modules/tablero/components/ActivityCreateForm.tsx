@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Star, Save, X, Camera, Edit, Trash2, Trash2Icon, Flame, Dumbbell, Droplets } from 'lucide-react'
-import { registrarEvento, uploadRecordPhoto } from '../../../firebase/services'
+import { registrarEvento } from '../../../firebase/services'
+import { useNeoToast } from '../../../components/NeoToast'
 import { playStarSound, playDeleteSound, playSuccessSound, playCloseSound, playClickSound } from '../../../utils/audio'
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function ActivityCreateForm({ groupId, userId, onClose }: Props) {
+  const { showToast } = useNeoToast()
   const [tipo, setTipo] = useState<'deposicion' | 'acto_sexual' | 'gym' | 'meada'>('deposicion')
   const [rating, setRating] = useState(0)
   const [note, setNote] = useState('')
@@ -41,16 +43,8 @@ export default function ActivityCreateForm({ groupId, userId, onClose }: Props) 
     </div>
   )
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setError('')
-    try {
-      const url = await uploadRecordPhoto(file)
-      setPhotoUrl(url)
-    } catch (err) {
-      setError((err as Error).message)
-    }
+  const handlePhotoDisabledClick = () => {
+    showToast('SUBIDA DE IMÁGENES TEMPORALMENTE DESHABILITADA')
   }
 
   const handleSave = async () => {
@@ -123,30 +117,25 @@ export default function ActivityCreateForm({ groupId, userId, onClose }: Props) 
 
       <div>
         <label className="block text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1">
-          Foto
+          Foto (subida deshabilitada)
         </label>
         <div className="flex gap-2">
-          <label className="flex-1 flex items-center justify-center gap-1 py-2 px-3 border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-700 text-black dark:text-white font-bold text-[10px] uppercase tracking-wider cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+          <button
+            type="button"
+            onClick={handlePhotoDisabledClick}
+            className="flex-1 flex items-center justify-center gap-1 py-2 px-3 border-2 border-black dark:border-white bg-gray-300 dark:bg-gray-700 text-black dark:text-white font-bold text-[10px] uppercase tracking-wider cursor-not-allowed opacity-70 transition-colors"
+          >
             <Camera size={12} strokeWidth={2.5} />
             Camara
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-          </label>
-          <label className="flex-1 flex items-center justify-center gap-1 py-2 px-3 border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-700 text-black dark:text-white font-bold text-[10px] uppercase tracking-wider cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+          </button>
+          <button
+            type="button"
+            onClick={handlePhotoDisabledClick}
+            className="flex-1 flex items-center justify-center gap-1 py-2 px-3 border-2 border-black dark:border-white bg-gray-300 dark:bg-gray-700 text-black dark:text-white font-bold text-[10px] uppercase tracking-wider cursor-not-allowed opacity-70 transition-colors"
+          >
             <Edit size={12} strokeWidth={2.5} />
             Galeria
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-          </label>
+          </button>
         </div>
         {photoUrl && (
           <div className="mt-2 border-2 border-black dark:border-white p-1">

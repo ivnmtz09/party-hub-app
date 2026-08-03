@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from 'react'
+import { useState } from 'react'
 import {
   X,
   Star,
@@ -10,9 +10,8 @@ import {
   Droplets,
   Save,
 } from 'lucide-react'
-import imageCompression from 'browser-image-compression'
-import { uploadRecordPhoto } from '../../../firebase/services'
-import { playCagadaSound, playCuleadaSound, playGymSound, playMeadaSound, playSuccessSound, playCloseSound, playStarSound, playToggleOffSound, playDeleteSound } from '../../../utils/audio'
+import { useNeoToast } from '../../../components/NeoToast'
+import { playCagadaSound, playCuleadaSound, playGymSound, playMeadaSound, playSuccessSound, playCloseSound, playStarSound, playToggleOffSound } from '../../../utils/audio'
 
 interface Props {
   groupId: string
@@ -28,16 +27,15 @@ const TIPO_OPTIONS = [
   { tipo: 'meada' as const, label: 'MEADA', icon: Droplets, color: 'bg-yellow-400 dark:bg-yellow-500', ring: 'ring-yellow-400 dark:ring-yellow-500' },
 ]
 
+const PHOTO_DISABLED_MESSAGE = 'SUBIDA DE IMÁGENES TEMPORALMENTE DESHABILITADA'
+
 export default function RecordInlineForm({ onClose, onSave }: Props) {
+  const { showToast } = useNeoToast()
   const [selectedTipo, setSelectedTipo] = useState<'deposicion' | 'acto_sexual' | 'gym' | 'meada' | null>(null)
   const [rating, setRating] = useState(0)
   const [note, setNote] = useState('')
-  const [photoUrl, setPhotoUrl] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [rawFile, setRawFile] = useState<File | null>(null)
-  const fileRef = useRef<HTMLInputElement>(null)
-  const previewUrl = useMemo(() => (rawFile ? URL.createObjectURL(rawFile) : ''), [rawFile])
 
   const handleSelectTipo = (tipo: 'deposicion' | 'acto_sexual' | 'gym' | 'meada') => {
     if (tipo === 'deposicion') playCagadaSound()
@@ -47,15 +45,8 @@ export default function RecordInlineForm({ onClose, onSave }: Props) {
     setSelectedTipo(tipo)
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    if (file.size > 20 * 1024 * 1024) {
-      alert('Maximo 20MB')
-      return
-    }
-    setError('')
-    setRawFile(file)
+  const handlePhotoDisabledClick = () => {
+    showToast(PHOTO_DISABLED_MESSAGE)
   }
 
   const handleSave = async () => {
@@ -63,13 +54,7 @@ export default function RecordInlineForm({ onClose, onSave }: Props) {
     setSaving(true)
     setError('')
     try {
-      let finalPhotoUrl = photoUrl
-      if (rawFile) {
-        const options = { maxSizeMB: 0.9, maxWidthOrHeight: 1920, useWebWorker: true }
-        const compressedFile = await imageCompression(rawFile, options)
-        finalPhotoUrl = await uploadRecordPhoto(compressedFile)
-      }
-      await onSave(selectedTipo, { rating, note, photoUrl: finalPhotoUrl })
+      await onSave(selectedTipo, { rating, note, photoUrl: '' })
       playSuccessSound()
       onClose()
     } catch (err) {
@@ -125,7 +110,7 @@ export default function RecordInlineForm({ onClose, onSave }: Props) {
       ) : (
         <div className="space-y-3">
           <button
-            onClick={() => { playToggleOffSound(); setSelectedTipo(null); setRating(0); setNote(''); setPhotoUrl(''); setRawFile(null); setError(''); }}
+            onClick={() => { playToggleOffSound(); setSelectedTipo(null); setRating(0); setNote(''); setError(''); }}
             className="inline-flex items-center gap-1.5 py-1.5 px-3 border-2 border-black dark:border-white bg-yellow-300 dark:bg-yellow-400 text-black font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
           >
             Cambiar tipo
@@ -172,48 +157,26 @@ export default function RecordInlineForm({ onClose, onSave }: Props) {
 
           <div>
             <label className="block text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1">
-              Foto (max 20MB, se comprime al guardar)
+              Foto (subida deshabilitada)
             </label>
             <div className="flex gap-2">
-              <label className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 border-4 border-black dark:border-white bg-gray-100 dark:bg-gray-700 text-black dark:text-white font-bold text-[10px] uppercase tracking-wider cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+              <button
+                type="button"
+                onClick={handlePhotoDisabledClick}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 border-4 border-black dark:border-white bg-gray-300 dark:bg-gray-700 text-black dark:text-white font-bold text-[10px] uppercase tracking-wider cursor-not-allowed opacity-70 transition-colors"
+              >
                 <Camera size={14} strokeWidth={2.5} />
                 Camara
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-              </label>
-              <label className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 border-4 border-black dark:border-white bg-gray-100 dark:bg-gray-700 text-black dark:text-white font-bold text-[10px] uppercase tracking-wider cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+              </button>
+              <button
+                type="button"
+                onClick={handlePhotoDisabledClick}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 border-4 border-black dark:border-white bg-gray-300 dark:bg-gray-700 text-black dark:text-white font-bold text-[10px] uppercase tracking-wider cursor-not-allowed opacity-70 transition-colors"
+              >
                 <Edit size={14} strokeWidth={2.5} />
                 Galeria
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-              </label>
+              </button>
             </div>
-            {(photoUrl || previewUrl) && (
-              <div className="mt-2 border-4 border-black dark:border-white p-2">
-                <img
-                  src={photoUrl || previewUrl}
-                  alt="Preview"
-                  className="w-full h-24 object-cover border-2 border-black dark:border-white"
-                />
-                <button
-                  onClick={() => { playDeleteSound(); setPhotoUrl(''); setRawFile(null); }}
-                  className="mt-1 flex items-center gap-1 text-red-600 font-black text-[10px] uppercase tracking-wider"
-                >
-                  <Trash2 size={10} strokeWidth={2.5} />
-                  Eliminar foto
-                </button>
-              </div>
-            )}
           </div>
 
           {error && (

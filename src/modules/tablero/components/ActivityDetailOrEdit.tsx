@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Star, Pencil, Save, X, Camera, Edit, Trash2, Heart, Flame, Smile, Skull, Frown, MessageSquare, Send } from 'lucide-react'
 import type { Evento, ReactionType, CommentData, Miembro } from '../../../firebase/services'
-import { updateActivityRecord, uploadRecordPhoto, toggleReaction, addComment, subscribeToComments, observarMiembros } from '../../../firebase/services'
+import { updateActivityRecord, toggleReaction, addComment, subscribeToComments, observarMiembros } from '../../../firebase/services'
 import { useAuth } from '../../../context/AuthContext'
+import { useNeoToast } from '../../../components/NeoToast'
 import { playReactionSound, playCommentSendSound, playCloseSound, playStarSound, playDeleteSound, playSuccessSound, playClickSound } from '../../../utils/audio'
 
 interface Props {
@@ -31,6 +32,7 @@ const TIPO_BADGE: Record<Evento['tipo'], { label: string; color: string }> = {
 
 export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose }: Props) {
   const { user, userProfile } = useAuth()
+  const { showToast } = useNeoToast()
   const [isEditing, setIsEditing] = useState(false)
   const [rating, setRating] = useState(evento.rating ?? 0)
   const [note, setNote] = useState(evento.note ?? '')
@@ -119,16 +121,8 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
     </div>
   )
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setError('')
-    try {
-      const url = await uploadRecordPhoto(file)
-      setPhotoUrl(url)
-    } catch (err) {
-      setError((err as Error).message)
-    }
+  const handlePhotoDisabledClick = () => {
+    showToast('SUBIDA DE IMÁGENES TEMPORALMENTE DESHABILITADA')
   }
 
   const handleSave = async () => {
@@ -381,30 +375,25 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
 
       <div>
         <label className="block text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1">
-          Foto
+          Foto (subida deshabilitada)
         </label>
         <div className="flex gap-2">
-          <label className="flex-1 flex items-center justify-center gap-1 py-2 px-3 border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-700 text-black dark:text-white font-bold text-[10px] uppercase tracking-wider cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+          <button
+            type="button"
+            onClick={handlePhotoDisabledClick}
+            className="flex-1 flex items-center justify-center gap-1 py-2 px-3 border-2 border-black dark:border-white bg-gray-300 dark:bg-gray-700 text-black dark:text-white font-bold text-[10px] uppercase tracking-wider cursor-not-allowed opacity-70 transition-colors"
+          >
             <Camera size={12} strokeWidth={2.5} />
             Camara
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-          </label>
-          <label className="flex-1 flex items-center justify-center gap-1 py-2 px-3 border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-700 text-black dark:text-white font-bold text-[10px] uppercase tracking-wider cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+          </button>
+          <button
+            type="button"
+            onClick={handlePhotoDisabledClick}
+            className="flex-1 flex items-center justify-center gap-1 py-2 px-3 border-2 border-black dark:border-white bg-gray-300 dark:bg-gray-700 text-black dark:text-white font-bold text-[10px] uppercase tracking-wider cursor-not-allowed opacity-70 transition-colors"
+          >
             <Edit size={12} strokeWidth={2.5} />
             Galeria
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-          </label>
+          </button>
         </div>
         {photoUrl && (
           <div className="mt-2 border-2 border-black dark:border-white p-1">
