@@ -11,6 +11,7 @@ import CodigoSecretoLobby from '../modules/arcade/pages/CodigoSecretoLobby'
 import FrenteLobby from '../modules/arcade/pages/FrenteLobby'
 import ImpostorGameHub from '../modules/arcade/pages/ImpostorGameHub'
 import TableroPage from '../modules/tablero/pages/TableroPage'
+import HistorialPage from '../modules/tablero/pages/HistorialPage'
 import ProfilePage from '../modules/profile/pages/ProfilePage'
 import LoginPage from '../components/LoginPage'
 import SplashScreen from '../components/SplashScreen'
@@ -55,6 +56,7 @@ export const router = createBrowserRouter([
       { path: 'arcade', element: <ArcadePage /> },
       { path: 'tablero', element: <TableroPage /> },
       { path: 'perfil', element: <ProfilePage /> },
+      { path: 'historial', element: <HistorialPage /> },
     ],
   },
   {

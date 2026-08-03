@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { Trash2, Flame, Dumbbell, Droplet, Check, X, Eye, ChevronDown } from 'lucide-react'
 import { doc, updateDoc } from 'firebase/firestore'
 import { ref, deleteObject } from 'firebase/storage'
@@ -88,7 +89,8 @@ export default function RecentActivity({ miembros, userId, groupId }: Props) {
     setExpandedId((prev) => (prev === id ? null : id))
   }
 
-  const shouldShowMore = eventos.length === visibleLimit && visibleLimit < 20
+  const hasExpandedMore = visibleLimit > 5
+  const shouldShowMore = !hasExpandedMore && eventos.length === visibleLimit
 
   const renderAvatar = (miembro: Miembro | undefined) => {
     if (!miembro) {
@@ -238,12 +240,21 @@ export default function RecentActivity({ miembros, userId, groupId }: Props) {
 
           {shouldShowMore && (
             <button
-              onClick={() => { playClickSound(); setVisibleLimit((prev) => Math.min(prev + 5, 20)) }}
+              onClick={() => { playClickSound(); setVisibleLimit(25) }}
               className="w-full flex items-center justify-center gap-2 mt-6 py-3 border-4 border-black dark:border-white bg-cyan-300 dark:bg-cyan-500 text-black dark:text-gray-900 font-black uppercase tracking-wider shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
             >
               <ChevronDown size={16} strokeWidth={2.5} />
               Ver mas...
             </button>
+          )}
+
+          {hasExpandedMore && (
+            <Link
+              to="/historial"
+              className="w-full mt-4 bg-yellow-400 border-4 border-black text-black font-black uppercase py-3 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all flex items-center justify-center gap-2"
+            >
+              VER MUCHOS MAS
+            </Link>
           )}
         </div>
       )}
