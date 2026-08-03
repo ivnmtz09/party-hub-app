@@ -28,10 +28,11 @@ import {
   playCopySound,
   playSuccessSound,
 } from '../../../utils/audio'
+import GroupSelector from '../../../components/GroupSelector'
 
 export default function TableroPage() {
   const { user } = useAuth()
-  const { activeGroupId } = useNotification()
+  const { activeGroupId, setActiveGroupId } = useNotification()
   const [grupos, setGrupos] = useState<Grupo[]>([])
   const [miembros, setMiembros] = useState<Miembro[]>([])
   const [eventos, setEventos] = useState<Evento[]>([])
@@ -183,15 +184,14 @@ export default function TableroPage() {
 
   return (
     <div className="w-full max-w-md mx-auto p-4 space-y-6 animate-fade-in-up">
-      <div className="relative">
-        <Link
-          to="/home"
-          className="w-full flex items-center justify-between gap-2 py-3 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
-        >
-          <span className="truncate">{activeGroup.nombre}</span>
-          <X size={16} strokeWidth={2.5} className="rotate-30 opacity-50" />
-        </Link>
-      </div>
+      <h2 className="text-2xl font-black uppercase tracking-wider text-black dark:text-white">
+        Tablero
+      </h2>
+      <p className="text-gray-500 dark:text-gray-400 mt-2 mb-6 font-bold uppercase tracking-wider text-sm">
+        REGISTRO DE ACTIVIDADES
+      </p>
+
+      <GroupSelector grupos={grupos} activeGroupId={activeGroupId} setActiveGroupId={setActiveGroupId} />
 
       <div className="flex gap-2">
         <button
@@ -201,7 +201,7 @@ export default function TableroPage() {
           {copied ? (
             <>
               <Check size={14} strokeWidth={2.5} />
-              {activeGroup.codigoInvitacion}
+              {activeGroup!.codigoInvitacion}
             </>
           ) : (
             <>

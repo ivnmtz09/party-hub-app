@@ -1,21 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus } from 'lucide-react'
-import {
-  collection,
-  query,
-  where,
-  or,
-  orderBy,
-  limit,
-  onSnapshot,
-} from 'firebase/firestore'
 import { useAuth } from '../../../context/AuthContext'
 import { useNotification } from '../../../context/NotificationContext'
-import { db } from '../../../firebase/config'
 import {
   observarGruposDelUsuario,
   observarMiembros,
+  observarEventosConLimite,
   registrarEvento,
   type Evento,
   type Grupo,
@@ -55,19 +46,7 @@ export default function HistorialPage() {
     }
     const unsubMiembros = observarMiembros(activeGroupId, (lista) => setMiembros(lista))
     setLoading(true)
-    const eventosRef = collection(db, 'eventos')
-    const q = query(
-      eventosRef,
-      or(
-        where('groupIds', 'array-contains', activeGroupId),
-        where('groupId', '==', activeGroupId),
-      ),
-      orderBy('timestamp', 'desc'),
-      limit(200),
-    )
-    const unsubEventos = onSnapshot(q, (snap) => {
-      const lista: Evento[] = []
-      snap.forEach((d) => lista.push({ id: d.id, ...d.data() } as Evento))
+    const unsubEventos = observarEventosConLimite(activeGroupId, 200, (lista) => {
       setEventos(lista)
       setLoading(false)
     })

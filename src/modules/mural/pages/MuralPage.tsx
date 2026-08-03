@@ -25,11 +25,14 @@ import type { Timestamp } from 'firebase/firestore'
 import { useAuth } from '../../../context/AuthContext'
 import { useNotification } from '../../../context/NotificationContext'
 import {
+  observarGruposDelUsuario,
   observarEventosMural,
   registrarEventoMural,
+  type Grupo,
   type MuralEvent,
 } from '../../../firebase/services'
 import Skeleton from '../../../components/Skeleton'
+import GroupSelector from '../../../components/GroupSelector'
 import { playClickSound, playSuccessSound } from '../../../utils/audio'
 
 const SUCESOS = [
@@ -74,12 +77,30 @@ function tiempoRelativo(ts: Timestamp | null): string {
 
 export default function MuralPage() {
   const { user, userProfile } = useAuth()
-  const { activeGroupId } = useNotification()
+  const { activeGroupId, setActiveGroupId } = useNotification()
+  const [grupos, setGrupos] = useState<Grupo[]>([])
   const [eventos, setEventos] = useState<MuralEvent[]>([])
   const [loading, setLoading] = useState(true)
 
+  const activeGroup = grupos.find((g) => g.id === activeGroupId)
+
   useEffect(() => {
-    if (!activeGroupId) return
+    if (!user) return
+    const unsub = observarGruposDelUsuario(user.uid, (lista) => {
+      setGrupos(lista)
+      if (!activeGroupId || !lista.find((g) => g.id === activeGroupId)) {
+        if (lista.length > 0) setActiveGroupId(lista[0]!.id)
+      }
+    })
+    return unsub
+  }, [user, activeGroupId, setActiveGroupId])
+
+  useEffect(() => {
+    if (!activeGroupId) {
+      setEventos([])
+      setLoading(false)
+      return
+    }
     setLoading(true)
     const unsub = observarEventosMural(
       activeGroupId,
@@ -138,12 +159,19 @@ export default function MuralPage() {
     [eventos],
   )
 
-  if (!activeGroupId) {
+  if (!activeGroup) {
     return (
-      <div className="w-full max-w-md mx-auto p-4 space-y-6">
-        <p className="text-sm font-bold text-center text-gray-500 dark:text-gray-400">
-          No tienes grupos activos para usar el mural.
+      <div className="w-full max-w-md mx-auto p-4 space-y-6 animate-fade-in-up">
+        <h2 className="text-2xl font-black uppercase tracking-wider text-black dark:text-white">
+          Mural
+        </h2>
+        <p className="text-gray-500 dark:text-gray-400 mt-2 mb-6 font-bold uppercase tracking-wider text-sm">
+          CONTROL DE HÁBITOS
         </p>
+        <p className="text-sm font-bold text-center text-gray-500 dark:text-gray-400">
+          No tienes un grupo activo seleccionado.
+        </p>
+        <GroupSelector grupos={grupos} activeGroupId={activeGroupId} setActiveGroupId={setActiveGroupId} />
       </div>
     )
   }
@@ -153,6 +181,11 @@ export default function MuralPage() {
       <h2 className="text-2xl font-black uppercase tracking-wider text-black dark:text-white">
         Mural
       </h2>
+      <p className="text-gray-500 dark:text-gray-400 mt-2 mb-6 font-bold uppercase tracking-wider text-sm">
+        CONTROL DE HÁBITOS
+      </p>
+
+      <GroupSelector grupos={grupos} activeGroupId={activeGroupId} setActiveGroupId={setActiveGroupId} />
 
       <section className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-4 shadow-[4px_4px_0px_rgba(0,0,0,1)]">
         <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-3">

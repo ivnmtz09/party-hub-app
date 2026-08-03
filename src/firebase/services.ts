@@ -9,14 +9,13 @@ import {
   addDoc,
   query,
   where,
-  orderBy,
-  limit,
-  onSnapshot,
+   orderBy,
+   onSnapshot,
   serverTimestamp,
   increment,
   arrayUnion,
    arrayRemove,
-   or,
+   type QuerySnapshot,
    type Timestamp,
 } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
@@ -224,24 +223,75 @@ async function obtenerGruposIds(userId: string): Promise<string[]> {
   return snap.docs.map((d) => d.id)
 }
 
+function timestampToNumber(ts: unknown): number {
+  if (!ts) return 0
+  if (typeof (ts as Timestamp).toMillis === 'function') return (ts as Timestamp).toMillis()
+  if (typeof (ts as { seconds?: number }).seconds === 'number') return (ts as { seconds: number }).seconds * 1000
+  const n = new Date(ts as unknown as string).getTime()
+  return Number.isFinite(n) ? n : 0
+}
+
+type MergedDoc = { id: string; data: Record<string, unknown>; ts: number }
+
+function applyChanges(
+  docs: Record<string, MergedDoc>,
+  snap: QuerySnapshot,
+  tsField: 'timestamp' | 'createdAt',
+) {
+  snap.docChanges().forEach((change) => {
+    if (change.type === 'removed') {
+      delete docs[change.doc.id]
+    } else {
+      const data = change.doc.data() as Record<string, unknown>
+      docs[change.doc.id] = { id: change.doc.id, data, ts: timestampToNumber(data[tsField]) }
+    }
+  })
+}
+
+function buildMerged(docs: Record<string, MergedDoc>, maxResults?: number): Array<Record<string, unknown>> {
+  const arr = Object.values(docs).sort((a, b) => b.ts - a.ts)
+  const final = maxResults !== undefined ? arr.slice(0, maxResults) : arr
+  return final.map((x) => ({ id: x.id, ...x.data }))
+}
+
 export function observarEventos(
   activeGroupId: string,
   callback: EventoCallback,
 ): () => void {
   const ref = collection(db, 'eventos')
-  const q = query(
-    ref,
-    or(
-      where('groupIds', 'array-contains', activeGroupId),
-      where('groupId', '==', activeGroupId),
-    ),
-    orderBy('timestamp', 'desc'),
+  const qNew = query(ref, where('groupIds', 'array-contains', activeGroupId))
+  const qOld = query(ref, where('groupId', '==', activeGroupId))
+  const docs: Record<string, MergedDoc> = {}
+  let readyNew = false
+  let readyOld = false
+
+  const flush = () => {
+    callback(buildMerged(docs) as unknown as Evento[])
+  }
+
+  const unsubNew = onSnapshot(
+    qNew,
+    (snap) => {
+      applyChanges(docs, snap, 'timestamp')
+      readyNew = true
+      if (readyOld) flush()
+    },
+    (error) => { console.error('Error al cargar eventos (nuevos):', error) },
   )
-  return onSnapshot(q, (snap) => {
-    const lista: Evento[] = []
-    snap.forEach((d) => lista.push({ id: d.id, ...d.data() } as Evento))
-    callback(lista)
-  })
+  const unsubOld = onSnapshot(
+    qOld,
+    (snap) => {
+      applyChanges(docs, snap, 'timestamp')
+      readyOld = true
+      if (readyNew) flush()
+    },
+    (error) => { console.error('Error al cargar eventos (viejos):', error) },
+  )
+
+  return () => {
+    unsubNew()
+    unsubOld()
+  }
 }
 
 export function observarEventosConLimite(
@@ -250,20 +300,39 @@ export function observarEventosConLimite(
   callback: EventoCallback,
 ): () => void {
   const ref = collection(db, 'eventos')
-  const q = query(
-    ref,
-    or(
-      where('groupIds', 'array-contains', activeGroupId),
-      where('groupId', '==', activeGroupId),
-    ),
-    orderBy('timestamp', 'desc'),
-    limit(maxResults),
+  const qNew = query(ref, where('groupIds', 'array-contains', activeGroupId))
+  const qOld = query(ref, where('groupId', '==', activeGroupId))
+  const docs: Record<string, MergedDoc> = {}
+  let readyNew = false
+  let readyOld = false
+
+  const flush = () => {
+    callback(buildMerged(docs, maxResults) as unknown as Evento[])
+  }
+
+  const unsubNew = onSnapshot(
+    qNew,
+    (snap) => {
+      applyChanges(docs, snap, 'timestamp')
+      readyNew = true
+      if (readyOld) flush()
+    },
+    (error) => { console.error('Error al cargar eventos (nuevos):', error) },
   )
-  return onSnapshot(q, (snap) => {
-    const lista: Evento[] = []
-    snap.forEach((d) => lista.push({ id: d.id, ...d.data() } as Evento))
-    callback(lista)
-  })
+  const unsubOld = onSnapshot(
+    qOld,
+    (snap) => {
+      applyChanges(docs, snap, 'timestamp')
+      readyOld = true
+      if (readyNew) flush()
+    },
+    (error) => { console.error('Error al cargar eventos (viejos):', error) },
+  )
+
+  return () => {
+    unsubNew()
+    unsubOld()
+  }
 }
 
 export async function registrarEvento(
@@ -1261,22 +1330,37 @@ export function observarEventosMural(
   onError?: (error: Error) => void,
 ): () => void {
   const muralRef = collection(db, 'mural_events')
-  const q = query(
-    muralRef,
-    where('groupIds', 'array-contains', activeGroupId),
-    orderBy('createdAt', 'desc'),
-    limit(100),
-  )
-  return onSnapshot(
-    q,
+  const qNew = query(muralRef, where('groupIds', 'array-contains', activeGroupId))
+  const qOld = query(muralRef, where('groupId', '==', activeGroupId))
+  const docs: Record<string, MergedDoc> = {}
+  let readyNew = false
+  let readyOld = false
+
+  const flush = () => {
+    callback(buildMerged(docs, 100) as unknown as MuralEvent[])
+  }
+
+  const unsubNew = onSnapshot(
+    qNew,
     (snap) => {
-      const lista: MuralEvent[] = []
-      snap.forEach((d) => lista.push({ id: d.id, ...d.data() } as MuralEvent))
-      callback(lista)
+      applyChanges(docs, snap, 'createdAt')
+      readyNew = true
+      if (readyOld) flush()
     },
-    (error) => {
-      console.error('Error al cargar mural_events:', error)
-      if (onError) onError(error)
-    },
+    (error) => { console.error('Error al cargar mural_events:', error); if (onError) onError(error as Error) },
   )
+  const unsubOld = onSnapshot(
+    qOld,
+    (snap) => {
+      applyChanges(docs, snap, 'createdAt')
+      readyOld = true
+      if (readyNew) flush()
+    },
+    (error) => { console.error('Error al cargar mural_events:', error); if (onError) onError(error as Error) },
+  )
+
+  return () => {
+    unsubNew()
+    unsubOld()
+  }
 }
