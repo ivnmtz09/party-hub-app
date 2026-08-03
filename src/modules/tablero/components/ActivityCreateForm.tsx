@@ -5,12 +5,11 @@ import { useNeoToast } from '../../../components/NeoToast'
 import { playStarSound, playDeleteSound, playSuccessSound, playCloseSound, playClickSound } from '../../../utils/audio'
 
 interface Props {
-  groupId: string
   userId: string
   onClose: () => void
 }
 
-export default function ActivityCreateForm({ groupId, userId, onClose }: Props) {
+export default function ActivityCreateForm({ userId, onClose }: Props) {
   const { showToast } = useNeoToast()
   const [tipo, setTipo] = useState<'deposicion' | 'acto_sexual' | 'gym' | 'meada'>('deposicion')
   const [rating, setRating] = useState(0)
@@ -51,7 +50,7 @@ export default function ActivityCreateForm({ groupId, userId, onClose }: Props) 
     setSaving(true)
     setError('')
     try {
-      await registrarEvento(groupId, userId, tipo, { rating, note, photoUrl })
+      await registrarEvento(userId, tipo, { rating, note, photoUrl })
       playSuccessSound()
       onClose()
     } catch {

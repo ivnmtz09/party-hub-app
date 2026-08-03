@@ -4,11 +4,14 @@ import { Plus } from 'lucide-react'
 import {
   collection,
   query,
+  where,
+  or,
   orderBy,
   limit,
   onSnapshot,
 } from 'firebase/firestore'
 import { useAuth } from '../../../context/AuthContext'
+import { useNotification } from '../../../context/NotificationContext'
 import { db } from '../../../firebase/config'
 import {
   observarGruposDelUsuario,
@@ -25,8 +28,8 @@ import { playOpenSound, playCloseSound } from '../../../utils/audio'
 
 export default function HistorialPage() {
   const { user } = useAuth()
+  const { activeGroupId } = useNotification()
   const [grupos, setGrupos] = useState<Grupo[]>([])
-  const [groupId, setGroupId] = useState<string | null>(null)
   const [miembros, setMiembros] = useState<Miembro[]>([])
   const [eventos, setEventos] = useState<Evento[]>([])
   const [initialized, setInitialized] = useState(false)
@@ -39,21 +42,29 @@ export default function HistorialPage() {
     if (!user) return
     const unsub = observarGruposDelUsuario(user.uid, (lista) => {
       setGrupos(lista)
-      setGroupId((prev) => {
-        if (prev && lista.find((g) => g.id === prev)) return prev
-        return lista.length > 0 ? lista[0]!.id : null
-      })
       setInitialized(true)
     })
     return unsub
   }, [user])
 
   useEffect(() => {
-    if (!groupId) return
-    const unsubMiembros = observarMiembros(groupId, (lista) => setMiembros(lista))
+    if (!activeGroupId) {
+      setEventos([])
+      setLoading(false)
+      return
+    }
+    const unsubMiembros = observarMiembros(activeGroupId, (lista) => setMiembros(lista))
     setLoading(true)
-    const eventosRef = collection(db, 'grupos', groupId, 'eventos')
-    const q = query(eventosRef, orderBy('timestamp', 'desc'), limit(200))
+    const eventosRef = collection(db, 'eventos')
+    const q = query(
+      eventosRef,
+      or(
+        where('groupIds', 'array-contains', activeGroupId),
+        where('groupId', '==', activeGroupId),
+      ),
+      orderBy('timestamp', 'desc'),
+      limit(200),
+    )
     const unsubEventos = onSnapshot(q, (snap) => {
       const lista: Evento[] = []
       snap.forEach((d) => lista.push({ id: d.id, ...d.data() } as Evento))
@@ -64,14 +75,14 @@ export default function HistorialPage() {
       unsubMiembros()
       unsubEventos()
     }
-  }, [groupId])
+  }, [activeGroupId])
 
   const handleCreateRecord = async (
     tipo: 'deposicion' | 'acto_sexual' | 'gym' | 'meada',
     data: { rating: number; note: string; photoUrl: string },
   ) => {
-    if (!groupId || !user) return
-    await registrarEvento(groupId, user.uid, tipo, data)
+    if (!user) return
+    await registrarEvento(user.uid, tipo, data)
   }
 
   if (!initialized) {
@@ -89,7 +100,7 @@ export default function HistorialPage() {
           to="/"
           className="bg-white border-4 border-black text-black font-black px-4 py-2 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:bg-gray-200 mb-6 inline-block"
         >
-          VOLVER AL TABLERO
+          VOLVER AL HOME
         </Link>
         <p className="text-sm font-bold text-center text-gray-500 dark:text-gray-400">
           No tienes grupos activos para mostrar su historial.
@@ -98,7 +109,7 @@ export default function HistorialPage() {
     )
   }
 
-  const activeGroup = grupos.find((g) => g.id === groupId)
+  const activeGroup = grupos.find((g) => g.id === activeGroupId)
 
   return (
     <div className="w-full max-w-md mx-auto p-4 space-y-4">
@@ -106,7 +117,7 @@ export default function HistorialPage() {
         to="/"
         className="bg-white border-2 border-black text-black font-black px-4 py-2 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:bg-gray-200 mb-6 inline-block"
       >
-        VOLVER AL TABLERO
+        VOLVER AL HOME
       </Link>
 
       <div>
@@ -128,9 +139,9 @@ export default function HistorialPage() {
         </button>
       </div>
 
-      {showCreateForm && groupId && (
+      {showCreateForm && (
         <RecordInlineForm
-          groupId={groupId}
+          groupId={activeGroupId ?? ''}
           userId={userId}
           onClose={() => setShowCreateForm(false)}
           onSave={handleCreateRecord}
@@ -155,7 +166,7 @@ export default function HistorialPage() {
                   evento={ev}
                   miembros={miembros}
                   userId={userId}
-                  groupId={groupId ?? ''}
+                  groupId={activeGroupId ?? ''}
                 />
               ))}
             </div>

@@ -39,7 +39,7 @@ export default function RecentActivity({ miembros, userId, groupId }: Props) {
         : new Date(item.timestamp as unknown as string).getTime()
       if (Date.now() - recordTime > expirationTime) {
         deleteObject(ref(storage, item.photoUrl)).catch(() => {})
-        updateDoc(doc(db, 'grupos', groupId, 'eventos', item.id!), {
+        updateDoc(doc(db, 'eventos', item.id!), {
           photoUrl: null,
         }).catch(() => {})
       }

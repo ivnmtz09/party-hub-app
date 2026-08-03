@@ -83,7 +83,7 @@ export default function RecentActivityCard({ evento, miembros, userId, groupId }
   const handleDelete = async () => {
     setIsLoading(true)
     try {
-      await eliminarEvento(groupId, evento.id!)
+      await eliminarEvento(evento.id!)
     } catch {
       /* error silencioso */
     } finally {

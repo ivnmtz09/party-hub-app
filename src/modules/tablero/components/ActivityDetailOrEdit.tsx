@@ -51,8 +51,8 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
   const currentUserId = user?.uid
 
   useEffect(() => {
-    if (!evento.id) return
-    const unsub = subscribeToComments(groupId, evento.id, setComments)
+        if (!evento.id) return
+    const unsub = subscribeToComments(evento.id, setComments)
     return unsub
   }, [groupId, evento.id])
 
@@ -73,7 +73,7 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
     if (!currentUserId || !evento.id) return
     playReactionSound()
     try {
-      await toggleReaction(groupId, evento.id, currentUserId, reactionType)
+            await toggleReaction(evento.id, currentUserId, reactionType)
     } catch {
       /* error silencioso */
     }
@@ -85,7 +85,7 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
     setCommentText('')
     playCommentSendSound()
     try {
-      await addComment(groupId, evento.id, {
+      await addComment(evento.id, {
         userId: currentUserId,
         nickname: userProfile?.nickname || user?.displayName || 'Anonimo',
         text,
@@ -134,7 +134,7 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
     setSaving(true)
     setError('')
     try {
-      await updateActivityRecord(groupId, evento.id!, { rating, note, photoUrl })
+      await updateActivityRecord(evento.id!, { rating, note, photoUrl })
       playSuccessSound()
       setIsEditing(false)
     } catch {

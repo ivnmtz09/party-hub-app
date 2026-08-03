@@ -25,7 +25,6 @@ interface PropsCreate {
   open: boolean
   onClose: () => void
   tipo: 'deposicion' | 'acto_sexual' | 'gym' | 'meada'
-  groupId: string
   anchorRect?: AnchorRect
   onSave: (data: { rating: number; note: string; photoUrl: string }) => Promise<void>
 }
@@ -36,7 +35,6 @@ interface PropsViewEdit {
   onClose: () => void
   evento: Evento
   miembros: Miembro[]
-  groupId: string
   anchorRect?: AnchorRect
   onSave?: (data: { rating: number; note: string; photoUrl: string }) => Promise<void>
 }
@@ -80,7 +78,7 @@ function getModalPosition(anchor?: AnchorRect) {
 }
 
 export default function RecordModal(props: Props) {
-  const { open, onClose, groupId, anchorRect } = props
+  const { open, onClose, anchorRect } = props
   const { showToast } = useNeoToast()
 
   const isCreate = props.mode === 'create'
@@ -126,7 +124,7 @@ export default function RecordModal(props: Props) {
       if (isCreate) {
         await props.onSave({ rating, note, photoUrl })
       } else if (props.onSave) {
-        await updateActivityRecord(groupId, props.evento.id!, { rating, note, photoUrl })
+        await updateActivityRecord(props.evento.id!, { rating, note, photoUrl })
       }
       onClose()
     } catch {

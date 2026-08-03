@@ -15,8 +15,9 @@ import {
   serverTimestamp,
   increment,
   arrayUnion,
-  arrayRemove,
-  type Timestamp,
+   arrayRemove,
+   or,
+   type Timestamp,
 } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { db, storage } from './config'
@@ -54,6 +55,7 @@ export interface Evento {
   userId: string
   tipo: 'deposicion' | 'acto_sexual' | 'gym' | 'meada'
   timestamp: Timestamp
+  groupIds?: string[]
   rating?: number
   note?: string
   photoUrl?: string
@@ -215,12 +217,26 @@ export function observarMiembros(
   })
 }
 
+async function obtenerGruposIds(userId: string): Promise<string[]> {
+  const gruposRef = collection(db, 'grupos')
+  const q = query(gruposRef, where('miembrosIds', 'array-contains', userId))
+  const snap = await getDocs(q)
+  return snap.docs.map((d) => d.id)
+}
+
 export function observarEventos(
-  groupId: string,
+  activeGroupId: string,
   callback: EventoCallback,
 ): () => void {
-  const ref = collection(db, 'grupos', groupId, 'eventos')
-  const q = query(ref, orderBy('timestamp', 'desc'))
+  const ref = collection(db, 'eventos')
+  const q = query(
+    ref,
+    or(
+      where('groupIds', 'array-contains', activeGroupId),
+      where('groupId', '==', activeGroupId),
+    ),
+    orderBy('timestamp', 'desc'),
+  )
   return onSnapshot(q, (snap) => {
     const lista: Evento[] = []
     snap.forEach((d) => lista.push({ id: d.id, ...d.data() } as Evento))
@@ -229,12 +245,20 @@ export function observarEventos(
 }
 
 export function observarEventosConLimite(
-  groupId: string,
+  activeGroupId: string,
   maxResults: number,
   callback: EventoCallback,
 ): () => void {
-  const ref = collection(db, 'grupos', groupId, 'eventos')
-  const q = query(ref, orderBy('timestamp', 'desc'), limit(maxResults))
+  const ref = collection(db, 'eventos')
+  const q = query(
+    ref,
+    or(
+      where('groupIds', 'array-contains', activeGroupId),
+      where('groupId', '==', activeGroupId),
+    ),
+    orderBy('timestamp', 'desc'),
+    limit(maxResults),
+  )
   return onSnapshot(q, (snap) => {
     const lista: Evento[] = []
     snap.forEach((d) => lista.push({ id: d.id, ...d.data() } as Evento))
@@ -243,15 +267,16 @@ export function observarEventosConLimite(
 }
 
 export async function registrarEvento(
-  groupId: string,
   userId: string,
   tipo: 'deposicion' | 'acto_sexual' | 'gym' | 'meada',
   meta?: { rating?: number; note?: string; photoUrl?: string },
 ) {
-  const eventoRef = collection(db, 'grupos', groupId, 'eventos')
+  const groupIds = await obtenerGruposIds(userId)
+  const eventoRef = collection(db, 'eventos')
   const docData: Record<string, unknown> = {
     userId,
     tipo,
+    groupIds,
     timestamp: serverTimestamp(),
   }
   if (meta?.rating) docData.rating = meta.rating
@@ -259,7 +284,6 @@ export async function registrarEvento(
   if (meta?.photoUrl) docData.photoUrl = meta.photoUrl
   await addDoc(eventoRef, docData)
 
-  const miembroRef = doc(db, 'grupos', groupId, 'miembros', userId)
   const updates: Record<string, unknown> = {}
 
   if (tipo === 'deposicion') {
@@ -276,7 +300,11 @@ export async function registrarEvento(
     updates.ultimoGym = serverTimestamp()
   }
 
-  await updateDoc(miembroRef, updates)
+  await Promise.all(
+    groupIds.map((gid) =>
+      updateDoc(doc(db, 'grupos', gid, 'miembros', userId), updates),
+    ),
+  )
 }
 
 export async function actualizarNombreGrupo(groupId: string, nuevoNombre: string): Promise<void> {
@@ -303,32 +331,37 @@ export async function abandonarGrupo(groupId: string, userId: string): Promise<v
   await deleteDoc(doc(db, 'grupos', groupId, 'miembros', userId))
 }
 
-export async function eliminarEvento(groupId: string, eventId: string): Promise<void> {
-  const eventoRef = doc(db, 'grupos', groupId, 'eventos', eventId)
+export async function eliminarEvento(eventId: string): Promise<void> {
+  const eventoRef = doc(db, 'eventos', eventId)
   const snap = await getDoc(eventoRef)
   if (!snap.exists()) throw new Error('Evento no encontrado')
 
   const evento = snap.data() as Evento
   await deleteDoc(eventoRef)
 
-  const miembroRef = doc(db, 'grupos', groupId, 'miembros', evento.userId)
+  const updates: Record<string, unknown> = {}
   if (evento.tipo === 'deposicion') {
-    await updateDoc(miembroRef, { deposiciones: increment(-1) })
+    updates.deposiciones = increment(-1)
   } else if (evento.tipo === 'acto_sexual') {
-    await updateDoc(miembroRef, { actosSexuales: increment(-1) })
+    updates.actosSexuales = increment(-1)
   } else if (evento.tipo === 'meada') {
-    await updateDoc(miembroRef, { meadas: increment(-1) })
+    updates.meadas = increment(-1)
   } else {
-    await updateDoc(miembroRef, { gym: increment(-1) })
+    updates.gym = increment(-1)
   }
+
+  await Promise.all(
+    (evento.groupIds ?? []).map((gid) =>
+      updateDoc(doc(db, 'grupos', gid, 'miembros', evento.userId), updates),
+    ),
+  )
 }
 
 export async function updateActivityRecord(
-  groupId: string,
   eventId: string,
   data: { rating?: number; note?: string; photoUrl?: string },
 ): Promise<void> {
-  const eventoRef = doc(db, 'grupos', groupId, 'eventos', eventId)
+  const eventoRef = doc(db, 'eventos', eventId)
   const snap = await getDoc(eventoRef)
   if (!snap.exists()) throw new Error('Evento no encontrado')
   await updateDoc(eventoRef, data)
@@ -344,12 +377,11 @@ export async function uploadRecordPhoto(file: File): Promise<string> {
 /* ───── Reacciones ───── */
 
 export async function toggleReaction(
-  groupId: string,
   recordId: string,
   userId: string,
   reactionType: ReactionType,
 ): Promise<void> {
-  const eventoRef = doc(db, 'grupos', groupId, 'eventos', recordId)
+  const eventoRef = doc(db, 'eventos', recordId)
   const snap = await getDoc(eventoRef)
   if (!snap.exists()) throw new Error('Registro no encontrado')
 
@@ -381,17 +413,16 @@ export async function toggleReaction(
 /* ───── Comentarios ───── */
 
 export async function addComment(
-  groupId: string,
   recordId: string,
   commentData: Omit<CommentData, 'id' | 'createdAt'>,
 ): Promise<string> {
-  const commentsRef = collection(db, 'grupos', groupId, 'eventos', recordId, 'comments')
+  const commentsRef = collection(db, 'eventos', recordId, 'comments')
   const docRef = await addDoc(commentsRef, {
     ...commentData,
     createdAt: serverTimestamp(),
   })
 
-  const eventoSnap = await getDoc(doc(db, 'grupos', groupId, 'eventos', recordId))
+  const eventoSnap = await getDoc(doc(db, 'eventos', recordId))
   if (eventoSnap.exists()) {
     const evento = eventoSnap.data() as Evento
     if (evento.userId && evento.userId !== commentData.userId) {
@@ -410,11 +441,10 @@ export async function addComment(
 }
 
 export function subscribeToComments(
-  groupId: string,
   recordId: string,
   callback: (comments: CommentData[]) => void,
 ): () => void {
-  const commentsRef = collection(db, 'grupos', groupId, 'eventos', recordId, 'comments')
+  const commentsRef = collection(db, 'eventos', recordId, 'comments')
   const q = query(commentsRef, orderBy('createdAt', 'asc'))
   return onSnapshot(q, (snap) => {
     const lista: CommentData[] = []
@@ -1200,24 +1230,24 @@ export interface MuralEvent {
   id?: string
   userId: string
   userName: string
-  groupId: string
+  groupIds?: string[]
   type: string
   value?: number
   createdAt: Timestamp | null
 }
 
 export async function registrarEventoMural(
-  groupId: string,
   userId: string,
   userName: string,
   type: string,
   value?: number,
 ): Promise<void> {
+  const groupIds = await obtenerGruposIds(userId)
   const muralRef = collection(db, 'mural_events')
   const docData: Record<string, unknown> = {
     userId,
     userName,
-    groupId,
+    groupIds,
     type,
     createdAt: serverTimestamp(),
   }
@@ -1226,14 +1256,14 @@ export async function registrarEventoMural(
 }
 
 export function observarEventosMural(
-  groupId: string,
+  activeGroupId: string,
   callback: (eventos: MuralEvent[]) => void,
   onError?: (error: Error) => void,
 ): () => void {
   const muralRef = collection(db, 'mural_events')
   const q = query(
     muralRef,
-    where('groupId', '==', groupId),
+    where('groupIds', 'array-contains', activeGroupId),
     orderBy('createdAt', 'desc'),
     limit(100),
   )

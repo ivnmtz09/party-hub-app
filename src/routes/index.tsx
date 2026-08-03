@@ -14,6 +14,7 @@ import TableroPage from '../modules/tablero/pages/TableroPage'
 import HistorialPage from '../modules/tablero/pages/HistorialPage'
 import MembersPage from '../modules/tablero/pages/MembersPage'
 import MuralPage from '../modules/mural/pages/MuralPage'
+import HomePage from '../modules/home/pages/Home'
 import ProfilePage from '../modules/profile/pages/ProfilePage'
 import LoginPage from '../components/LoginPage'
 import SplashScreen from '../components/SplashScreen'
@@ -54,7 +55,8 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      { index: true, element: <Navigate to="/arcade" replace /> },
+      { index: true, element: <Navigate to="/home" replace /> },
+      { path: 'home', element: <HomePage /> },
       { path: 'arcade', element: <ArcadePage /> },
       { path: 'tablero', element: <TableroPage /> },
       { path: 'mural', element: <MuralPage /> },

@@ -1,0 +1,237 @@
+import { useEffect, useState } from 'react'
+import { Check, Copy, FolderPlus, Crown, LogIn, Settings, Users } from 'lucide-react'
+import { useAuth } from '../../../context/AuthContext'
+import { useNotification } from '../../../context/NotificationContext'
+import {
+  observarGruposDelUsuario,
+  observarMiembros,
+  type Grupo,
+  type Miembro,
+} from '../../../firebase/services'
+import Skeleton from '../../../components/Skeleton'
+import UserAvatar from '../../../components/UserAvatar'
+import CreateGroupModal from '../../tablero/components/CreateGroupModal'
+import JoinGroupModal from '../../tablero/components/JoinGroupModal'
+import GroupSettingsModal from '../../tablero/components/GroupSettingsModal'
+import { playOpenSound, playClickSound, playCloseSound, playCopySound } from '../../../utils/audio'
+export default function Home() {
+  const { user } = useAuth()
+  const { activeGroupId, setActiveGroupId } = useNotification()
+  const [grupos, setGrupos] = useState<Grupo[]>([])
+  const [miembros, setMiembros] = useState<Miembro[]>([])
+  const [initialized, setInitialized] = useState(false)
+  const [loadingMembers, setLoadingMembers] = useState(true)
+  const [showCreateGroup, setShowCreateGroup] = useState(false)
+  const [showJoinGroup, setShowJoinGroup] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    if (!user) return
+    const unsub = observarGruposDelUsuario(user.uid, (lista) => {
+      setGrupos(lista)
+      setInitialized(true)
+      if (!activeGroupId || !lista.find((g) => g.id === activeGroupId)) {
+        if (lista.length > 0) setActiveGroupId(lista[0]!.id)
+      }
+    })
+    return unsub
+  }, [user, activeGroupId, setActiveGroupId])
+
+  useEffect(() => {
+    if (!activeGroupId) return
+    setLoadingMembers(true)
+    const unsub = observarMiembros(activeGroupId, (list) => {
+      setMiembros(list)
+      setLoadingMembers(false)
+    })
+    return unsub
+  }, [activeGroupId])
+
+  const activeGroup = grupos.find((g) => g.id === activeGroupId)
+
+  const handleCopyCode = () => {
+    if (!activeGroup) return
+    playCopySound()
+    navigator.clipboard.writeText(activeGroup.codigoInvitacion)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  if (!initialized) {
+    return (
+      <div className="w-full max-w-md mx-auto p-4 space-y-4">
+        <Skeleton variant="card" count={2} />
+      </div>
+    )
+  }
+
+  return (
+    <div className="w-full max-w-md mx-auto p-4 space-y-6 animate-fade-in-up">
+      <h2 className="text-2xl font-black uppercase tracking-wider text-black dark:text-white">
+        Home
+      </h2>
+      <p className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">
+        Administra tus grupos y elige el activo
+      </p>
+
+      <div className="flex flex-col gap-3">
+        <button
+          onClick={() => { playOpenSound(); setShowCreateGroup(true) }}
+          className="w-full flex items-center justify-center gap-3 py-5 border-4 border-black dark:border-white bg-emerald-300 dark:bg-emerald-500 text-black dark:text-gray-900 font-black uppercase tracking-wider shadow-[4px_4px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
+        >
+          <FolderPlus size={22} strokeWidth={2.5} />
+          Crear Nuevo Grupo
+        </button>
+        <button
+          onClick={() => { playOpenSound(); setShowJoinGroup(true) }}
+          className="w-full flex items-center justify-center gap-3 py-5 border-4 border-black dark:border-white bg-blue-300 dark:bg-blue-500 text-black dark:text-gray-900 font-black uppercase tracking-wider shadow-[4px_4px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
+        >
+          <LogIn size={22} strokeWidth={2.5} />
+          Unirse a un Grupo
+        </button>
+      </div>
+
+      <div>
+        <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-3">
+          Tus Grupos
+        </h3>
+        {grupos.length === 0 ? (
+          <div className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[4px_4px_0px_rgba(0,0,0,1)]">
+            <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center">
+              No tienes grupos. Crea uno o unete.
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {grupos.map((g) => {
+              const isActive = g.id === activeGroupId
+              return (
+                <button
+                  key={g.id}
+                  onClick={() => { playClickSound(); setActiveGroupId(g.id) }}
+                  className={`flex items-center justify-between gap-3 w-full py-4 px-4 border-4 border-black dark:border-white font-black uppercase tracking-wider shadow-[4px_4px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all ${
+                    isActive
+                      ? 'bg-yellow-300 dark:bg-yellow-500 text-black'
+                      : 'bg-white dark:bg-gray-800 text-black dark:text-white'
+                  }`}
+                >
+                  <span className="truncate text-sm">{g.nombre}</span>
+                  <span className="flex items-center gap-2 shrink-0">
+                    {g.miembrosIds.length}
+                    <span className="flex items-center gap-1 text-[10px]">
+                      <Users size={14} strokeWidth={2.5} />
+                    </span>
+                    {isActive && <Check size={18} strokeWidth={3} />}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {activeGroup && (
+        <div className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-4 shadow-[4px_4px_0px_rgba(0,0,0,1)]">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                Grupo Activo
+              </span>
+              <span className="text-sm font-black uppercase tracking-wider text-black dark:text-white truncate max-w-[140px]">
+                {activeGroup.nombre}
+              </span>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => { playCopySound(); handleCopyCode() }}
+                className="flex items-center gap-1.5 py-2 px-3 border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-700 text-black dark:text-white font-bold text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+              >
+                {copied ? (
+                  <>
+                    <Check size={12} strokeWidth={2.5} />
+                    {activeGroup.codigoInvitacion}
+                  </>
+                ) : (
+                  <>
+                    <Copy size={12} strokeWidth={2.5} />
+                    Codigo
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => { playOpenSound(); setShowSettings(true) }}
+                className="p-2 border-2 border-black dark:border-white bg-gray-200 dark:bg-gray-600 text-black dark:text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+              >
+                <Settings size={16} strokeWidth={2.5} />
+              </button>
+            </div>
+          </div>
+
+          <h4 className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
+            Miembros ({miembros.length})
+          </h4>
+          {loadingMembers ? (
+            <Skeleton variant="listItem" count={3} />
+          ) : miembros.length === 0 ? (
+            <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center py-3">
+              Sin miembros
+            </p>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {miembros.map((m) => (
+                <div
+                  key={m.id}
+                  className="flex items-center gap-3 border-2 border-black dark:border-white bg-white dark:bg-gray-800 p-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                >
+                  <UserAvatar
+                    name={m.nickname || m.displayName}
+                    color={m.avatar || '#fbbf24'}
+                    type={m.avatarType || 'letter'}
+                    avatarIcon={m.avatarIcon || 'Gamepad2'}
+                    size={36}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-black uppercase tracking-wider text-xs text-black dark:text-white truncate">
+                      {m.nickname || m.displayName.split(' ')[0]}
+                    </p>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      {m.id === activeGroup.adminId ? (
+                        <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest bg-red-600 text-white px-1.5 py-0.5 border border-black dark:border-white">
+                          <Crown size={10} strokeWidth={2.5} />
+                          ADMIN
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-black uppercase tracking-widest bg-gray-300 dark:bg-gray-600 text-black dark:text-white px-1.5 py-0.5 border border-black dark:border-white">
+                          INVITADO
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      <CreateGroupModal
+        open={showCreateGroup}
+        onClose={() => { playCloseSound(); setShowCreateGroup(false) }}
+      />
+      <JoinGroupModal
+        open={showJoinGroup}
+        onClose={() => { playCloseSound(); setShowJoinGroup(false) }}
+      />
+      {activeGroup && (
+        <GroupSettingsModal
+          open={showSettings}
+          onClose={() => { playCloseSound(); setShowSettings(false) }}
+          group={activeGroup}
+          miembros={miembros}
+          userId={user?.uid ?? ''}
+        />
+      )}
+    </div>
+  )
+}

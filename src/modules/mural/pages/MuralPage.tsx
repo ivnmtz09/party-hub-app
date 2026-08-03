@@ -23,11 +23,10 @@ import {
 } from 'recharts'
 import type { Timestamp } from 'firebase/firestore'
 import { useAuth } from '../../../context/AuthContext'
+import { useNotification } from '../../../context/NotificationContext'
 import {
-  observarGruposDelUsuario,
   observarEventosMural,
   registrarEventoMural,
-  type Grupo,
   type MuralEvent,
 } from '../../../firebase/services'
 import Skeleton from '../../../components/Skeleton'
@@ -36,12 +35,12 @@ import { playClickSound, playSuccessSound } from '../../../utils/audio'
 const SUCESOS = [
   { type: 'subi_peso', label: 'SUBÍ DE PESO', icon: ArrowUp, bg: 'bg-red-500 dark:bg-red-600 text-white' },
   { type: 'baje_peso', label: 'BAJÉ DE PESO', icon: ArrowDown, bg: 'bg-green-400 dark:bg-green-500 text-black dark:text-gray-900' },
-  { type: 'comi_chatarra', label: 'COMÍ CHATARRA', icon: Hamburger, bg: 'bg-orange-400 dark:bg-orange-500 text-black dark:text-gray-900' },
-  { type: 'gaste_plata', label: 'GASTÉ PLATA', icon: Banknote, bg: 'bg-yellow-300 dark:bg-yellow-500 text-black' },
-  { type: 'dormi_bien', label: 'DORMÍ BIEN', icon: Moon, bg: 'bg-cyan-300 dark:bg-cyan-500 text-black dark:text-gray-900' },
-  { type: 'gane_plata', label: 'GANÉ PLATA', icon: Coins, bg: 'bg-green-400 dark:bg-green-500 text-black dark:text-gray-900' },
   { type: 'comi_saludable', label: 'COMÍ SALUDABLE', icon: Leaf, bg: 'bg-lime-400 dark:bg-lime-500 text-black' },
+  { type: 'comi_chatarra', label: 'COMÍ CHATARRA', icon: Hamburger, bg: 'bg-orange-400 dark:bg-orange-500 text-black dark:text-gray-900' },
+  { type: 'dormi_bien', label: 'DORMÍ BIEN', icon: Moon, bg: 'bg-cyan-300 dark:bg-cyan-500 text-black dark:text-gray-900' },
   { type: 'dormi_mal', label: 'DORMÍ MAL', icon: CloudRain, bg: 'bg-slate-400 dark:bg-slate-500 text-black dark:text-gray-900' },
+  { type: 'gane_plata', label: 'GANÉ PLATA', icon: Coins, bg: 'bg-green-400 dark:bg-green-500 text-black dark:text-gray-900' },
+  { type: 'gaste_plata', label: 'GASTÉ PLATA', icon: Banknote, bg: 'bg-yellow-300 dark:bg-yellow-500 text-black' },
   { type: 'hice_deberes', label: 'HICE DEBERES', icon: BookOpen, bg: 'bg-blue-300 dark:bg-blue-400 text-black' },
   { type: 'procrastine', label: 'PROCRASTINÉ', icon: Clock, bg: 'bg-pink-400 dark:bg-pink-500 text-black dark:text-gray-900' },
 ] as const
@@ -75,30 +74,15 @@ function tiempoRelativo(ts: Timestamp | null): string {
 
 export default function MuralPage() {
   const { user, userProfile } = useAuth()
-  const [grupos, setGrupos] = useState<Grupo[]>([])
-  const [groupId, setGroupId] = useState<string | null>(null)
+  const { activeGroupId } = useNotification()
   const [eventos, setEventos] = useState<MuralEvent[]>([])
-  const [initialized, setInitialized] = useState(false)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!user) return
-    const unsub = observarGruposDelUsuario(user.uid, (lista) => {
-      setGrupos(lista)
-      setGroupId((prev) => {
-        if (prev && lista.find((g) => g.id === prev)) return prev
-        return lista.length > 0 ? lista[0]!.id : null
-      })
-      setInitialized(true)
-    })
-    return unsub
-  }, [user])
-
-  useEffect(() => {
-    if (!groupId) return
+    if (!activeGroupId) return
     setLoading(true)
     const unsub = observarEventosMural(
-      groupId,
+      activeGroupId,
       (lista) => {
         setEventos(lista)
         setLoading(false)
@@ -108,14 +92,14 @@ export default function MuralPage() {
       },
     )
     return unsub
-  }, [groupId])
+  }, [activeGroupId])
 
   const handleAgua = async () => {
-    if (!user || !groupId) return
+    if (!user) return
     const nombre = userProfile?.nickname || user.displayName?.split(' ')[0] || 'Alguien'
     playClickSound()
     try {
-      await registrarEventoMural(groupId, user.uid, nombre, 'agua', 200)
+      await registrarEventoMural(user.uid, nombre, 'agua', 200)
       playSuccessSound()
     } catch {
       /* error silencioso */
@@ -123,11 +107,11 @@ export default function MuralPage() {
   }
 
   const handleSuceso = async (type: string) => {
-    if (!user || !groupId) return
+    if (!user) return
     const nombre = userProfile?.nickname || user.displayName?.split(' ')[0] || 'Alguien'
     playClickSound()
     try {
-      await registrarEventoMural(groupId, user.uid, nombre, type)
+      await registrarEventoMural(user.uid, nombre, type)
       playSuccessSound()
     } catch {
       /* error silencioso */
@@ -154,15 +138,7 @@ export default function MuralPage() {
     [eventos],
   )
 
-  if (!initialized) {
-    return (
-      <div className="w-full max-w-md mx-auto p-4 space-y-4">
-        <Skeleton variant="card" count={2} />
-      </div>
-    )
-  }
-
-  if (grupos.length === 0) {
+  if (!activeGroupId) {
     return (
       <div className="w-full max-w-md mx-auto p-4 space-y-6">
         <p className="text-sm font-bold text-center text-gray-500 dark:text-gray-400">

@@ -10,6 +10,7 @@ import {
 import {
   collection,
   query,
+  where,
   orderBy,
   limit,
   onSnapshot,
@@ -28,6 +29,7 @@ interface Toast {
 }
 
 interface NotificationContextValue {
+  activeGroupId: string | null
   setActiveGroupId: (id: string | null) => void
 }
 
@@ -49,8 +51,8 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!activeGroupId) return
 
-    const eventosRef = collection(db, 'grupos', activeGroupId, 'eventos')
-    const q = query(eventosRef, orderBy('timestamp', 'desc'), limit(1))
+    const eventosRef = collection(db, 'eventos')
+    const q = query(eventosRef, where('groupIds', 'array-contains', activeGroupId), orderBy('timestamp', 'desc'), limit(1))
 
     const unsub = onSnapshot(q, (snap) => {
       snap.docChanges().forEach(async (change) => {
@@ -112,7 +114,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   return (
     <NotificationContext.Provider
-      value={{ setActiveGroupId: handleSetActiveGroupId }}
+      value={{ activeGroupId, setActiveGroupId: handleSetActiveGroupId }}
     >
       {children}
 
