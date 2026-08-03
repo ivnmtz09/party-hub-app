@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../../../context/AuthContext'
 import { useNotification } from '../../../context/NotificationContext'
+import { Link } from 'react-router-dom'
 import {
   observarGruposDelUsuario,
   observarMiembros,
@@ -33,7 +34,6 @@ import {
   type Miembro,
   type Evento,
 } from '../../../firebase/services'
-import MemberList from '../components/MemberList'
 import StatsChart from '../components/StatsChart'
 import JoinGroupModal from '../components/JoinGroupModal'
 import RecentActivity from '../components/RecentActivity'
@@ -674,7 +674,12 @@ export default function TableroPage() {
 
       <StatsChart miembros={miembros} eventos={filteredEventos} filterLabel={filterLabel} />
 
-      <MemberList miembros={miembros} adminId={activeGroup?.adminId} />
+      <Link
+        to="/miembros"
+        className="w-full flex items-center justify-center py-3 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-black uppercase tracking-wider shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all"
+      >
+        MIEMBROS DEL GRUPO
+      </Link>
 
       <RecentActivity
         miembros={miembros}

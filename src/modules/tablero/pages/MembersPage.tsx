@@ -1,14 +1,16 @@
-import { useState, useMemo } from 'react'
-import { Crown, ChevronDown, ChevronUp, Dumbbell, Trash2, Flame } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { Crown, Droplet, Dumbbell, Trash2, Flame } from 'lucide-react'
 import type { Timestamp } from 'firebase/firestore'
-import type { Miembro } from '../../../firebase/services'
+import { useAuth } from '../../../context/AuthContext'
+import {
+  observarGruposDelUsuario,
+  observarMiembros,
+  type Grupo,
+  type Miembro,
+} from '../../../firebase/services'
 import UserAvatar from '../../../components/UserAvatar'
-import { playToggleOnSound, playToggleOffSound } from '../../../utils/audio'
-
-interface Props {
-  miembros: Miembro[]
-  adminId?: string
-}
+import Skeleton from '../../../components/Skeleton'
 
 function tiempoRelativo(ts: Timestamp | null): string {
   if (!ts) return ''
@@ -32,11 +34,38 @@ function determinateRotation(id: string): number {
   return (hash % 21) - 10
 }
 
-export default function MemberList({ miembros, adminId }: Props) {
-  const [isOpen, setIsOpen] = useState(false)
+export default function MembersPage() {
+  const { user } = useAuth()
+  const [grupos, setGrupos] = useState<Grupo[]>([])
+  const [groupId, setGroupId] = useState<string | null>(null)
+  const [miembros, setMiembros] = useState<Miembro[]>([])
+  const [initialized, setInitialized] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!user) return
+    const unsub = observarGruposDelUsuario(user.uid, (lista) => {
+      setGrupos(lista)
+      setGroupId((prev) => {
+        if (prev && lista.find((g) => g.id === prev)) return prev
+        return lista.length > 0 ? lista[0]!.id : null
+      })
+      setInitialized(true)
+    })
+    return unsub
+  }, [user])
+
+  useEffect(() => {
+    if (!groupId) return
+    const unsub = observarMiembros(groupId, (lista) => {
+      setMiembros(lista)
+      setLoading(false)
+    })
+    return unsub
+  }, [groupId])
 
   const getLeaderId = useMemo(() => {
-    const fn = (key: 'deposiciones' | 'actosSexuales' | 'gym'): string | null => {
+    const fn = (key: 'deposiciones' | 'actosSexuales' | 'gym' | 'meadas'): string | null => {
       if (miembros.length === 0) return null
       const values = miembros.map((m) => m[key] || 0)
       const maxVal = Math.max(...values)
@@ -47,47 +76,89 @@ export default function MemberList({ miembros, adminId }: Props) {
     return fn
   }, [miembros])
 
-  const leaderCagadas = getLeaderId('deposiciones')
-  const leaderCuleadas = getLeaderId('actosSexuales')
-  const leaderGym = getLeaderId('gym')
+  const activeGroup = grupos.find((g) => g.id === groupId)
+  const adminId = activeGroup?.adminId
 
-  if (miembros.length === 0) {
+  if (!initialized) {
     return (
-      <p className="text-gray-500 dark:text-gray-400 text-center py-8 font-bold uppercase tracking-wider">
-        No hay miembros en el grupo
-      </p>
+      <div className="w-full max-w-md mx-auto p-4 space-y-4">
+        <Skeleton variant="card" count={2} />
+      </div>
     )
   }
 
-  return (
-    <section>
-      <button
-        onClick={() => { isOpen ? playToggleOffSound() : playToggleOnSound(); setIsOpen(!isOpen) }}
-        className="w-full flex items-center justify-between py-3 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
-      >
-        <span>MIEMBROS DEL GRUPO</span>
-        {isOpen ? (
-          <ChevronUp size={20} strokeWidth={2.5} />
-        ) : (
-          <ChevronDown size={20} strokeWidth={2.5} />
-        )}
-      </button>
+  if (grupos.length === 0) {
+    return (
+      <div className="w-full max-w-md mx-auto p-4 space-y-6">
+        <Link
+          to="/"
+          className="bg-white border-4 border-black text-black font-black px-4 py-2 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:bg-gray-200 mb-6 inline-block"
+        >
+          VOLVER AL TABLERO
+        </Link>
+        <p className="text-sm font-bold text-center text-gray-500 dark:text-gray-400">
+          No tienes grupos activos para mostrar sus miembros.
+        </p>
+      </div>
+    )
+  }
 
-      {isOpen && (
-        <div className="space-y-3 mt-3">
+  if (loading) {
+    return (
+      <div className="w-full max-w-md mx-auto p-4 space-y-4">
+        <Link
+          to="/"
+          className="bg-white border border-black text-black font-black px-4 py-2 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:bg-gray-200 mb-6 inline-block"
+        >
+          VOLVER AL TABLERO
+        </Link>
+        <Skeleton variant="listItem" count={4} />
+      </div>
+    )
+  }
+
+  const leaderCagadas = getLeaderId('deposiciones')
+  const leaderCuleadas = getLeaderId('actosSexuales')
+  const leaderGym = getLeaderId('gym')
+  const leaderMeadas = getLeaderId('meadas')
+
+  return (
+    <div className="w-full max-w-md mx-auto p-4 space-y-4 animate-fade-in-up">
+      <Link
+        to="/"
+        className="bg-white border border-black text-black font-black px-4 py-2 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:bg-gray-200 mb-6 inline-block"
+      >
+        VOLVER AL TABLERO
+      </Link>
+
+      <h2 className="text-2xl font-black uppercase tracking-wider text-black dark:text-white">
+        Miembros Del Grupo
+      </h2>
+      <p className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">
+        {miembros.length} miembros de {activeGroup?.nombre || 'tu grupo'}
+      </p>
+
+      {miembros.length === 0 ? (
+        <p className="text-gray-500 dark:text-gray-400 text-center py-8 font-bold uppercase tracking-wider">
+          No hay miembros en el grupo
+        </p>
+      ) : (
+        <div className="space-y-3">
           {miembros.map((m) => {
             const ultimoGym = m.ultimoGym ? tiempoRelativo(m.ultimoGym as Timestamp) : ''
             const ultimaDepo = m.ultimaDeposicion ? tiempoRelativo(m.ultimaDeposicion as Timestamp) : ''
             const ultimoSexo = m.ultimoActoSexual ? tiempoRelativo(m.ultimoActoSexual as Timestamp) : ''
+            const ultimaMeada = m.ultimaMeada ? tiempoRelativo(m.ultimaMeada as Timestamp) : ''
             const crownRotation = determinateRotation(m.id)
             const showCrownCagadas = leaderCagadas === m.id
             const showCrownCuleadas = leaderCuleadas === m.id
             const showCrownGym = leaderGym === m.id
+            const showCrownMeadas = leaderMeadas === m.id
 
             return (
               <div
                 key={m.id}
-                className="border-2 border-black dark:border-white bg-white dark:bg-gray-800 p-4 shadow-brutal-sm dark:shadow-brutal-sm-dark"
+                className="border border-black dark:border-white bg-white dark:bg-gray-800 p-4 shadow-[4px_4px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_rgba(255,255,255,1)]"
               >
                 <div className="flex items-center gap-3 mb-3">
                   <UserAvatar
@@ -133,6 +204,14 @@ export default function MemberList({ miembros, adminId }: Props) {
                     crownRotation={crownRotation}
                   />
                   <CounterWithCrown
+                    value={m.meadas || 0}
+                    label="MEADAS"
+                    icon={<Droplet size={16} strokeWidth={2.5} className="text-yellow-400" />}
+                    valueClass="text-lg font-black text-yellow-400"
+                    showCrown={showCrownMeadas}
+                    crownRotation={crownRotation}
+                  />
+                  <CounterWithCrown
                     value={m.gym || 0}
                     label="GYM"
                     icon={<Dumbbell size={16} strokeWidth={2.5} className="text-blue-600 dark:text-blue-400" />}
@@ -142,7 +221,7 @@ export default function MemberList({ miembros, adminId }: Props) {
                   />
                 </div>
 
-                {(ultimoGym || ultimaDepo || ultimoSexo) && (
+                {(ultimoGym || ultimaDepo || ultimoSexo || ultimaMeada) && (
                   <div className="flex flex-col gap-1 mt-2 text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     {ultimaDepo && (
                       <span className="flex items-center gap-1">
@@ -152,6 +231,11 @@ export default function MemberList({ miembros, adminId }: Props) {
                     {ultimoSexo && (
                       <span className="flex items-center gap-1">
                         <Flame size={14} strokeWidth={2.5} /> Ultima culeada: {ultimoSexo}
+                      </span>
+                    )}
+                    {ultimaMeada && (
+                      <span className="flex items-center gap-1">
+                        <Droplet size={14} strokeWidth={2.5} className="text-yellow-400" /> Ultima meada: {ultimaMeada}
                       </span>
                     )}
                     {ultimoGym && (
@@ -166,7 +250,7 @@ export default function MemberList({ miembros, adminId }: Props) {
           })}
         </div>
       )}
-    </section>
+    </div>
   )
 }
 
