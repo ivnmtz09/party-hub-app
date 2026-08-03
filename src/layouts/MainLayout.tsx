@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Outlet, NavLink } from 'react-router-dom'
-import { Menu, Gamepad2, LayoutDashboard } from 'lucide-react'
+import { Menu, Gamepad2, LayoutDashboard, Zap } from 'lucide-react'
 import SideDrawer from '../components/SideDrawer'
 import BrandLogo from '../components/BrandLogo'
 import NotificationBell from '../components/NotificationBell'
@@ -8,6 +8,7 @@ import NotificationBell from '../components/NotificationBell'
 const navItems = [
   { to: '/arcade', label: 'Arcade', icon: Gamepad2 },
   { to: '/tablero', label: 'Tablero', icon: LayoutDashboard },
+  { to: '/mural', label: 'Mural', icon: Zap },
 ]
 
 export default function MainLayout() {

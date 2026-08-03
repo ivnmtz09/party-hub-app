@@ -1193,3 +1193,52 @@ export async function abandonarSalaFrente(
     await updateDoc(salaRef, update)
   }
 }
+
+/* ───── Mural ───── */
+
+export interface MuralEvent {
+  id?: string
+  userId: string
+  userName: string
+  groupId: string
+  type: string
+  value?: number
+  createdAt: Timestamp | null
+}
+
+export async function registrarEventoMural(
+  groupId: string,
+  userId: string,
+  userName: string,
+  type: string,
+  value?: number,
+): Promise<void> {
+  const muralRef = collection(db, 'mural_events')
+  const docData: Record<string, unknown> = {
+    userId,
+    userName,
+    groupId,
+    type,
+    createdAt: serverTimestamp(),
+  }
+  if (value !== undefined) docData.value = value
+  await addDoc(muralRef, docData)
+}
+
+export function observarEventosMural(
+  groupId: string,
+  callback: (eventos: MuralEvent[]) => void,
+): () => void {
+  const muralRef = collection(db, 'mural_events')
+  const q = query(
+    muralRef,
+    where('groupId', '==', groupId),
+    orderBy('createdAt', 'desc'),
+    limit(100),
+  )
+  return onSnapshot(q, (snap) => {
+    const lista: MuralEvent[] = []
+    snap.forEach((d) => lista.push({ id: d.id, ...d.data() } as MuralEvent))
+    callback(lista)
+  })
+}

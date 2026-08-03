@@ -13,6 +13,7 @@ import ImpostorGameHub from '../modules/arcade/pages/ImpostorGameHub'
 import TableroPage from '../modules/tablero/pages/TableroPage'
 import HistorialPage from '../modules/tablero/pages/HistorialPage'
 import MembersPage from '../modules/tablero/pages/MembersPage'
+import MuralPage from '../modules/mural/pages/MuralPage'
 import ProfilePage from '../modules/profile/pages/ProfilePage'
 import LoginPage from '../components/LoginPage'
 import SplashScreen from '../components/SplashScreen'
@@ -56,6 +57,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/arcade" replace /> },
       { path: 'arcade', element: <ArcadePage /> },
       { path: 'tablero', element: <TableroPage /> },
+      { path: 'mural', element: <MuralPage /> },
       { path: 'perfil', element: <ProfilePage /> },
       { path: 'historial', element: <HistorialPage /> },
       { path: 'miembros', element: <MembersPage /> },
