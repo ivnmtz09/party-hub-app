@@ -11,6 +11,7 @@ interface Props {
   groupId: string
   isOwner: boolean
   onClose: () => void
+  startEditing?: boolean
 }
 
 const REACTION_CONFIG: Record<ReactionType, { icon: typeof Heart; activeBg: string }> = {
@@ -30,10 +31,10 @@ const TIPO_BADGE: Record<Evento['tipo'], { label: string; color: string }> = {
   meada: { label: 'MEADA', color: 'bg-yellow-400 dark:bg-yellow-500' },
 }
 
-export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose }: Props) {
+export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose, startEditing }: Props) {
   const { user, userProfile } = useAuth()
   const { showToast } = useNeoToast()
-  const [isEditing, setIsEditing] = useState(false)
+  const [isEditing, setIsEditing] = useState(startEditing ?? false)
   const [rating, setRating] = useState(evento.rating ?? 0)
   const [note, setNote] = useState(evento.note ?? '')
   const [photoUrl, setPhotoUrl] = useState(evento.photoUrl ?? '')
