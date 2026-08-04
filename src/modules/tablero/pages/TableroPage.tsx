@@ -100,7 +100,17 @@ export default function TableroPage() {
     const ahora = new Date()
 
     return eventos.filter((e) => {
-      const fechaEvento = e.timestamp?.toDate ? e.timestamp.toDate() : new Date(e.timestamp as any)
+      let fechaEvento: Date | null = null
+      if (e.timestamp) {
+        const ts = e.timestamp as { toDate?: () => Date } | unknown
+        if (ts && typeof (ts as { toDate?: unknown }).toDate === 'function') {
+          fechaEvento = (ts as { toDate: () => Date }).toDate()
+        } else {
+          const d = new Date(e.timestamp as unknown as string)
+          if (!isNaN(d.getTime())) fechaEvento = d
+        }
+      }
+      if (!fechaEvento) return false
 
       switch (timeFilter) {
         case 'hoy':

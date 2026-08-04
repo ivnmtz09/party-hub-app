@@ -258,12 +258,10 @@ export function observarEventos(
   activeGroupId: string,
   callback: EventoCallback,
 ): () => void {
-  const ref = collection(db, 'eventos')
-  const qNew = query(ref, where('groupIds', 'array-contains', activeGroupId))
-  const qOld = query(ref, where('groupId', '==', activeGroupId))
+  const eventosRef = collection(db, 'eventos')
+  const gruposEventosRef = collection(db, 'grupos', activeGroupId, 'eventos')
+  const qNew = query(eventosRef, where('groupIds', 'array-contains', activeGroupId))
   const docs: Record<string, MergedDoc> = {}
-  let readyNew = false
-  let readyOld = false
 
   const flush = () => {
     callback(buildMerged(docs) as unknown as Evento[])
@@ -273,17 +271,15 @@ export function observarEventos(
     qNew,
     (snap) => {
       applyChanges(docs, snap, 'timestamp')
-      readyNew = true
-      if (readyOld) flush()
+      flush()
     },
     (error) => { console.error('Error al cargar eventos (nuevos):', error) },
   )
   const unsubOld = onSnapshot(
-    qOld,
+    gruposEventosRef,
     (snap) => {
       applyChanges(docs, snap, 'timestamp')
-      readyOld = true
-      if (readyNew) flush()
+      flush()
     },
     (error) => { console.error('Error al cargar eventos (viejos):', error) },
   )
@@ -299,12 +295,10 @@ export function observarEventosConLimite(
   maxResults: number,
   callback: EventoCallback,
 ): () => void {
-  const ref = collection(db, 'eventos')
-  const qNew = query(ref, where('groupIds', 'array-contains', activeGroupId))
-  const qOld = query(ref, where('groupId', '==', activeGroupId))
+  const eventosRef = collection(db, 'eventos')
+  const gruposEventosRef = collection(db, 'grupos', activeGroupId, 'eventos')
+  const qNew = query(eventosRef, where('groupIds', 'array-contains', activeGroupId))
   const docs: Record<string, MergedDoc> = {}
-  let readyNew = false
-  let readyOld = false
 
   const flush = () => {
     callback(buildMerged(docs, maxResults) as unknown as Evento[])
@@ -314,17 +308,15 @@ export function observarEventosConLimite(
     qNew,
     (snap) => {
       applyChanges(docs, snap, 'timestamp')
-      readyNew = true
-      if (readyOld) flush()
+      flush()
     },
     (error) => { console.error('Error al cargar eventos (nuevos):', error) },
   )
   const unsubOld = onSnapshot(
-    qOld,
+    gruposEventosRef,
     (snap) => {
       applyChanges(docs, snap, 'timestamp')
-      readyOld = true
-      if (readyNew) flush()
+      flush()
     },
     (error) => { console.error('Error al cargar eventos (viejos):', error) },
   )
