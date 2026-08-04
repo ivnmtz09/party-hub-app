@@ -41,7 +41,7 @@ import {
 } from '../../../firebase/services'
 import Skeleton from '../../../components/Skeleton'
 import GroupSelector from '../../../components/GroupSelector'
-import { playClickSound, playSuccessSound } from '../../../utils/audio'
+import { playClickSound, playCloseSound, playDeleteSound, playSuccessSound } from '../../../utils/audio'
 
 const SUCESOS = [
   { type: 'subi_peso', label: 'SUBÍ DE PESO', icon: ArrowUp, bg: 'bg-red-500 dark:bg-red-600 text-white' },
@@ -92,6 +92,7 @@ export default function MuralPage() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editType, setEditType] = useState<string>('')
   const [editingSaving, setEditingSaving] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const activeGroup = grupos.find((g) => g.id === activeGroupId)
   const nombre = userProfile?.nickname || user?.displayName?.split(' ')[0] || 'Alguien'
@@ -178,14 +179,26 @@ export default function MuralPage() {
   }
 
   const handleEliminar = async (ev: MuralEvent) => {
-    if (!ev.id || !window.confirm('¿Eliminar este registro?')) return
-    playClickSound()
+    if (!ev.id) return
+    playDeleteSound()
     try {
       await eliminarEventoMural(ev.id)
       playSuccessSound()
     } catch {
       /* error silencioso */
+    } finally {
+      setDeletingId(null)
     }
+  }
+
+  const handleConfirmarBorrado = (ev: MuralEvent) => {
+    playClickSound()
+    setDeletingId(ev.id ?? null)
+  }
+
+  const handleCancelarBorrado = () => {
+    playCloseSound()
+    setDeletingId(null)
   }
 
   const aguaChartData = useMemo(() => {
@@ -451,21 +464,41 @@ export default function MuralPage() {
                       <p className="text-sm font-black uppercase tracking-wider text-black dark:text-white">
                         {ev.userName} registró: {SUCESO_LABEL[ev.type] || ev.type}
                       </p>
-                      {isOwn(ev) && (
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => handleEditar(ev)}
-                            className="p-1 border-2 border-black dark:border-white bg-gray-200 dark:bg-gray-600 text-black dark:text-white font-black shadow-[1px_1px_0px_rgba(0,0,0,1)]"
-                          >
-                            <Pencil size={12} />
-                          </button>
+                      {isOwn(ev) && deletingId === ev.id ? (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] font-black uppercase tracking-wider text-black dark:text-white">
+                            CONFIRMAR:
+                          </span>
                           <button
                             onClick={() => handleEliminar(ev)}
-                            className="p-1 border-2 border-black dark:border-white bg-red-300 dark:bg-red-500 text-black dark:text-gray-900 font-black shadow-[1px_1px_0px_rgba(0,0,0,1)]"
+                            className="px-2.5 py-1 border-2 border-black bg-red-500 text-black font-black text-xs uppercase shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all"
                           >
-                            <Trash2 size={12} />
+                            SÍ
+                          </button>
+                          <button
+                            onClick={handleCancelarBorrado}
+                            className="px-2.5 py-1 border-2 border-black bg-gray-300 dark:bg-gray-600 text-black dark:text-white font-black text-xs uppercase shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all"
+                          >
+                            NO
                           </button>
                         </div>
+                      ) : (
+                        isOwn(ev) && (
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => handleEditar(ev)}
+                              className="p-2 border-2 border-black dark:border-white bg-gray-200 dark:bg-gray-600 text-black dark:text-white font-black shadow-[1px_1px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all"
+                            >
+                              <Pencil className="w-6 h-6" strokeWidth={2.5} />
+                            </button>
+                            <button
+                              onClick={() => handleConfirmarBorrado(ev)}
+                              className="p-2 border-2 border-black dark:border-white bg-red-300 dark:bg-red-500 text-black dark:text-gray-900 font-black shadow-[1px_1px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all"
+                            >
+                              <Trash2 className="w-6 h-6" strokeWidth={2.5} />
+                            </button>
+                          </div>
+                        )
                       )}
                     </div>
                     <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mt-0.5">
