@@ -1300,12 +1300,12 @@ export interface MuralEvent {
 }
 
 export const XP_POR_TIPO: Record<string, number> = {
-  baje_peso: 1,
+  baje_peso: 0,
+  subi_peso: 0,
   comi_saludable: 1,
   dormi_bien: 1,
   gane_plata: 1,
   hice_deberes: 1,
-  subi_peso: -1,
   comi_chatarra: -1,
   dormi_mal: -1,
   gaste_plata: -1,

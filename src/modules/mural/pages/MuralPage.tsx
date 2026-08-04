@@ -57,7 +57,7 @@ const SUCESOS = [
 ] as const
 
 const SUCESO_LABEL: Record<string, string> = {
-  agua: 'VASO DE AGUA',
+  agua: '+1 VASO DE AGUA',
   subi_peso: 'SUBÍ DE PESO',
   baje_peso: 'BAJÉ DE PESO',
   comi_chatarra: 'COMÍ CHATARRA',
@@ -203,16 +203,16 @@ export default function MuralPage() {
       .sort((a, b) => b.total - a.total)
   }, [eventos])
 
-  const feedEventos = useMemo(() => {
-    const ahora = new Date()
-    const inicioHoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate(), 0, 0, 0, 0)
-    return eventos
-      .filter((ev) => ev.type !== 'agua' && ev.createdAt)
-      .map((ev) => ({ ev, ts: ev.createdAt!.toMillis() }))
-      .filter((item) => item.ts >= inicioHoy.getTime() && item.ts <= ahora.getTime())
-      .sort((a, b) => b.ts - a.ts)
-      .map((item) => item.ev)
-  }, [eventos])
+   const feedEventos = useMemo(() => {
+     const ahora = new Date()
+     const inicioHoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate(), 0, 0, 0, 0)
+     return eventos
+       .filter((ev) => ev.createdAt)
+       .map((ev) => ({ ev, ts: ev.createdAt!.toMillis() }))
+       .filter((item) => item.ts >= inicioHoy.getTime() && item.ts <= ahora.getTime())
+       .sort((a, b) => b.ts - a.ts)
+       .map((item) => item.ev)
+   }, [eventos])
 
   const leaderboard = useMemo(() => {
     const ahora = new Date()
@@ -265,6 +265,15 @@ export default function MuralPage() {
       </p>
 
       <GroupSelector grupos={grupos} activeGroupId={activeGroupId} setActiveGroupId={setActiveGroupId} />
+
+      <div className="border-4 border-black dark:border-white bg-yellow-300 dark:bg-yellow-500 p-3 shadow-[4px_4px_0px_rgba(0,0,0,1)]">
+        <p className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1">
+          TU XP MENSUAL
+        </p>
+        <p className={`text-3xl font-black uppercase tracking-wider ${xpTotal >= 0 ? 'text-black dark:text-gray-900' : 'text-red-500'}`}>
+          {xpTotal >= 0 ? '+' : ''}{xpTotal}
+        </p>
+      </div>
 
       <section className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-4 shadow-[4px_4px_0px_rgba(0,0,0,1)]">
         <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-3">
@@ -413,6 +422,9 @@ export default function MuralPage() {
                       onChange={(e) => setEditType(e.target.value)}
                       className="flex-1 text-xs font-black uppercase tracking-wider border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
                     >
+                      <option key="agua" value="agua">
+                        VASO DE AGUA
+                      </option>
                       {SUCESOS.map((s) => (
                         <option key={s.type} value={s.type}>
                           {s.label}
