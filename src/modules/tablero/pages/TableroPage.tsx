@@ -273,13 +273,6 @@ export default function TableroPage() {
       >
         VER HISTORIAL COMPLETO
       </Link>
-
-      <Link
-        to="/mural"
-        className="w-full flex items-center justify-center py-3 px-4 border-4 border-black dark:border-white bg-cyan-300 dark:bg-cyan-400 text-black dark:text-gray-900 font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
-      >
-        IR AL MURAL
-      </Link>
     </div>
   )
 }

@@ -176,12 +176,12 @@ export default function MembersList({ miembros, activeGroup }: Props) {
               <div className="flex flex-col gap-1 mt-2 text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                 {ultimaDepo && (
                   <span className="flex items-center gap-1">
-                    <Trash2 size={14} strokeWidth={2.5} /> Ultima cagada: {ultimaDepo}
+                    <Trash2 size={14} strokeWidth={2.5} className="text-orange-500" /> Ultima cagada: {ultimaDepo}
                   </span>
                 )}
                 {ultimoSexo && (
                   <span className="flex items-center gap-1">
-                    <Flame size={14} strokeWidth={2.5} /> Ultima culeada: {ultimoSexo}
+                    <Flame size={14} strokeWidth={2.5} className="text-pink-500" /> Ultima culeada: {ultimoSexo}
                   </span>
                 )}
                 {ultimaMeada && (
@@ -191,7 +191,7 @@ export default function MembersList({ miembros, activeGroup }: Props) {
                 )}
                 {ultimoGym && (
                   <span className="flex items-center gap-1">
-                    <Dumbbell size={14} strokeWidth={2.5} /> Ultimo dia de gym: {ultimoGym}
+                    <Dumbbell size={14} strokeWidth={2.5} className="text-blue-500" /> Ultimo dia de gym: {ultimoGym}
                   </span>
                 )}
               </div>
