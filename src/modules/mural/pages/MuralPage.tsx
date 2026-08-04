@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   ArrowUp,
   ArrowDown,
+  Award,
   Banknote,
   BookOpen,
   Clock,
@@ -11,6 +12,11 @@ import {
   Hamburger,
   Leaf,
   Moon,
+  Pencil,
+  RefreshCw,
+  Save,
+  Trash2,
+  X,
 } from 'lucide-react'
 import {
   BarChart,
@@ -28,6 +34,8 @@ import {
   observarGruposDelUsuario,
   observarEventosMural,
   registrarEventoMural,
+  actualizarEventoMural,
+  eliminarEventoMural,
   type Grupo,
   type MuralEvent,
 } from '../../../firebase/services'
@@ -81,8 +89,13 @@ export default function MuralPage() {
   const [grupos, setGrupos] = useState<Grupo[]>([])
   const [eventos, setEventos] = useState<MuralEvent[]>([])
   const [loading, setLoading] = useState(true)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editType, setEditType] = useState<string>('')
+  const [editingSaving, setEditingSaving] = useState(false)
 
   const activeGroup = grupos.find((g) => g.id === activeGroupId)
+  const nombre = userProfile?.nickname || user?.displayName?.split(' ')[0] || 'Alguien'
+  const isOwn = (ev: MuralEvent) => (user ? ev.userId === user.uid : false)
 
   useEffect(() => {
     if (!user) return
@@ -117,7 +130,6 @@ export default function MuralPage() {
 
   const handleAgua = async () => {
     if (!user) return
-    const nombre = userProfile?.nickname || user.displayName?.split(' ')[0] || 'Alguien'
     playClickSound()
     try {
       await registrarEventoMural(user.uid, nombre, 'agua', 200)
@@ -129,10 +141,47 @@ export default function MuralPage() {
 
   const handleSuceso = async (type: string) => {
     if (!user) return
-    const nombre = userProfile?.nickname || user.displayName?.split(' ')[0] || 'Alguien'
     playClickSound()
     try {
       await registrarEventoMural(user.uid, nombre, type)
+      playSuccessSound()
+    } catch {
+      /* error silencioso */
+    }
+  }
+
+  const handleEditar = (ev: MuralEvent) => {
+    setEditingId(ev.id ?? null)
+    setEditType(ev.type)
+    playClickSound()
+  }
+
+  const handleGuardarEdicion = async () => {
+    if (!editingId) return
+    setEditingSaving(true)
+    playClickSound()
+    try {
+      await actualizarEventoMural(editingId, editType)
+      playSuccessSound()
+    } catch {
+      /* error silencioso */
+    } finally {
+      setEditingId(null)
+      setEditingSaving(false)
+    }
+  }
+
+  const handleCancelarEdicion = () => {
+    setEditingId(null)
+    setEditType('')
+    playClickSound()
+  }
+
+  const handleEliminar = async (ev: MuralEvent) => {
+    if (!ev.id || !window.confirm('¿Eliminar este registro?')) return
+    playClickSound()
+    try {
+      await eliminarEventoMural(ev.id)
       playSuccessSound()
     } catch {
       /* error silencioso */
@@ -154,9 +203,39 @@ export default function MuralPage() {
       .sort((a, b) => b.total - a.total)
   }, [eventos])
 
-  const feedEventos = useMemo(
-    () => eventos.filter((ev) => ev.type !== 'agua'),
-    [eventos],
+  const feedEventos = useMemo(() => {
+    const ahora = new Date()
+    const inicioHoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate(), 0, 0, 0, 0)
+    return eventos
+      .filter((ev) => ev.type !== 'agua' && ev.createdAt)
+      .map((ev) => ({ ev, ts: ev.createdAt!.toMillis() }))
+      .filter((item) => item.ts >= inicioHoy.getTime() && item.ts <= ahora.getTime())
+      .sort((a, b) => b.ts - a.ts)
+      .map((item) => item.ev)
+  }, [eventos])
+
+  const leaderboard = useMemo(() => {
+    const ahora = new Date()
+    const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1, 0, 0, 0, 0)
+    const porUsuario = new Map<string, { name: string; xp: number }>()
+    for (const ev of eventos) {
+      if (!ev.createdAt) continue
+      const fecha = ev.createdAt.toDate()
+      if (fecha < inicioMes || fecha > ahora) continue
+      const key = `${ev.userId}:${ev.userName}`
+      const current = porUsuario.get(key) || { name: ev.userName, xp: 0 }
+      current.xp += ev.xpValue ?? 0
+      porUsuario.set(key, current)
+    }
+    return Array.from(porUsuario.values())
+      .map((u) => ({ name: u.name, xp: Math.round((u.xp + Number.EPSILON) * 10) / 10 }))
+      .sort((a, b) => b.xp - a.xp)
+  }, [eventos])
+
+  const xpTotal = useMemo(
+    () =>
+      leaderboard.find((u) => user && u.name === nombre)?.xp ?? 0,
+    [leaderboard, nombre, user],
   )
 
   if (!activeGroup) {
@@ -250,6 +329,43 @@ export default function MuralPage() {
         </div>
       </section>
 
+      <section className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-4 shadow-[4px_4px_0px_rgba(0,0,0,1)]">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+            Líderes de XP (mes)
+          </h3>
+          <div className="flex items-center gap-1 text-xs font-black uppercase tracking-wider text-black dark:text-white">
+            <Award size={15} />
+            <span className={xpTotal >= 0 ? 'text-green-600' : 'text-red-500'}>{xpTotal}</span>
+          </div>
+        </div>
+        {loading ? (
+          <Skeleton variant="listItem" count={4} />
+        ) : leaderboard.length === 0 ? (
+          <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center py-4">
+            AÚN NO HAY XP ESTE MES
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {leaderboard.map((u, i) => (
+              <li
+                key={u.name}
+                className="border-4 border-black dark:border-white bg-gray-100 dark:bg-gray-700 p-2 shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black uppercase tracking-wider text-black dark:text-white">
+                    #{i + 1} {u.name}
+                  </span>
+                  <span className={u.xp >= 0 ? 'text-green-500' : 'text-red-500'}>
+                    {u.xp >= 0 ? '+' : ''}{u.xp} XP
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
       <section>
         <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-3">
           Sucesos Rápidos
@@ -285,17 +401,66 @@ export default function MuralPage() {
               </p>
             </div>
           ) : (
-            feedEventos.slice(0, 30).map((ev) => (
+            feedEventos.map((ev) => (
               <div
                 key={ev.id}
                 className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-3 shadow-[4px_4px_0px_rgba(0,0,0,1)]"
               >
-                <p className="text-sm font-black uppercase tracking-wider text-black dark:text-white">
-                  {ev.userName} registró: {SUCESO_LABEL[ev.type] || ev.type}
-                </p>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mt-0.5">
-                  {tiempoRelativo(ev.createdAt as Timestamp)}
-                </p>
+                {editingId === ev.id ? (
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={editType}
+                      onChange={(e) => setEditType(e.target.value)}
+                      className="flex-1 text-xs font-black uppercase tracking-wider border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+                    >
+                      {SUCESOS.map((s) => (
+                        <option key={s.type} value={s.type}>
+                          {s.label}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={handleGuardarEdicion}
+                      disabled={editingSaving}
+                      className="p-1 border-4 border-black dark:border-white bg-yellow-300 dark:bg-yellow-500 text-black font-black uppercase shadow-[2px_2px_0px_rgba(0,0,0,1)] disabled:opacity-50"
+                    >
+                      {editingSaving ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}
+                    </button>
+                    <button
+                      onClick={handleCancelarEdicion}
+                      className="p-1 border-4 border-black dark:border-white bg-pink-300 dark:bg-pink-500 text-black font-black uppercase shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-sm font-black uppercase tracking-wider text-black dark:text-white">
+                        {ev.userName} registró: {SUCESO_LABEL[ev.type] || ev.type}
+                      </p>
+                      {isOwn(ev) && (
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => handleEditar(ev)}
+                            className="p-1 border-2 border-black dark:border-white bg-gray-200 dark:bg-gray-600 text-black dark:text-white font-black shadow-[1px_1px_0px_rgba(0,0,0,1)]"
+                          >
+                            <Pencil size={12} />
+                          </button>
+                          <button
+                            onClick={() => handleEliminar(ev)}
+                            className="p-1 border-2 border-black dark:border-white bg-red-300 dark:bg-red-500 text-black dark:text-gray-900 font-black shadow-[1px_1px_0px_rgba(0,0,0,1)]"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mt-0.5">
+                      {tiempoRelativo(ev.createdAt as Timestamp)}
+                    </p>
+                  </>
+                )}
               </div>
             ))
           )}

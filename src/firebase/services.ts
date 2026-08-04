@@ -1292,9 +1292,29 @@ export interface MuralEvent {
   userId: string
   userName: string
   groupIds?: string[]
+  groupId?: string
   type: string
   value?: number
+  xpValue?: number
   createdAt: Timestamp | null
+}
+
+export const XP_POR_TIPO: Record<string, number> = {
+  baje_peso: 1,
+  comi_saludable: 1,
+  dormi_bien: 1,
+  gane_plata: 1,
+  hice_deberes: 1,
+  subi_peso: -1,
+  comi_chatarra: -1,
+  dormi_mal: -1,
+  gaste_plata: -1,
+  procrastine: -1,
+  agua: 0.2,
+}
+
+export function calcularXP(tipo: string): number {
+  return XP_POR_TIPO[tipo] ?? 0
 }
 
 export async function registrarEventoMural(
@@ -1310,10 +1330,24 @@ export async function registrarEventoMural(
     userName,
     groupIds,
     type,
+    xpValue: calcularXP(type),
     createdAt: serverTimestamp(),
   }
   if (value !== undefined) docData.value = value
   await addDoc(muralRef, docData)
+}
+
+export async function actualizarEventoMural(
+  eventId: string,
+  tipo: string,
+): Promise<void> {
+  const docRef = doc(db, 'mural_events', eventId)
+  await updateDoc(docRef, { type: tipo, xpValue: calcularXP(tipo) })
+}
+
+export async function eliminarEventoMural(eventId: string): Promise<void> {
+  const docRef = doc(db, 'mural_events', eventId)
+  await deleteDoc(docRef)
 }
 
 export function observarEventosMural(
@@ -1325,31 +1359,22 @@ export function observarEventosMural(
   const qNew = query(muralRef, where('groupIds', 'array-contains', activeGroupId))
   const qOld = query(muralRef, where('groupId', '==', activeGroupId))
   const docs: Record<string, MergedDoc> = {}
-  let readyNew = false
-  let readyOld = false
 
   const flush = () => {
-    callback(buildMerged(docs, 100) as unknown as MuralEvent[])
+    callback(buildMerged(docs) as unknown as MuralEvent[])
   }
 
-  const unsubNew = onSnapshot(
-    qNew,
-    (snap) => {
-      applyChanges(docs, snap, 'createdAt')
-      readyNew = true
-      if (readyOld) flush()
-    },
-    (error) => { console.error('Error al cargar mural_events:', error); if (onError) onError(error as Error) },
-  )
-  const unsubOld = onSnapshot(
-    qOld,
-    (snap) => {
-      applyChanges(docs, snap, 'createdAt')
-      readyOld = true
-      if (readyNew) flush()
-    },
-    (error) => { console.error('Error al cargar mural_events:', error); if (onError) onError(error as Error) },
-  )
+  const handler = (snap: QuerySnapshot) => {
+    applyChanges(docs, snap, 'createdAt')
+    flush()
+  }
+  const errorHandler = (error: Error) => {
+    console.error('Error al cargar mural_events:', error)
+    if (onError) onError(error)
+  }
+
+  const unsubNew = onSnapshot(qNew, handler, errorHandler)
+  const unsubOld = onSnapshot(qOld, handler, errorHandler)
 
   return () => {
     unsubNew()
