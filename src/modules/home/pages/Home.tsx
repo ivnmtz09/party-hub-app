@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Check, Copy, FolderPlus, Crown, LogIn, Settings, Users } from 'lucide-react'
+import { Check, Copy, FolderPlus, LogIn, Settings, Users } from 'lucide-react'
 import { useAuth } from '../../../context/AuthContext'
 import { useNotification } from '../../../context/NotificationContext'
 import {
@@ -9,7 +9,7 @@ import {
   type Miembro,
 } from '../../../firebase/services'
 import Skeleton from '../../../components/Skeleton'
-import UserAvatar from '../../../components/UserAvatar'
+import MembersList from '../../tablero/components/MembersList'
 import CreateGroupModal from '../../tablero/components/CreateGroupModal'
 import JoinGroupModal from '../../tablero/components/JoinGroupModal'
 import GroupSettingsModal from '../../tablero/components/GroupSettingsModal'
@@ -168,52 +168,18 @@ export default function Home() {
             </div>
           </div>
 
-          <h4 className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
-            Miembros ({miembros.length})
-          </h4>
-          {loadingMembers ? (
-            <Skeleton variant="listItem" count={3} />
-          ) : miembros.length === 0 ? (
-            <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center py-3">
-              Sin miembros
-            </p>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {miembros.map((m) => (
-                <div
-                  key={m.id}
-                  className="flex items-center gap-3 border-2 border-black dark:border-white bg-white dark:bg-gray-800 p-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                >
-                  <UserAvatar
-                    name={m.nickname || m.displayName}
-                    color={m.avatar || '#fbbf24'}
-                    type={m.avatarType || 'letter'}
-                    avatarIcon={m.avatarIcon || 'Gamepad2'}
-                    size={36}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-black uppercase tracking-wider text-xs text-black dark:text-white truncate">
-                      {m.nickname || m.displayName.split(' ')[0]}
-                    </p>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      {m.id === activeGroup.adminId ? (
-                        <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest bg-red-600 text-white px-1.5 py-0.5 border border-black dark:border-white">
-                          <Crown size={10} strokeWidth={2.5} />
-                          ADMIN
-                        </span>
-                      ) : (
-                        <span className="text-[10px] font-black uppercase tracking-widest bg-gray-300 dark:bg-gray-600 text-black dark:text-white px-1.5 py-0.5 border border-black dark:border-white">
-                          INVITADO
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+      <div className="mb-2">
+        <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+          Miembros ({miembros.length})
+        </h3>
+      </div>
+      {loadingMembers ? (
+        <Skeleton variant="listItem" count={3} />
+      ) : (
+        <MembersList miembros={miembros} activeGroup={activeGroup ?? undefined} />
       )}
+    </div>
+  )}
 
       <CreateGroupModal
         open={showCreateGroup}

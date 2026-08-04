@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   Plus,
-  Copy,
-  Check,
   Filter,
   X,
 } from 'lucide-react'
@@ -25,7 +23,6 @@ import Skeleton from '../../../components/Skeleton'
 import {
   playOpenSound,
   playCloseSound,
-  playCopySound,
   playSuccessSound,
 } from '../../../utils/audio'
 import GroupSelector from '../../../components/GroupSelector'
@@ -40,7 +37,6 @@ export default function TableroPage() {
   const [contentLoading, setContentLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showInlineForm, setShowInlineForm] = useState(false)
-  const [copied, setCopied] = useState(false)
   const [timeFilter, setTimeFilter] = useState<'este_mes' | 'mes_pasado' | 'esta_semana' | 'hoy'>('este_mes')
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
@@ -69,14 +65,6 @@ export default function TableroPage() {
   }, [activeGroupId, user])
 
   const activeGroup = grupos.find((g) => g.id === activeGroupId)
-
-  const handleCopyCode = async () => {
-    if (!activeGroup) return
-    playCopySound()
-    navigator.clipboard.writeText(activeGroup.codigoInvitacion)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
 
   const handleRecordSave = async (
     tipo: 'deposicion' | 'acto_sexual' | 'gym' | 'meada',
@@ -202,31 +190,6 @@ export default function TableroPage() {
       </p>
 
       <GroupSelector grupos={grupos} activeGroupId={activeGroupId} setActiveGroupId={setActiveGroupId} />
-
-      <div className="flex gap-2">
-        <button
-          onClick={handleCopyCode}
-          className="flex-1 flex items-center justify-center gap-2 py-2 border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-700 text-black dark:text-white font-bold text-xs uppercase tracking-wider shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
-        >
-          {copied ? (
-            <>
-              <Check size={14} strokeWidth={2.5} />
-              {activeGroup!.codigoInvitacion}
-            </>
-          ) : (
-            <>
-              <Copy size={14} strokeWidth={2.5} />
-              Codigo de Invitacion
-            </>
-          )}
-        </button>
-        <Link
-          to="/miembros"
-          className="flex items-center justify-center py-2 px-3 border-2 border-black dark:border-white bg-gray-200 dark:bg-gray-600 text-black dark:text-white font-black text-xs uppercase tracking-wider shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
-        >
-          Miembros
-        </Link>
-      </div>
 
       {errorMsg && (
         <p className="text-red-600 font-black text-sm text-center uppercase tracking-wider bg-red-100 dark:bg-red-900/30 border-2 border-red-600 py-2 px-4">
