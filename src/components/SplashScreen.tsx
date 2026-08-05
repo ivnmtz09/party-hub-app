@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Flame, Trash2, Dumbbell, Gamepad2 } from 'lucide-react'
 import BrandLogo from './BrandLogo'
 
@@ -24,6 +24,20 @@ const LOADING_MESSAGES = [
 
 export default function SplashScreen() {
   const randomMessage = useMemo(() => LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)], [])
+
+  useEffect(() => {
+    const splashAudio = new Audio('/splash-loop.mp3')
+    splashAudio.loop = true
+    splashAudio.volume = 0.4
+    splashAudio.play().catch((error) => {
+      console.warn('Autoplay bloqueado por el navegador', error)
+    })
+
+    return () => {
+      splashAudio.pause()
+      splashAudio.currentTime = 0
+    }
+  }, [])
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white dark:bg-gray-950 transition-colors duration-300">
