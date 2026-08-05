@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Flame, Trash2, Dumbbell, Gamepad2 } from 'lucide-react'
 import BrandLogo from './BrandLogo'
 
@@ -23,42 +23,40 @@ const LOADING_MESSAGES = [
 ]
 
 export default function SplashScreen() {
-  const [hasStarted, setHasStarted] = useState(false)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
   const randomMessage = useMemo(() => LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)], [])
 
   useEffect(() => {
     const splashAudio = new Audio('/splash-loop.mp3')
     splashAudio.loop = true
     splashAudio.volume = 0.4
-    audioRef.current = splashAudio
+
+    const tryPlay = () => {
+      splashAudio.play().catch((error) => {
+        console.warn('Autoplay bloqueado por el navegador', error)
+      })
+    }
+
+    const unlock = () => {
+      tryPlay()
+      window.removeEventListener('pointerdown', unlock)
+      window.removeEventListener('touchstart', unlock)
+      window.removeEventListener('keydown', unlock)
+    }
+
+    window.addEventListener('pointerdown', unlock)
+    window.addEventListener('touchstart', unlock)
+    window.addEventListener('keydown', unlock)
+
+    tryPlay()
 
     return () => {
+      window.removeEventListener('pointerdown', unlock)
+      window.removeEventListener('touchstart', unlock)
+      window.removeEventListener('keydown', unlock)
       splashAudio.pause()
       splashAudio.currentTime = 0
-      audioRef.current = null
     }
   }, [])
-
-  const handleStart = () => {
-    setHasStarted(true)
-    audioRef.current?.play().catch((error) => {
-      console.warn('Autoplay bloqueado por el navegador', error)
-    })
-  }
-
-  if (!hasStarted) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-gray-950 transition-colors duration-300">
-        <button
-          onClick={handleStart}
-          className="bg-yellow-400 dark:bg-yellow-500 border-8 border-black dark:border-white text-black dark:text-gray-900 font-black text-3xl sm:text-5xl uppercase tracking-wider px-10 py-8 text-center shadow-[8px_8px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_rgba(255,255,255,1)] hover:translate-y-2 hover:shadow-none active:translate-y-2 active:shadow-none transition-all"
-        >
-          TOCA PARA ENTRAR
-        </button>
-      </div>
-    )
-  }
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white dark:bg-gray-950 transition-colors duration-300">

@@ -16,8 +16,10 @@ App de fiestas con diseno **Neobrutalism** — juegos de deduccion social y tabl
 
 | Modulo | Descripcion |
 |---|---|
-| **Arcade / El Impostor** | Juego de rol social con asignacion secreta de palabras, rondas de debate, votacion y revelacion. Soporta grupos de 4-10 jugadores. |
+| **Home** | Pantalla de inicio con gestion de grupos: crear grupo, unirse por codigo con desplegable inline, elegir grupo activo, copiar codigo de invitacion, ver miembros y abrir ajustes. |
 | **Tablero Social** | Registro de eventos grupales con soporte de **multiples grupos por codigos de invitacion**. Cada grupo tiene un admin que puede expulsar miembros, editar el nombre y eliminar el grupo. Incluye graficos de barras con estadisticas por miembro. |
+| **Mural** | Panel de habitos diarios con gamificacion por XP: habitos buenos suman +1 XP, malos restan -1 XP, peso neutro 0 XP y agua +0.2 XP. El feed se limpia cada medianoche y el XP se acumula para el ranking mensual del grupo. |
+| **Arcade** | Catalogo de minijuegos multijugador: Impostor, Bomba de Tiempo, Ruleta, Dedo en la Llaga, Codigo Secreto y Frente a Frente. |
 
 ## Funcionalidades Clave
 
@@ -28,7 +30,6 @@ App de fiestas con diseno **Neobrutalism** — juegos de deduccion social y tabl
 - Sincronizacion en tiempo real con Firestore
 - Modal de ajustes: editar nombre, expulsar miembros, eliminar/abandonar grupo
 - Grafico de barras comparativo (Deposiciones vs Actos Sexuales por miembro)
-
 ### Tablero Social — Features Avanzadas
 - **Reacciones por usuario**: toggle unico con iconos semanticos (corazon, fuego, sonrisa, calavera, triste). Colores activos individualizados
 - **Comentarios por registro**: agregar texto con avatar, timestamp relativo, lista expandible con toggle
@@ -42,6 +43,26 @@ App de fiestas con diseno **Neobrutalism** — juegos de deduccion social y tabl
 - 120 palabras en 6 categorias
 - Fases: Asignacion -> Debate -> Votacion -> Resultados
 - Diseno FlipCard para revelacion de roles
+
+### Mural (Gamificacion)
+- Registro de habitos diarios con Puntos de Experiencia (XP)
+- Habitos buenos suman +1 XP, malos restan -1 XP, peso neutro 0 XP, cada vaso de agua de 200ml suma +0.2 XP
+- Feed con reacciones y comentarios
+- Limpieza automatica del feed cada medianoche; el XP se acumula todo el mes para el ranking del grupo
+
+### Navegacion Inferior Condicional
+- Barra de navegacion inferior (INICIO / TABLERO / MURAL / ARCADE) que solo muestra los botones de TABLERO y MURAL cuando el usuario tiene un grupo activo o pertenece a alguno
+- Sin grupo activo, la barra muestra unicamente INICIO y ARCADE, expandidos al ancho completo de forma simetrica
+
+### Union a Grupo Inline
+- El boton "UNIRSE A UN GRUPO" abre un desplegable inline neobrutalista directamente debajo del boton (sin modal superpuesto)
+- Input de codigo de 6 caracteres y boton "UNIRME" con feedback de error y estado de carga
+
+### Splash Screen con Audio en Bucle
+- Pantalla de carga con mensajes tematicos aleatorios (Tablero, Mural y Arcade)
+- Audio en bucle `splash-loop.mp3` (generado, ~4s) con volumen 0.4 para dar presencia sin ser intrusivo
+- Desbloqueo no intrusivo: intenta reproducir al montar y retoma con el primer toque o tecla si el navegador bloquea el autoplay
+- Cleanup automatico: el audio se detiene al desmontarse el componente
 
 ### Sistema de Sonidos Interactivos
 - **13 sonidos custom**: click, toggle on/off, reaccion, comentario, copiar, eliminar, abrir/cerrar modal, estrella, shuffle, spin, voto, switch
@@ -73,34 +94,42 @@ VITE_FIREBASE_APP_ID=
 
 ```
 src/
-├── components/          # Componentes globales (Login, Splash, SideDrawer, UserAvatar, Skeleton)
-├── context/             # AuthContext, ThemeContext
+├── components/          # Componentes globales (Login, Splash, SideDrawer, NeoToast, Skeleton)
+├── context/             # AuthContext, ThemeContext, NotificationContext (grupo activo + toasts)
 ├── firebase/
 │   ├── config.ts        # Init Firebase
-│   └── services.ts      # Firestore: grupos, miembros, eventos, graficos, reacciones, comentarios
+│   └── services.ts      # Firestore: grupos, miembros, eventos, mural, graficos, reacciones, comentarios
 ├── layouts/
-│   └── MainLayout.tsx   # Header sticky + bottom nav brutalista
+│   └── MainLayout.tsx   # Header sticky + bottom nav brutalista condicional
 ├── modules/
 │   ├── arcade/
-│   │   ├── components/  # FlipCard
+│   │   ├── components/  # FlipCard, GameHeader
 │   │   ├── context/     # GameContext
 │   │   ├── data/        # 120 palabras en 6 categorias
 │   │   ├── hooks/       # useImpostorGame (maquina de estados)
-│   │   ├── pages/       # ArcadePage, ImpostorGameHub, Setup, Reveal, Debate, Voting, Results
-│   │   └── types/       # Word, PlayerRole, GameState
+│   │   └── pages/       # ArcadePage, Impostor, Bomba, Ruleta, Dedo en la Llaga, Codigo Secreto, Frente a Frente
+│   ├── home/
+│   │   └── pages/
+│   │       └── Home.tsx # Gestion de grupos + desplegable inline de union
+│   ├── mural/
+│   │   └── pages/
+│   │       └── MuralPage.tsx   # Habitos con XP y ranking
+│   ├── profile/
+│   │   └── pages/
+│   │       └── ProfilePage.tsx # Perfil con avatar, nickname y datos de sesion
 │   └── tablero/
 │       ├── components/
-│       │   ├── ActivityDetailOrEdit.tsx  # Detalle con reacciones, comentarios y Lightbox
-│       │   ├── MemberList.tsx            # Lista con avatar, rol (ADMIN/INVITADO) y stats
-│       │   ├── RecordInlineForm.tsx      # Formulario inline de creacion de registros
-│       │   ├── RecentActivity.tsx        # Timeline paginada con avatares y tarjetas apiladas
-│       │   ├── StatsChart.tsx            # Grafico de barras (recharts)
-│       │   ├── StatsSection.tsx          # Timeline de ultimos eventos
-│       │   ├── CreateGroupModal.tsx      # Modal creacion de grupo
-│       │   ├── JoinGroupModal.tsx        # Modal union por codigo
-│       │   └── GroupSettingsModal.tsx    # Ajustes: nombre, expulsar, eliminar/abandonar
+│       │   ├── ActivityCreateForm.tsx     # Formulario de creacion de registros
+│       │   ├── ActivityDetailOrEdit.tsx   # Detalle con reacciones, comentarios y Lightbox
+│       │   ├── MembersList.tsx            # Lista con avatar, rol (ADMIN/INVITADO) y stats
+│       │   ├── RecordModal.tsx            # Modal de registros
+│       │   ├── RecentActivity.tsx         # Timeline paginada con avatares y tarjetas apiladas
+│       │   ├── StatsChart.tsx             # Grafico de barras (recharts)
+│       │   ├── CreateGroupModal.tsx       # Modal creacion de grupo
+│       │   └── GroupSettingsModal.tsx     # Ajustes: nombre, expulsar, eliminar/abandonar
 │       └── pages/
-│           └── TableroPage.tsx           # Pagina principal del tablero multigrupo
+│           ├── TableroPage.tsx            # Pagina principal del tablero multigrupo
+│           └── HistorialPage.tsx          # Historial de eventos del grupo activo
 ├── routes/
 │   └── index.tsx        # Router con nested layouts y proteccion de rutas
 ├── utils/
@@ -109,6 +138,10 @@ src/
 ├── index.css            # Tailwind directives + animaciones custom
 └── main.tsx             # Entry point
 ```
+
+## Audio de carga (Splash)
+
+El bucle de carga del splash vive en `public/splash-loop.mp3` (bucle de ~4 segundos sintetizado con tonos suaves). Si quieres reemplazarlo, solo cambia el archivo manteniendo el mismo nombre; el codigo en `SplashScreen.tsx` lo reproduce en bucle con `volume = 0.4`.
 
 ## Iconos de reacciones
 
