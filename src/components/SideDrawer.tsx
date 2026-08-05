@@ -7,13 +7,10 @@ import {
   Code,
   ExternalLink,
   HelpCircle,
-  Activity,
-  UserX,
-  Bomb,
-  RotateCw,
-  Target,
-  Lock,
-  Users,
+  Home,
+  ClipboardList,
+  Star,
+  Gamepad2,
   ChevronDown,
   User,
 } from "lucide-react";
@@ -166,39 +163,24 @@ export default function SideDrawer({ open, onClose }: Props) {
               <div className="space-y-2 border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-800 p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                 <div className="space-y-1">
                   <ManualItem
-                    icon={<Activity size={16} strokeWidth={2.5} />}
-                    title="El Tablero"
-                    desc="Registra tus Cagadas, Culeadas y tus idas al GYM. Las graficas se reinician cada mes para coronar a un nuevo lider."
+                    icon={<Home size={16} strokeWidth={2.5} />}
+                    title="Inicio"
+                    desc="Administras tus grupos. Ves los codigos de invitacion y las tarjetas de estadisticas de cada miembro (conteo y ultima vez de Cagadas, Culeadas, Meadas y dias de Gym)."
                   />
                   <ManualItem
-                    icon={<UserX size={16} strokeWidth={2.5} />}
-                    title="El Impostor"
-                    desc="Un jugador oculto no conoce la palabra secreta. Los civiles deben dar pistas de UNA sola palabra. Vota antes de que el impostor gane!"
+                    icon={<ClipboardList size={16} strokeWidth={2.5} />}
+                    title="Tablero"
+                    desc="Es el registro de eventos principales. Publicas tus Cagadas, Culeadas, Meadas y Gym. Puedes reaccionar y comentar las publicaciones de tus amigos y ver graficos estadisticos mensuales."
                   />
                   <ManualItem
-                    icon={<Bomb size={16} strokeWidth={2.5} />}
-                    title="Bomba de Tiempo"
-                    desc="Responde la pregunta de presion y pasa el turno rapido. El tiempo disminuye cada ronda. Si te explota, preparate para una penitencia turbia."
+                    icon={<Star size={16} strokeWidth={2.5} />}
+                    title="Mural (Gamificacion)"
+                    desc="Panel de habitos diarios. Registra acciones rapidas para ganar Puntos de Experiencia (XP). Habitos buenos suman +1 XP, habitos malos restan -1 XP. El peso (subir/bajar) es neutro (0 XP). Cada vaso de agua de 200ml suma +0.2 XP. El feed se limpia cada medianoche, pero el XP se acumula todo el mes para el Ranking del grupo."
                   />
                   <ManualItem
-                    icon={<RotateCw size={16} strokeWidth={2.5} />}
-                    title="Ruleta"
-                    desc="Personaliza la rueda con nombres, opciones o letras (ideal para jugar Stop). Gira y que la suerte decida."
-                  />
-                  <ManualItem
-                    icon={<Target size={16} strokeWidth={2.5} />}
-                    title="Dedo en la Llaga"
-                    desc="Votacion grupal y democratica. Quien del grupo es el mas probable en hacer lo que dice la tarjeta?"
-                  />
-                  <ManualItem
-                    icon={<Lock size={16} strokeWidth={2.5} />}
-                    title="Codigo Secreto"
-                    desc="Juego de deduccion 1v1. Adivina el codigo de 4 cifras de tu rival. Fija = Numero y posicion correctos. Pica = Numero correcto en posicion equivocada. El primero en descifrarlo, gana."
-                  />
-                  <ManualItem
-                    icon={<Users size={16} strokeWidth={2.5} />}
-                    title="Frente a Frente"
-                    desc="Juego por equipos. Ponte el celular en la frente. Tu equipo debe darte pistas para que adivines el personaje en pantalla antes de que el tiempo explote."
+                    icon={<Gamepad2 size={16} strokeWidth={2.5} />}
+                    title="Arcade"
+                    desc="Catalogo de minijuegos multijugador para pasar el rato con tu grupo: Impostor, Bomba de Tiempo, Ruleta, Dedo en la Llaga, Codigo Secreto y Frente a Frente."
                   />
                 </div>
               </div>
@@ -247,7 +229,7 @@ export default function SideDrawer({ open, onClose }: Props) {
               </span>
               <span className="inline-flex items-center gap-1.5 text-xs font-mono text-gray-600 dark:text-gray-400 uppercase tracking-widest">
                 <Code size={12} strokeWidth={2.5} />
-                Version 1.9.0
+                Version 1.10.0
               </span>
             </div>
           </div>
