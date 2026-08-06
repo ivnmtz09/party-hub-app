@@ -15,6 +15,7 @@ import HistorialPage from '../modules/tablero/pages/HistorialPage'
 import MuralPage from '../modules/mural/pages/MuralPage'
 import HomePage from '../modules/home/pages/Home'
 import NotFound from '../pages/NotFound'
+import RegistroPage from '../pages/RegistroPage'
 import ProfilePage from '../modules/profile/pages/ProfilePage'
 import LoginPage from '../components/LoginPage'
 import SplashScreen from '../components/SplashScreen'
@@ -117,6 +118,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <FrenteLobby />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/registro/:id',
+    element: (
+      <ProtectedRoute>
+        <RegistroPage />
       </ProtectedRoute>
     ),
   },
