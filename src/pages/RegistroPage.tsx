@@ -112,15 +112,17 @@ interface AvatarData {
   avatarIcon?: string
 }
 
-function RegistroAvatar({ data, size = 64 }: { data: AvatarData | null; size?: number }) {
+function RegistroAvatar({ data, fallbackInitial, size = 64 }: { data: AvatarData | null; fallbackInitial?: string; size?: number }) {
+  /* Cuando no hay datos de perfil del autor, mostramos la inicial del nombre de fallback o 'U' */
   if (!data) {
+    const letra = (fallbackInitial || 'U').charAt(0).toUpperCase()
     return (
       <div
-        className="border-4 border-black dark:border-white flex items-center justify-center bg-gray-200 dark:bg-gray-700 shrink-0"
+        className="border-4 border-black dark:border-white flex items-center justify-center bg-yellow-300 dark:bg-yellow-500 shrink-0"
         style={{ width: size, height: size }}
       >
-        <span className="font-black text-black dark:text-white" style={{ fontSize: size * 0.35 }}>
-          ?
+        <span className="font-black text-black" style={{ fontSize: size * 0.4 }}>
+          {letra}
         </span>
       </div>
     )
@@ -130,7 +132,8 @@ function RegistroAvatar({ data, size = 64 }: { data: AvatarData | null; size?: n
     data.avatarType === 'shape'
       ? ICON_OPTIONS.find((o) => o.id === data.avatarIcon)?.icon
       : null
-  const initial = (data.nickname || data.displayName || '?').charAt(0).toUpperCase()
+  /* Prioridad: nickname > displayName (solo primer word) > fallback 'U' */
+  const initial = (data.nickname || data.displayName?.split(' ')[0] || fallbackInitial || 'U').charAt(0).toUpperCase()
 
   return (
     <div
@@ -352,7 +355,8 @@ export default function RegistroPage() {
   }
   const reactions = evento.reactions ?? {}
   const currentUserId = user?.uid
-  const autorNombre = autorData?.nickname || autorData?.displayName?.split(' ')[0] || evento.userId
+  /* Nunca exponemos el UID crudo: si no hay nombre disponible, usamos 'USUARIO' como fallback */
+  const autorNombre = autorData?.nickname || autorData?.displayName?.split(' ')[0] || 'USUARIO'
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -382,7 +386,8 @@ export default function RegistroPage() {
 
           {/* Header de la tarjeta */}
           <div className="flex items-center gap-4 p-4 border-b-4 border-black dark:border-white">
-            <RegistroAvatar data={autorData} size={64} />
+            {/* Avatar — pasa autorNombre como fallbackInitial para la inicial */}
+            <RegistroAvatar data={autorData} fallbackInitial={autorNombre} size={64} />
 
             <div className="flex-1 min-w-0">
               <p className="text-lg font-black uppercase tracking-wider truncate text-black dark:text-white">
@@ -393,7 +398,8 @@ export default function RegistroPage() {
               </p>
             </div>
 
-            <div className="flex flex-col items-center gap-1 shrink-0">
+            {/* Icono + badge alineados a la derecha en columna */}
+            <div className="flex flex-col items-end gap-2 shrink-0">
               <div className="w-12 h-12 border-2 border-black dark:border-white flex items-center justify-center bg-gray-100 dark:bg-gray-700">
                 <TipoIcon tipo={evento.tipo} />
               </div>
@@ -406,11 +412,11 @@ export default function RegistroPage() {
           </div>
 
           {/* Cuerpo: rating, nota, foto */}
-          <div className="p-4 space-y-4">
+          <div className="p-5 space-y-5">
 
             {/* Rating */}
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
+            <div className="pb-4 border-b-2 border-gray-100 dark:border-gray-700">
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-3">
                 CALIFICACION
               </p>
               <Stars value={evento.rating ?? 0} />
@@ -447,7 +453,7 @@ export default function RegistroPage() {
           </div>
 
           {/* ─── Reacciones ─── */}
-          <div className="px-4 pb-4 border-t-2 border-gray-200 dark:border-gray-700 pt-4">
+          <div className="px-5 pb-5 border-t-2 border-gray-200 dark:border-gray-700 pt-5">
             <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-3">
               REACCIONES
             </p>
@@ -461,7 +467,7 @@ export default function RegistroPage() {
                   <button
                     key={type}
                     onClick={() => handleReaction(type)}
-                    className={`flex items-center gap-1 px-3 py-2 border-2 border-black dark:border-white font-black text-[10px] uppercase tracking-wider transition-all shadow-[2px_2px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none hover:translate-y-0.5 hover:shadow-[1px_1px_0px_rgba(0,0,0,1)] ${
+                    className={`flex items-center gap-1 px-3 py-2 border-2 border-black dark:border-white font-black text-[10px] uppercase tracking-wider transition-all shadow-[2px_2px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none hover:translate-y-[2px] hover:shadow-[1px_0px_0px_rgba(0,0,0,1)] ${
                       isActive
                         ? `${activeBg} text-black`
                         : 'bg-white dark:bg-gray-800 text-black dark:text-white'
@@ -554,7 +560,7 @@ export default function RegistroPage() {
               <button
                 onClick={handleSendComment}
                 disabled={!commentText.trim()}
-                className="px-4 py-2 border-2 border-black dark:border-white bg-emerald-300 dark:bg-emerald-500 text-black font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 border-2 border-black dark:border-white bg-emerald-300 dark:bg-emerald-500 text-black font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:bg-emerald-400 dark:hover:bg-green-500 hover:translate-y-[2px] hover:shadow-[1px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <SendIcon />
               </button>
@@ -562,14 +568,6 @@ export default function RegistroPage() {
           </div>
         </div>
 
-        {/* ─── Footer: volver ─── */}
-        <button
-          onClick={() => navigate(-1)}
-          className="w-full flex items-center justify-center gap-2 py-4 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-black uppercase tracking-wider shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all"
-        >
-          <ArrowLeftIcon />
-          VOLVER
-        </button>
       </div>
     </div>
   )
