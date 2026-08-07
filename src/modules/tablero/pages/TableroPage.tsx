@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   Plus,
-  Filter,
   X,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -22,7 +21,6 @@ import RecordInlineForm from '../components/RecordInlineForm'
 import Skeleton from '../../../components/Skeleton'
 import {
   playOpenSound,
-  playCloseSound,
   playSuccessSound,
 } from '../../../utils/audio'
 import GroupSelector from '../../../components/GroupSelector'
@@ -37,9 +35,42 @@ export default function TableroPage() {
   const [contentLoading, setContentLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showInlineForm, setShowInlineForm] = useState(false)
-  const [timeFilter, setTimeFilter] = useState<'este_mes' | 'mes_pasado' | 'esta_semana' | 'hoy'>('este_mes')
-  const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
+
+  const [selectedMonth, setSelectedMonth] = useState<string>(() => {
+    const d = new Date()
+    return `${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`
+  })
+  const [availableMonths, setAvailableMonths] = useState<string[]>([])
+
+  useEffect(() => {
+    if (eventos.length === 0) return
+    const unique = new Set<string>()
+    eventos.forEach((e) => {
+      if (!e.timestamp) return
+      const date = typeof (e.timestamp as any).toDate === 'function'
+        ? (e.timestamp as any).toDate()
+        : new Date(e.timestamp as any)
+      if (!isNaN(date.getTime())) {
+        const m = String(date.getMonth() + 1).padStart(2, '0')
+        const y = date.getFullYear()
+        unique.add(`${m}-${y}`)
+      }
+    })
+    const sorted = Array.from(unique).sort((a, b) => {
+      const partsA = a.split('-').map(Number)
+      const partsB = b.split('-').map(Number)
+      const ma = partsA[0] ?? 1
+      const ya = partsA[1] ?? 2026
+      const mb = partsB[0] ?? 1
+      const yb = partsB[1] ?? 2026
+      return (yb * 12 + mb) - (ya * 12 + ma)
+    })
+    setAvailableMonths(sorted)
+    if (sorted.length > 0 && sorted[0] && !sorted.includes(selectedMonth)) {
+      setSelectedMonth(sorted[0])
+    }
+  }, [eventos])
 
   useEffect(() => {
     if (!user) return
@@ -84,67 +115,18 @@ export default function TableroPage() {
     }
   }
 
-  const filteredEventos = useMemo(() => {
-    const ahora = new Date()
-
+  const chartEventos = useMemo(() => {
     return eventos.filter((e) => {
-      let fechaEvento: Date | null = null
-      if (e.timestamp) {
-        const ts = e.timestamp as { toDate?: () => Date } | unknown
-        if (ts && typeof (ts as { toDate?: unknown }).toDate === 'function') {
-          fechaEvento = (ts as { toDate: () => Date }).toDate()
-        } else {
-          const d = new Date(e.timestamp as unknown as string)
-          if (!isNaN(d.getTime())) fechaEvento = d
-        }
-      }
-      if (!fechaEvento) return false
-
-      switch (timeFilter) {
-        case 'hoy':
-          return fechaEvento.getFullYear() === ahora.getFullYear() &&
-                 fechaEvento.getMonth() === ahora.getMonth() &&
-                 fechaEvento.getDate() === ahora.getDate()
-        case 'esta_semana': {
-          const dayOfWeek = ahora.getDay()
-          const inicioSemana = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate() - ((dayOfWeek + 6) % 7))
-          inicioSemana.setHours(0, 0, 0, 0)
-          return fechaEvento >= inicioSemana && fechaEvento <= ahora
-        }
-        case 'mes_pasado': {
-          const mesAnterior = ahora.getMonth() - 1
-          const indiceMes = mesAnterior < 0 ? 11 : mesAnterior
-          const añoMesAnterior = mesAnterior < 0 ? ahora.getFullYear() - 1 : ahora.getFullYear()
-          return fechaEvento.getMonth() === indiceMes && fechaEvento.getFullYear() === añoMesAnterior
-        }
-        case 'este_mes':
-        default:
-          return fechaEvento.getMonth() === ahora.getMonth() &&
-                 fechaEvento.getFullYear() === ahora.getFullYear()
-      }
+      if (!e.timestamp) return false
+      const date = typeof (e.timestamp as any).toDate === 'function'
+        ? (e.timestamp as any).toDate()
+        : new Date(e.timestamp as any)
+      if (isNaN(date.getTime())) return false
+      const m = String(date.getMonth() + 1).padStart(2, '0')
+      const y = date.getFullYear()
+      return `${m}-${y}` === selectedMonth
     })
-  }, [eventos, timeFilter])
-
-  const NOMBRES_MESES = [
-    'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO',
-    'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE',
-  ]
-
-  const filterLabel = useMemo(() => {
-    const now = new Date()
-    switch (timeFilter) {
-      case 'hoy': return 'HOY'
-      case 'esta_semana': return 'ESTA SEMANA'
-      case 'mes_pasado': {
-        const lastMonth = now.getMonth() - 1
-        const year = lastMonth < 0 ? now.getFullYear() - 1 : now.getFullYear()
-        const monthIndex = lastMonth < 0 ? 11 : lastMonth
-        return `${NOMBRES_MESES[monthIndex]} ${year}`
-      }
-      case 'este_mes':
-      default: return `${NOMBRES_MESES[now.getMonth()]} ${now.getFullYear()}`
-    }
-  }, [timeFilter])
+  }, [eventos, selectedMonth])
 
   if (!initialized) {
     return (
@@ -200,7 +182,13 @@ export default function TableroPage() {
       {contentLoading ? (
         <Skeleton variant="listItem" count={5} />
       ) : (
-        <StatsChart miembros={miembros} eventos={filteredEventos} filterLabel={filterLabel} />
+        <StatsChart
+          miembros={miembros}
+          eventos={chartEventos}
+          selectedMonth={selectedMonth}
+          availableMonths={availableMonths}
+          onMonthChange={setSelectedMonth}
+        />
       )}
 
       <button
@@ -228,45 +216,7 @@ export default function TableroPage() {
         totalEventosCount={eventos.length}
       />
 
-      <div className="relative w-full mb-4 z-10">
-        <button
-          onClick={() => { playOpenSound(); setIsFilterMenuOpen(!isFilterMenuOpen) }}
-          className="w-full flex items-center justify-between gap-2 py-3 px-4 border-4 border-black dark:border-white bg-yellow-300 dark:bg-yellow-500 text-black dark:text-gray-900 font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
-        >
-          <span>Filtro: {timeFilter.replace('_', ' ').toUpperCase()}</span>
-          <Filter size={20} strokeWidth={2.5} />
-        </button>
-        {isFilterMenuOpen && (
-          <>
-            <div
-              className="fixed inset-0 z-10"
-              onClick={() => setIsFilterMenuOpen(false)}
-            />
-            <div className="absolute top-full left-0 w-full bg-white dark:bg-gray-800 border-4 border-black dark:border-white shadow-brutal-sm dark:shadow-brutal-sm-dark mt-2 flex flex-col z-20">
-              {(['este_mes', 'mes_pasado', 'esta_semana', 'hoy'] as const).map((f) => (
-                <button
-                  key={f}
-                  onClick={() => {
-                    playCloseSound()
-                    setTimeFilter(f)
-                    setIsFilterMenuOpen(false)
-                  }}
-                  className={`w-full text-left py-3 px-4 font-bold uppercase tracking-wider text-sm border-b-2 border-black dark:border-white last:border-b-0 transition-colors ${
-                    timeFilter === f
-                      ? 'bg-yellow-200 dark:bg-yellow-400 text-black'
-                      : 'bg-white dark:bg-gray-800 text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  {f === 'este_mes' && 'ESTE MES'}
-                  {f === 'mes_pasado' && 'MES PASADO'}
-                  {f === 'esta_semana' && 'ESTA SEMANA'}
-                  {f === 'hoy' && 'HOY'}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
+
 
       <Link
         to="/historial"

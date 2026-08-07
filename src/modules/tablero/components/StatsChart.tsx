@@ -13,10 +13,12 @@ import type { Miembro, Evento } from '../../../firebase/services'
 interface Props {
   miembros: Miembro[]
   eventos: Evento[]
-  filterLabel?: string
+  selectedMonth: string
+  availableMonths: string[]
+  onMonthChange: (val: string) => void
 }
 
-export default function StatsChart({ miembros, eventos, filterLabel }: Props) {
+export default function StatsChart({ miembros, eventos, selectedMonth, availableMonths, onMonthChange }: Props) {
   const data = miembros.map((m) => {
     const eventosUsuario = eventos.filter((e) => e.userId === m.id)
     const cagadas = eventosUsuario.filter((e) => e.tipo === 'deposicion').length
@@ -40,19 +42,47 @@ export default function StatsChart({ miembros, eventos, filterLabel }: Props) {
     'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'
   ]
 
-  const displayTitle = filterLabel || `ESTADÍSTICAS DE ${NOMBRES_MESES[new Date().getMonth()] ?? ''}`
-
   return (
     <div
       className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-4 shadow-brutal dark:shadow-brutal-dark"
-      style={{ pointerEvents: 'none' }}
     >
-      <div className="flex flex-col gap-1 mb-4">
+      <div className="flex flex-col gap-2 mb-4">
         <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
           Cagadas vs Culeadas vs Meadas vs Gym
         </h3>
-        <div className="inline-block self-start bg-yellow-300 dark:bg-yellow-400 text-black border-2 border-black dark:border-white px-2.5 py-1 text-xs font-black uppercase tracking-widest shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-          ESTADÍSTICAS DE {displayTitle}
+        
+        {/* Selector de Mes Neobrutalista */}
+        <div className="relative">
+          <select
+            value={selectedMonth}
+            onChange={(e) => onMonthChange(e.target.value)}
+            className="w-full sm:w-auto bg-yellow-400 border-4 border-black text-black font-black uppercase p-2 shadow-[4px_4px_0px_rgba(0,0,0,1)] focus:outline-none cursor-pointer text-xs select-none"
+          >
+            {availableMonths.length === 0 ? (
+              <option value={selectedMonth} className="bg-white text-black font-black">
+                {(() => {
+                  const parts = selectedMonth.split('-')
+                  const m = parts[0] ?? '1'
+                  const y = parts[1] ?? '2026'
+                  const monthIndex = Math.max(0, Math.min(11, parseInt(m, 10) - 1))
+                  return `${NOMBRES_MESES[monthIndex]} ${y}`
+                })()}
+              </option>
+            ) : (
+              availableMonths.map((m) => {
+                const parts = m.split('-')
+                const month = parts[0] ?? '1'
+                const year = parts[1] ?? '2026'
+                const monthIndex = Math.max(0, Math.min(11, parseInt(month, 10) - 1))
+                const legible = `${NOMBRES_MESES[monthIndex]} ${year}`
+                return (
+                  <option key={m} value={m} className="bg-white text-black font-black">
+                    {legible}
+                  </option>
+                )
+              })
+            )}
+          </select>
         </div>
       </div>
       <ResponsiveContainer width="100%" height={Math.max(200, data.length * 60)}>
