@@ -9,8 +9,8 @@ export interface GameDeck {
 export const decks: GameDeck[] = [
   {
     id: 'dedo-en-la-llaga',
-    titulo: 'El Dedo en la Llaga',
-    descripcion: 'Quien es mas probable...',
+    titulo: '¿Quién Es Más Probable...?',
+    descripcion: 'Multijugador: ¿quién es más probable que...?',
     esTurbio: false,
     cartas: [
       'Tirarse un pedo en un ascensor lleno de gente',

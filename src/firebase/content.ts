@@ -78,8 +78,8 @@ export interface ManualContenido {
 
 export const JUEGOS_DEFAULT: JuegoContenido[] = [
   { id: 'impostor', title: 'El Impostor', description: 'Descubre al impostor antes de que sea demasiado tarde', icon: 'UserX', path: '/arcade/impostor', active: true, order: 0 },
-  { id: 'ruleta', title: 'Ruleta Personalizada', description: 'Agrega opciones, girala y descubre el resultado', icon: 'RotateCw', path: '/arcade/rouleta', active: true, order: 1 },
-  { id: 'dedo', title: 'El Dedo en la Llaga', description: 'Multijugador: quien es mas probable...', icon: 'Hand', path: '/arcade/juego', active: true, order: 2 },
+  { id: 'dedo', title: 'Quién Es Más Probable...?', description: 'Multijugador: ¿quién es más probable que...?', icon: 'Hand', path: '/arcade/juego', active: true, order: 1 },
+  { id: 'ruleta', title: 'Ruleta Personalizada', description: 'Agrega opciones, girala y descubre el resultado', icon: 'RotateCw', path: '/arcade/rouleta', active: true, order: 2 },
   { id: 'yo-nunca', title: 'Yo Nunca', description: 'Confiesa tus pecados mas oscuros', icon: 'Skull', path: '/arcade/cartas/yo-nunca', active: true, turbio: true, order: 3 },
   { id: 'bomba', title: 'Bomba de Tiempo', description: 'Responde rapido o la bomba explota', icon: 'Bomb', path: '/arcade/bomba', active: true, turbio: true, order: 4 },
   { id: 'codigo-secreto', title: 'Codigo Secreto', description: 'Adivina el codigo de 4 cifras de tu rival (1v1)', icon: 'Lock', path: '/arcade/codigo-secreto', active: true, order: 5 },

@@ -792,6 +792,9 @@ export async function cargarPartidaImpostor(): Promise<ImpostorSession | null> {
 export interface DedoPlayer {
   id: string
   name: string
+  avatar: string
+  avatarType?: string
+  avatarIcon?: string
 }
 
 export interface DedoRoom {
@@ -824,6 +827,9 @@ function generarCodigoDedo(): string {
 export async function crearSalaDedo(
   userId: string,
   displayName: string,
+  avatar: string,
+  avatarType?: string,
+  avatarIcon?: string,
 ): Promise<string> {
   const code = generarCodigoDedo()
   const salaRef = doc(db, 'arcade_rooms', code)
@@ -831,7 +837,7 @@ export async function crearSalaDedo(
     code,
     game: 'dedo_llaga',
     hostId: userId,
-    players: [{ id: userId, name: displayName }],
+    players: [{ id: userId, name: displayName, avatar, avatarType, avatarIcon }],
     phase: 'lobby',
     currentCard: '',
     votes: {},
@@ -843,6 +849,9 @@ export async function unirseSalaDedo(
   codigo: string,
   userId: string,
   displayName: string,
+  avatar: string,
+  avatarType?: string,
+  avatarIcon?: string,
 ): Promise<void> {
   const salaRef = doc(db, 'arcade_rooms', codigo)
   const snap = await getDoc(salaRef)
@@ -854,7 +863,7 @@ export async function unirseSalaDedo(
   const exists = data.players.some((p) => p.id === userId)
   if (!exists) {
     await updateDoc(salaRef, {
-      players: arrayUnion({ id: userId, name: displayName }),
+      players: arrayUnion({ id: userId, name: displayName, avatar, avatarType, avatarIcon }),
     })
   }
 }

@@ -84,7 +84,7 @@ export default function DedoLlagaSetupPage() {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col">
         <div className="flex-1 w-full max-w-md mx-auto p-4 space-y-5">
-          <GameHeader title="El Dedo en la Llaga" backTo="/arcade" />
+          <GameHeader title="¿Quién Es Más Probable...?" backTo="/arcade" />
           <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center">
             Configura la partida
           </p>
@@ -160,7 +160,7 @@ export default function DedoLlagaSetupPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col">
       <div className="w-full max-w-md mx-auto p-4 pt-2 pb-8">
-        <GameHeader title="El Dedo en la Llaga" backTo="/arcade" />
+        <GameHeader title="¿Quién Es Más Probable...?" backTo="/arcade" />
       </div>
 
       <div className="flex-1 flex flex-col items-center w-full max-w-md mx-auto pb-12 px-4">

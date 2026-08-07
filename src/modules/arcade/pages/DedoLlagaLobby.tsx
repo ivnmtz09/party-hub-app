@@ -8,6 +8,7 @@ import {
   type DedoRoom,
 } from '../../../firebase/services'
 import GameHeader from '../../../components/GameHeader'
+import UserAvatar from '../../../components/UserAvatar'
 import DedoLlagaOnline from './DedoLlagaOnline'
 import { useAppContent } from '../../../context/ContentContext'
 import type { DeckContenido } from '../../../firebase/content'
@@ -29,7 +30,6 @@ export default function DedoLlagaLobby() {
   const deck = getDeck('dedo-en-la-llaga')
   const [phase, setPhase] = useState<LobbyPhase>('menu')
   const [roomCode, setRoomCode] = useState('')
-  const [nameInput, setNameInput] = useState('')
   const [codeInput, setCodeInput] = useState('')
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
@@ -38,7 +38,10 @@ export default function DedoLlagaLobby() {
   const [loading, setLoading] = useState(false)
 
   const userId = user?.uid ?? ''
-  const displayName = userProfile?.nickname || user?.displayName || (nameInput.trim() || 'Invitado')
+  const displayName = userProfile?.nickname || user?.displayName || 'Invitado'
+  const avatarColor = userProfile?.avatar || '#fbbf24'
+  const avatarType = userProfile?.avatarType || 'letter'
+  const avatarIcon = userProfile?.avatarIcon || 'Gamepad2'
   const isHost = room?.hostId === userId
 
   useEffect(() => {
@@ -54,7 +57,7 @@ export default function DedoLlagaLobby() {
     setLoading(true)
     setError('')
     try {
-      const code = await crearSalaDedo(userId, displayName)
+      const code = await crearSalaDedo(userId, displayName, avatarColor, avatarType, avatarIcon)
       setRoomCode(code)
       setPhase('inside')
     } catch (e) {
@@ -65,11 +68,11 @@ export default function DedoLlagaLobby() {
   }
 
   const handleJoin = async () => {
-    if (!userId || codeInput.trim().length !== 4 || !nameInput.trim()) return
+    if (!userId || codeInput.trim().length !== 4) return
     setLoading(true)
     setError('')
     try {
-      await unirseSalaDedo(codeInput.trim().toUpperCase(), userId, nameInput.trim())
+      await unirseSalaDedo(codeInput.trim().toUpperCase(), userId, displayName, avatarColor, avatarType, avatarIcon)
       setRoomCode(codeInput.trim().toUpperCase())
       setPhase('inside')
     } catch (e) {
@@ -116,7 +119,7 @@ export default function DedoLlagaLobby() {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col p-4 sm:p-6 transition-colors">
         <div className="w-full max-w-md mx-auto pt-2 pb-8">
-          <GameHeader title="El Dedo en la Llaga" backTo="/arcade" />
+          <GameHeader title="¿Quién Es Más Probable...?" backTo="/arcade" />
         </div>
 
         <div className="flex-1 w-full max-w-md mx-auto flex flex-col gap-6">
@@ -164,9 +167,14 @@ export default function DedoLlagaLobby() {
                   key={p.id}
                   className="flex items-center gap-3 border-2 border-black dark:border-white bg-gray-50 dark:bg-gray-700 px-3 py-2"
                 >
-                  <div className="w-8 h-8 border-2 border-black dark:border-white bg-fuchsia-300 dark:bg-fuchsia-500 flex items-center justify-center text-xs font-black text-black dark:text-gray-900">
-                    {p.name.charAt(0).toUpperCase()}
-                  </div>
+                  <UserAvatar
+                    name={p.name}
+                    color={p.avatar || '#fbbf24'}
+                    type={p.avatarType === 'shape' ? 'shape' : 'letter'}
+                    avatarIcon={p.avatarIcon || 'Gamepad2'}
+                    size={32}
+                    className="shrink-0"
+                  />
                   <span className="font-bold text-sm uppercase tracking-wider text-black dark:text-white">
                     {p.name.split(' ')[0]}
                     {p.id === room.hostId && (
@@ -222,7 +230,7 @@ export default function DedoLlagaLobby() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col p-4 sm:p-6 text-black dark:text-white transition-colors">
       <div className="w-full max-w-md mx-auto pt-2 pb-8">
-        <GameHeader title="EL DEDO EN LA LLAGA" backTo="/arcade" />
+        <GameHeader title="¿Quién Es Más Probable...?" backTo="/arcade" />
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md mx-auto pb-12 gap-6">
@@ -249,16 +257,27 @@ export default function DedoLlagaLobby() {
               maxLength={4}
               className="w-full text-center py-4 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-700 text-black dark:text-white font-black uppercase tracking-widest text-3xl placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none"
             />
-            <input
-              type="text"
-              value={nameInput}
-              onChange={(e) => setNameInput(e.target.value)}
-              placeholder="Tu nombre"
-              className="w-full py-3 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-700 text-black dark:text-white font-bold text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none"
-            />
+            <div className="flex items-center gap-3 border-2 border-black dark:border-white bg-gray-50 dark:bg-gray-700 px-3 py-2">
+              <UserAvatar
+                name={displayName}
+                color={avatarColor}
+                type={avatarType === 'shape' ? 'shape' : 'letter'}
+                avatarIcon={avatarIcon}
+                size={36}
+                className="shrink-0"
+              />
+              <div className="min-w-0">
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                  Entrando como
+                </p>
+                <p className="font-bold text-sm uppercase tracking-wider text-black dark:text-white truncate">
+                  {displayName.split(' ')[0]}
+                </p>
+              </div>
+            </div>
             <button
               onClick={handleJoin}
-              disabled={loading || codeInput.trim().length !== 4 || !nameInput.trim() || !userId}
+              disabled={loading || codeInput.trim().length !== 4 || !userId}
               className="w-full flex items-center justify-center gap-2 py-4 border-4 border-black dark:border-white bg-fuchsia-400 dark:bg-fuchsia-500 text-black dark:text-gray-900 font-black uppercase tracking-wider text-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {loading ? (
