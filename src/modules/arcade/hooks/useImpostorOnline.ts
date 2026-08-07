@@ -130,7 +130,11 @@ export function useImpostorOnline({
     if (!room) return null
     const filtered = allWords.filter((w) => room.categories.includes(w.categoria))
     const pool = filtered.length > 0 ? filtered : allWords
-    const selected = pool[Math.floor(Math.random() * pool.length)]
+    const availableCategories = Array.from(new Set(pool.map((w) => w.categoria)))
+    const pickedCategory =
+      availableCategories[Math.floor(Math.random() * availableCategories.length)]
+    const categoryWords = pool.filter((w) => w.categoria === pickedCategory)
+    const selected = categoryWords[Math.floor(Math.random() * categoryWords.length)]
     if (!selected) return null
 
     const impostorCount = computeImpostorCount(room.players.length)
@@ -143,12 +147,19 @@ export function useImpostorOnline({
     for (const p of room.players) {
       const isImpostor = impostorIds.includes(p.id)
       secrets[p.id] = isImpostor
-        ? { isImpostor: true, word: '', description: '', clue: selected.clue }
+        ? {
+            isImpostor: true,
+            word: '',
+            description: '',
+            clue: selected.clue,
+            categoria: selected.categoria,
+          }
         : {
             isImpostor: false,
             word: selected.word,
             description: selected.description,
             clue: '',
+            categoria: selected.categoria,
           }
     }
 

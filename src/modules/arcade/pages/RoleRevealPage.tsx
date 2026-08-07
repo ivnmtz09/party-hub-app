@@ -53,6 +53,7 @@ export default function RoleRevealPage() {
           word={currentPlayer.assignedWord}
           description={currentPlayer.description}
           clue={currentPlayer.hint}
+          categoria={currentPlayer.categoria}
           cluesEnabled={state.config.cluesEnabled}
           onPass={handlePass}
         />

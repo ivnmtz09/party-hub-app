@@ -6,6 +6,7 @@ interface ImpostorCardProps {
   word: string
   description: string
   clue: string
+  categoria: string
   cluesEnabled: boolean
   onPass: () => void
   isOnlineMode?: boolean
@@ -21,6 +22,7 @@ export default function ImpostorCard({
   word,
   description,
   clue,
+  categoria,
   cluesEnabled,
   onPass,
   isOnlineMode = false,
@@ -61,6 +63,9 @@ export default function ImpostorCard({
 
   return (
     <div className="w-full max-w-xs mx-auto flex flex-col gap-4">
+      <p className="text-center text-[10px] sm:text-xs font-black uppercase tracking-widest text-black/60 dark:text-white/60 border-2 border-black bg-yellow-300 dark:bg-yellow-400 px-3 py-1 mx-auto">
+        {categoria}
+      </p>
       <div className="relative w-full aspect-[3/4] overflow-hidden [perspective:1000px]">
         <div
           className="relative w-full h-full [transform-style:preserve-3d] transition-transform duration-500"

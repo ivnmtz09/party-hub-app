@@ -486,6 +486,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
               word={game.mySecret.word}
               description={game.mySecret.description}
               clue={game.mySecret.clue}
+              categoria={game.mySecret.categoria}
               cluesEnabled={room.cluesEnabled}
               onPass={() => {}}
               isOnlineMode

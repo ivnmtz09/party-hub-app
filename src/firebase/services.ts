@@ -1397,6 +1397,7 @@ export interface ImpostorSecret {
   word: string
   description: string
   clue: string
+  categoria: string
 }
 
 export interface ImpostorRoom {

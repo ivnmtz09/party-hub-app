@@ -12,6 +12,7 @@ export interface PlayerRole {
   assignedWord: string
   hint: string
   description: string
+  categoria: string
 }
 
 export type GamePhase = 'Setup' | 'Reveal' | 'Debate' | 'Voting' | 'Result'

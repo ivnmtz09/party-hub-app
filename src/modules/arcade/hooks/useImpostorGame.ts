@@ -19,7 +19,10 @@ function assignRoles(config: GameConfig, words: Word[]): PlayerRole[] {
   const filtered = words.filter((w) => categories.includes(w.categoria))
   if (filtered.length === 0) throw new Error('No words for selected categories')
 
-  const selected = filtered[Math.floor(Math.random() * filtered.length)]
+  const availableCategories = Array.from(new Set(filtered.map((w) => w.categoria)))
+  const pickedCategory = availableCategories[Math.floor(Math.random() * availableCategories.length)]
+  const categoryWords = filtered.filter((w) => w.categoria === pickedCategory)
+  const selected = categoryWords[Math.floor(Math.random() * categoryWords.length)]
   if (!selected) throw new Error('Failed to pick a word')
 
   const shuffled = shuffle(playerNames)
@@ -31,6 +34,7 @@ function assignRoles(config: GameConfig, words: Word[]): PlayerRole[] {
     assignedWord: selected.word,
     hint: selected.clue,
     description: selected.description,
+    categoria: selected.categoria,
   }))
 }
 
