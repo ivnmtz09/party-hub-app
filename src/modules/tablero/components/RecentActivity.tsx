@@ -14,9 +14,10 @@ interface Props {
   miembros: Miembro[]
   userId: string
   groupId: string
+  totalEventosCount?: number
 }
 
-export default function RecentActivity({ miembros, userId, groupId }: Props) {
+export default function RecentActivity({ miembros, userId, groupId, totalEventosCount }: Props) {
   const [visibleLimit, setVisibleLimit] = useState(5)
   const [eventos, setEventos] = useState<Evento[]>([])
   const [loading, setLoading] = useState(true)
@@ -92,7 +93,7 @@ export default function RecentActivity({ miembros, userId, groupId }: Props) {
               to="/historial"
               className="w-full mt-4 bg-yellow-400 border-4 border-black text-black font-black uppercase py-3 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all flex items-center justify-center gap-2"
             >
-              VER MUCHOS MAS
+              {totalEventosCount && totalEventosCount >= 300 ? 'VER ÚLTIMOS 300 REGISTROS' : 'VER TODOS LOS REGISTROS'}
             </Link>
           )}
         </div>

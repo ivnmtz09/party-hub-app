@@ -93,6 +93,7 @@ export default function MuralPage() {
   const [editType, setEditType] = useState<string>('')
   const [editingSaving, setEditingSaving] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
 
   const activeGroup = grupos.find((g) => g.id === activeGroupId)
   const nombre = userProfile?.nickname || user?.displayName?.split(' ')[0] || 'Alguien'
@@ -426,85 +427,117 @@ export default function MuralPage() {
             feedEventos.map((ev) => (
               <div
                 key={ev.id}
-                className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-3 shadow-[4px_4px_0px_rgba(0,0,0,1)]"
+                className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-3 shadow-[4px_4px_0px_rgba(0,0,0,1)] transition-all"
               >
-                {editingId === ev.id ? (
-                  <div className="flex items-center gap-2">
-                    <select
-                      value={editType}
-                      onChange={(e) => setEditType(e.target.value)}
-                      className="flex-1 text-xs font-black uppercase tracking-wider border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
-                    >
-                      <option key="agua" value="agua">
-                        VASO DE AGUA
-                      </option>
-                      {SUCESOS.map((s) => (
-                        <option key={s.type} value={s.type}>
-                          {s.label}
-                        </option>
-                      ))}
-                    </select>
-                    <button
-                      onClick={handleGuardarEdicion}
-                      disabled={editingSaving}
-                      className="p-1 border-4 border-black dark:border-white bg-yellow-300 dark:bg-yellow-500 text-black font-black uppercase shadow-[2px_2px_0px_rgba(0,0,0,1)] disabled:opacity-50"
-                    >
-                      {editingSaving ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}
-                    </button>
-                    <button
-                      onClick={handleCancelarEdicion}
-                      className="p-1 border-4 border-black dark:border-white bg-pink-300 dark:bg-pink-500 text-black font-black uppercase shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-                    >
-                      <X size={14} />
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-sm font-black uppercase tracking-wider text-black dark:text-white">
-                        {ev.userName} registró: {SUCESO_LABEL[ev.type] || ev.type}
-                      </p>
-                      {isOwn(ev) && deletingId === ev.id ? (
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] font-black uppercase tracking-wider text-black dark:text-white">
-                            CONFIRMAR:
-                          </span>
-                          <button
-                            onClick={() => handleEliminar(ev)}
-                            className="px-2.5 py-1 border-2 border-black bg-red-500 text-black font-black text-xs uppercase shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all"
-                          >
-                            SÍ
-                          </button>
-                          <button
-                            onClick={handleCancelarBorrado}
-                            className="px-2.5 py-1 border-2 border-black bg-gray-300 dark:bg-gray-600 text-black dark:text-white font-black text-xs uppercase shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all"
-                          >
-                            NO
-                          </button>
-                        </div>
-                      ) : (
-                        isOwn(ev) && (
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => handleEditar(ev)}
-                              className="p-2 border-2 border-black dark:border-white bg-gray-200 dark:bg-gray-600 text-black dark:text-white font-black shadow-[1px_1px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all"
-                            >
-                              <Pencil className="w-6 h-6" strokeWidth={2.5} />
-                            </button>
-                            <button
-                              onClick={() => handleConfirmarBorrado(ev)}
-                              className="p-2 border-2 border-black dark:border-white bg-red-300 dark:bg-red-500 text-black dark:text-gray-900 font-black shadow-[1px_1px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all"
-                            >
-                              <Trash2 className="w-6 h-6" strokeWidth={2.5} />
-                            </button>
-                          </div>
-                        )
-                      )}
-                    </div>
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-black uppercase tracking-wider text-black dark:text-white">
+                      {ev.userName} registró: {SUCESO_LABEL[ev.type] || ev.type}
+                    </p>
                     <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mt-0.5">
                       {tiempoRelativo(ev.createdAt as Timestamp)}
                     </p>
-                  </>
+                  </div>
+                  <button
+                    onClick={() => {
+                      playClickSound()
+                      setExpandedId(expandedId === ev.id ? null : (ev.id ?? null))
+                    }}
+                    className="px-3 py-1.5 border-2 border-black dark:border-white bg-yellow-300 dark:bg-yellow-500 text-black font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all"
+                  >
+                    {expandedId === ev.id ? 'OCULTAR' : 'VER REGISTRO'}
+                  </button>
+                </div>
+
+                {expandedId === ev.id && (
+                  <div className="border-2 border-black dark:border-white bg-gray-50 dark:bg-gray-900 p-3 mt-3 shadow-[2px_2px_0px_rgba(0,0,0,1)]">
+                    {editingId === ev.id ? (
+                      <div className="space-y-2">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                          EDITAR REGISTRO
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <select
+                            value={editType}
+                            onChange={(e) => setEditType(e.target.value)}
+                            className="flex-1 text-xs font-black uppercase tracking-wider border-2 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white p-2"
+                          >
+                            <option key="agua" value="agua">
+                              VASO DE AGUA
+                            </option>
+                            {SUCESOS.map((s) => (
+                              <option key={s.type} value={s.type}>
+                                {s.label}
+                              </option>
+                            ))}
+                          </select>
+                          <button
+                            onClick={handleGuardarEdicion}
+                            disabled={editingSaving}
+                            className="p-2 border-2 border-black bg-emerald-400 dark:bg-emerald-500 text-black font-black uppercase shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50"
+                          >
+                            {editingSaving ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}
+                          </button>
+                          <button
+                            onClick={handleCancelarEdicion}
+                            className="p-2 border-2 border-black bg-pink-300 dark:bg-pink-500 text-black font-black uppercase shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between items-center gap-2 flex-wrap">
+                        <div>
+                          <p className="text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                            INFORMACIÓN DEL REGISTRO
+                          </p>
+                          <p className="text-xs font-bold text-black dark:text-white mt-1">
+                            XP: <span className="font-black">{ev.xpValue ?? 0} XP</span>
+                          </p>
+                        </div>
+
+                        {isOwn(ev) && (
+                          <div className="flex items-center gap-1.5">
+                            {deletingId === ev.id ? (
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[10px] font-black uppercase tracking-wider text-black dark:text-white">
+                                  ¿ELIMINAR?:
+                                </span>
+                                <button
+                                  onClick={() => handleEliminar(ev)}
+                                  className="px-2 py-1 border-2 border-black bg-red-500 text-white font-black text-[10px] uppercase shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all"
+                                >
+                                  SÍ
+                                </button>
+                                <button
+                                  onClick={handleCancelarBorrado}
+                                  className="px-2 py-1 border-2 border-black bg-gray-300 dark:bg-gray-600 text-black dark:text-white font-black text-[10px] uppercase shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all"
+                                >
+                                  NO
+                                </button>
+                              </div>
+                            ) : (
+                              <>
+                                <button
+                                  onClick={() => handleEditar(ev)}
+                                  className="p-2 border-2 border-black dark:border-white bg-cyan-300 dark:bg-cyan-500 text-black font-black shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all flex items-center justify-center"
+                                >
+                                  <Pencil size={12} strokeWidth={2.5} />
+                                </button>
+                                <button
+                                  onClick={() => handleConfirmarBorrado(ev)}
+                                  className="p-2 border-2 border-black dark:border-white bg-red-300 dark:bg-red-500 text-black dark:text-gray-900 font-black shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all flex items-center justify-center"
+                                >
+                                  <Trash2 size={12} strokeWidth={2.5} />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             ))

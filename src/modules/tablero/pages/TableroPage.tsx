@@ -225,6 +225,7 @@ export default function TableroPage() {
         miembros={miembros}
         userId={user?.uid ?? ''}
         groupId={activeGroupId ?? ''}
+        totalEventosCount={eventos.length}
       />
 
       <div className="relative w-full mb-4 z-10">
@@ -271,7 +272,7 @@ export default function TableroPage() {
         to="/historial"
         className="w-full flex items-center justify-center py-3 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
       >
-        VER HISTORIAL COMPLETO
+        {eventos.length >= 300 ? 'VER ÚLTIMOS 300 REGISTROS' : 'VER TODOS LOS REGISTROS'}
       </Link>
     </div>
   )

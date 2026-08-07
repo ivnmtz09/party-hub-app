@@ -46,7 +46,7 @@ export default function HistorialPage() {
     }
     const unsubMiembros = observarMiembros(activeGroupId, (lista) => setMiembros(lista))
     setLoading(true)
-    const unsubEventos = observarEventosConLimite(activeGroupId, 200, (lista) => {
+    const unsubEventos = observarEventosConLimite(activeGroupId, 300, (lista) => {
       setEventos(lista)
       setLoading(false)
     })
@@ -101,10 +101,12 @@ export default function HistorialPage() {
 
       <div>
         <h2 className="text-2xl font-black uppercase tracking-wider text-black dark:text-white">
-          Historial Completo
+          {eventos.length === 300 ? 'ÚLTIMOS 300 REGISTROS' : 'TODOS LOS REGISTROS'}
         </h2>
-        <p className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">
-          {eventos.length} registros de {activeGroup?.nombre || 'tu grupo'}
+        <p className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mt-1">
+          {eventos.length === 300
+            ? `ÚLTIMOS 300 ELEMENTOS DE ${activeGroup?.nombre ? activeGroup.nombre.toUpperCase() : 'TU GRUPO'}`
+            : `TOTAL DE ${eventos.length} REGISTROS DE ${activeGroup?.nombre ? activeGroup.nombre.toUpperCase() : 'TU GRUPO'}`}
         </p>
       </div>
 
