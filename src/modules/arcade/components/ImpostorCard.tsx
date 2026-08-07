@@ -8,6 +8,7 @@ interface ImpostorCardProps {
   clue: string
   cluesEnabled: boolean
   onPass: () => void
+  isOnlineMode?: boolean
 }
 
 const FLIP_DURATION_MS = 500
@@ -22,6 +23,7 @@ export default function ImpostorCard({
   clue,
   cluesEnabled,
   onPass,
+  isOnlineMode = false,
 }: ImpostorCardProps) {
   const [revealed, setRevealed] = useState(false)
   const [fading, setFading] = useState(false)
@@ -120,7 +122,7 @@ export default function ImpostorCard({
         </div>
       </div>
 
-      {revealed && (
+      {revealed && !isOnlineMode && (
         <button
           onClick={handlePass}
           className="w-full flex items-center justify-center gap-2 py-4 border-4 border-black bg-white text-black font-black uppercase tracking-wider text-base sm:text-lg shadow-[4px_4px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"

@@ -488,6 +488,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
               clue={game.mySecret.clue}
               cluesEnabled={room.cluesEnabled}
               onPass={() => {}}
+              isOnlineMode
             />
           ) : (
             <div className="flex items-center gap-3 border-4 border-black bg-white p-5 shadow-[6px_6px_0px_rgba(0,0,0,1)]">
@@ -505,9 +506,9 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
               Pasar a votacion
             </button>
           ) : (
-            <div className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] text-center">
-              <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Revisa tu carta. El anfitrion pasara a votacion...
+            <div className="w-full border-2 border-dashed border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 p-4 text-center">
+              <p className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                Esperando a que el anfitrion inicie la votacion...
               </p>
             </div>
           )}
@@ -601,18 +602,32 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
   }
 
   const counts = computeVoteCounts(room.votes)
-  const winnerId = room.winnerId
-  const winnerSecret = winnerId ? room.secrets[winnerId] : null
-  const impostors = room.players.filter((p) => room.impostorIds.includes(p.id))
+  const impostorPlayers = room.players.filter((p) => room.impostorIds.includes(p.id))
   const civilPlayer = room.players.find((p) => !room.impostorIds.includes(p.id))
   const secretWord = civilPlayer ? room.secrets[civilPlayer.id]?.word ?? '' : ''
-  const resultType = !winnerId ? 'none' : winnerSecret?.isImpostor ? 'impostor' : 'civil'
+
+  const mostVotedCount = room.players.reduce(
+    (max, p) => Math.max(max, counts[p.id] ?? 0),
+    0,
+  )
+  const mostVotedIds = new Set(
+    room.players.filter((p) => (counts[p.id] ?? 0) === mostVotedCount).map((p) => p.id),
+  )
+  const impostorSpotted =
+    mostVotedCount > 0 && room.impostorIds.some((id) => mostVotedIds.has(id))
+
+  const resultType =
+    mostVotedCount === 0 ? 'none' : impostorSpotted ? 'civilians_win' : 'impostor_wins'
   const bannerClass =
-    resultType === 'civil' ? 'bg-emerald-500' : resultType === 'impostor' ? 'bg-red-500' : 'bg-gray-400'
+    resultType === 'civilians_win'
+      ? 'bg-emerald-500'
+      : resultType === 'impostor_wins'
+        ? 'bg-red-500'
+        : 'bg-gray-400'
   const bannerText =
-    resultType === 'civil'
+    resultType === 'civilians_win'
       ? '¡Los civiles ganan!'
-      : resultType === 'impostor'
+      : resultType === 'impostor_wins'
         ? '¡El impostor gana!'
         : 'Sin votos'
 
@@ -623,9 +638,9 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
       </div>
       <div className="flex-1 w-full max-w-md mx-auto flex flex-col gap-5 p-4 pb-10">
         <div className={`w-full border-4 border-black p-6 text-center shadow-[8px_8px_0px_rgba(0,0,0,1)] ${bannerClass}`}>
-          {resultType === 'civil' ? (
+          {resultType === 'civilians_win' ? (
             <Trophy size={44} strokeWidth={2.5} className="mx-auto mb-2 text-black" />
-          ) : resultType === 'impostor' ? (
+          ) : resultType === 'impostor_wins' ? (
             <Skull size={44} strokeWidth={2.5} className="mx-auto mb-2 text-black" />
           ) : null}
           <p className="text-2xl sm:text-3xl font-black uppercase tracking-widest text-black">
@@ -638,7 +653,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
             <p className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
               El impostor era
             </p>
-            {impostors.map((p) => (
+            {impostorPlayers.map((p) => (
               <div
                 key={p.id}
                 className="flex items-center gap-3 border-2 border-black bg-gray-50 dark:bg-gray-700 px-3 py-2"
