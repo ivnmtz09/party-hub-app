@@ -13,12 +13,12 @@ import type { Miembro, Evento } from '../../../firebase/services'
 interface Props {
   miembros: Miembro[]
   eventos: Evento[]
-  selectedMonth: string
+  timeFilter: string
   availableMonths: string[]
-  onMonthChange: (val: string) => void
+  onTimeFilterChange: (val: string) => void
 }
 
-export default function StatsChart({ miembros, eventos, selectedMonth, availableMonths, onMonthChange }: Props) {
+export default function StatsChart({ miembros, eventos, timeFilter, availableMonths, onTimeFilterChange }: Props) {
   const data = miembros.map((m) => {
     const eventosUsuario = eventos.filter((e) => e.userId === m.id)
     const cagadas = eventosUsuario.filter((e) => e.tipo === 'deposicion').length
@@ -51,37 +51,29 @@ export default function StatsChart({ miembros, eventos, selectedMonth, available
           Cagadas vs Culeadas vs Meadas vs Gym
         </h3>
         
-        {/* Selector de Mes Neobrutalista */}
+        {/* Selector de Mes/Tiempo Neobrutalista */}
         <div className="relative">
           <select
-            value={selectedMonth}
-            onChange={(e) => onMonthChange(e.target.value)}
+            value={timeFilter}
+            onChange={(e) => onTimeFilterChange(e.target.value)}
             className="w-full sm:w-auto bg-yellow-400 border-4 border-black text-black font-black uppercase p-2 shadow-[4px_4px_0px_rgba(0,0,0,1)] focus:outline-none cursor-pointer text-xs select-none"
           >
-            {availableMonths.length === 0 ? (
-              <option value={selectedMonth} className="bg-white text-black font-black">
-                {(() => {
-                  const parts = selectedMonth.split('-')
-                  const m = parts[0] ?? '1'
-                  const y = parts[1] ?? '2026'
-                  const monthIndex = Math.max(0, Math.min(11, parseInt(m, 10) - 1))
-                  return `${NOMBRES_MESES[monthIndex]} ${y}`
-                })()}
-              </option>
-            ) : (
-              availableMonths.map((m) => {
-                const parts = m.split('-')
-                const month = parts[0] ?? '1'
-                const year = parts[1] ?? '2026'
-                const monthIndex = Math.max(0, Math.min(11, parseInt(month, 10) - 1))
-                const legible = `${NOMBRES_MESES[monthIndex]} ${year}`
-                return (
-                  <option key={m} value={m} className="bg-white text-black font-black">
-                    {legible}
-                  </option>
-                )
-              })
-            )}
+            <option value="hoy" className="bg-white text-black font-black">HOY</option>
+            <option value="semana" className="bg-white text-black font-black">ESTA SEMANA</option>
+            <option value="mes_actual" className="bg-white text-black font-black">ESTE MES</option>
+            {availableMonths.map((m) => {
+              const parts = m.split('-')
+              const month = parts[0] ?? '1'
+              const year = parts[1] ?? '2026'
+              const monthIndex = Math.max(0, Math.min(11, parseInt(month, 10) - 1))
+              const legible = `${NOMBRES_MESES[monthIndex]} ${year}`
+              return (
+                <option key={m} value={m} className="bg-white text-black font-black">
+                  {legible}
+                </option>
+              )
+            })}
+            <option value="siempre" className="bg-white text-black font-black">HISTORIAL COMPLETO</option>
           </select>
         </div>
       </div>

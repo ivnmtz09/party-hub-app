@@ -37,15 +37,15 @@ export default function TableroPage() {
   const [showInlineForm, setShowInlineForm] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
-  const [selectedMonth, setSelectedMonth] = useState<string>(() => {
-    const d = new Date()
-    return `${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`
-  })
+  const [timeFilter, setTimeFilter] = useState<string>('mes_actual')
   const [availableMonths, setAvailableMonths] = useState<string[]>([])
 
   useEffect(() => {
     if (eventos.length === 0) return
     const unique = new Set<string>()
+    const d = new Date()
+    const currentMonthStr = `${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`
+
     eventos.forEach((e) => {
       if (!e.timestamp) return
       const date = typeof (e.timestamp as any).toDate === 'function'
@@ -54,7 +54,10 @@ export default function TableroPage() {
       if (!isNaN(date.getTime())) {
         const m = String(date.getMonth() + 1).padStart(2, '0')
         const y = date.getFullYear()
-        unique.add(`${m}-${y}`)
+        const key = `${m}-${y}`
+        if (key !== currentMonthStr) {
+          unique.add(key)
+        }
       }
     })
     const sorted = Array.from(unique).sort((a, b) => {
@@ -67,9 +70,6 @@ export default function TableroPage() {
       return (yb * 12 + mb) - (ya * 12 + ma)
     })
     setAvailableMonths(sorted)
-    if (sorted.length > 0 && sorted[0] && !sorted.includes(selectedMonth)) {
-      setSelectedMonth(sorted[0])
-    }
   }, [eventos])
 
   useEffect(() => {
@@ -116,17 +116,41 @@ export default function TableroPage() {
   }
 
   const chartEventos = useMemo(() => {
+    const ahora = new Date()
     return eventos.filter((e) => {
       if (!e.timestamp) return false
       const date = typeof (e.timestamp as any).toDate === 'function'
         ? (e.timestamp as any).toDate()
         : new Date(e.timestamp as any)
       if (isNaN(date.getTime())) return false
-      const m = String(date.getMonth() + 1).padStart(2, '0')
-      const y = date.getFullYear()
-      return `${m}-${y}` === selectedMonth
+
+      if (timeFilter === 'hoy') {
+        return date.getFullYear() === ahora.getFullYear() &&
+               date.getMonth() === ahora.getMonth() &&
+               date.getDate() === ahora.getDate()
+      }
+      if (timeFilter === 'semana') {
+        const dayOfWeek = ahora.getDay()
+        const inicioSemana = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate() - ((dayOfWeek + 6) % 7))
+        inicioSemana.setHours(0, 0, 0, 0)
+        return date >= inicioSemana && date <= ahora
+      }
+      if (timeFilter === 'mes_actual') {
+        return date.getMonth() === ahora.getMonth() &&
+               date.getFullYear() === ahora.getFullYear()
+      }
+      if (timeFilter === 'siempre') {
+        return true
+      }
+      // Formato MM-YYYY
+      const parts = timeFilter.split('-')
+      const targetMonth = parts[0]
+      const targetYear = parts[1]
+      const mStr = String(date.getMonth() + 1).padStart(2, '0')
+      const yStr = String(date.getFullYear())
+      return mStr === targetMonth && yStr === targetYear
     })
-  }, [eventos, selectedMonth])
+  }, [eventos, timeFilter])
 
   if (!initialized) {
     return (
@@ -185,9 +209,9 @@ export default function TableroPage() {
         <StatsChart
           miembros={miembros}
           eventos={chartEventos}
-          selectedMonth={selectedMonth}
+          timeFilter={timeFilter}
           availableMonths={availableMonths}
-          onMonthChange={setSelectedMonth}
+          onTimeFilterChange={setTimeFilter}
         />
       )}
 
