@@ -247,7 +247,7 @@ export default function RegistroPage() {
   const [commentText, setCommentText] = useState('')
   const [visibleLimit, setVisibleLimit] = useState(5)
 
-  /* ─── Fetch del documento ─── */
+  /* ─── Fetch del documento con deep fetch de usuario ─── */
   useEffect(() => {
     if (!id) {
       setEstado('no-existe')
@@ -257,8 +257,10 @@ export default function RegistroPage() {
     /* Determinar la coleccion segun el source */
     const coleccion = source === 'mural' ? 'posts' : 'eventos'
 
-    getDoc(doc(db, coleccion, id))
-      .then(async (snap) => {
+    const run = async () => {
+      try {
+        const snap = await getDoc(doc(db, coleccion, id))
+
         if (!snap.exists()) {
           setEstado('no-existe')
           return
@@ -266,18 +268,71 @@ export default function RegistroPage() {
 
         const data = { id: snap.id, ...snap.data() } as Evento
         setEvento(data)
-        setEstado('ok')
 
-        /* Intentar cargar el perfil del autor desde users */
-        if (data.userId) {
-          getDoc(doc(db, 'users', data.userId)).then((userSnap) => {
+        /*
+         * Deep fetch: el registro puede ser antiguo y carecer de userName.
+         * Buscamos el documento del autor en la coleccion 'users' usando
+         * cualquier campo de ID disponible (userId, creatorId, uid).
+         * El estado NO cambia a 'ok' hasta que este fetch termine,
+         * evitando el flash de 'USUARIO' antes de tener el nombre real.
+         */
+        const autorId =
+          data.userId ??
+          (data as unknown as Record<string, string>).creatorId ??
+          (data as unknown as Record<string, string>).uid ??
+          null
+
+        if (autorId) {
+          try {
+            const userSnap = await getDoc(doc(db, 'users', autorId))
             if (userSnap.exists()) {
-              setAutorData(userSnap.data() as MiembroSnap)
+              const userData = userSnap.data() as MiembroSnap & {
+                name?: string
+                userName?: string
+              }
+              /*
+               * Normaliza cualquier campo de nombre que pueda venir
+               * del documento del usuario (nickname, displayName, userName, name).
+               */
+              setAutorData({
+                nickname:
+                  userData.nickname ||
+                  userData.userName ||
+                  userData.displayName ||
+                  (userData as Record<string, string>).name ||
+                  'USUARIO DESCONOCIDO',
+                displayName: userData.displayName,
+                avatar: userData.avatar,
+                avatarType: userData.avatarType,
+                avatarIcon: userData.avatarIcon,
+              })
+            } else {
+              /* El doc de usuario no existe: mostramos fallback explícito */
+              setAutorData({
+                nickname: 'USUARIO DESCONOCIDO',
+              })
             }
-          }).catch(() => {})
+          } catch {
+            /* Error de red al buscar el usuario: fallback gracioso */
+            setAutorData({
+              nickname: 'USUARIO DESCONOCIDO',
+            })
+          }
+        } else {
+          /* No hay ningun campo de ID de autor en el documento */
+          setAutorData({
+            nickname: 'USUARIO DESCONOCIDO',
+          })
         }
-      })
-      .catch(() => setEstado('no-existe'))
+
+        /* El estado cambia a 'ok' solo despues de completar el deep fetch */
+        setEstado('ok')
+      } catch {
+        setEstado('no-existe')
+      }
+    }
+
+    run()
   }, [id, source])
 
   /* ─── Suscripcion a comentarios ─── */
@@ -325,24 +380,30 @@ export default function RegistroPage() {
     )
   }
 
-  /* ─── Estado: no existe ─── */
+  /* ─── Estado: no disponible / formato antiguo ─── */
   if (estado === 'no-existe' || !evento) {
     return (
       <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col items-center justify-center p-6 gap-8">
-        <div className="border-4 border-black dark:border-white bg-red-500 p-8 shadow-[8px_8px_0px_rgba(0,0,0,1)] text-center">
-          <p className="text-3xl sm:text-5xl font-black uppercase tracking-widest text-white">
-            ESTE REGISTRO
-            <br />
-            YA NO EXISTE
+        {/* Boton ATRAS en la esquina superior para no quedar atrapado */}
+        <div className="w-full max-w-xl mb-2">
+          <button
+            onClick={() => navigate(-1)}
+            className="bg-white dark:bg-gray-800 border-4 border-black dark:border-white p-3 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none font-black uppercase flex items-center gap-2 transition-all text-black dark:text-white w-fit"
+          >
+            <ArrowLeftIcon />
+            ATRAS
+          </button>
+        </div>
+
+        <div className="border-4 border-black dark:border-white bg-gray-900 dark:bg-gray-800 p-8 shadow-[8px_8px_0px_rgba(0,0,0,1)] text-center max-w-xl w-full">
+          <p className="text-3xl sm:text-4xl font-black uppercase tracking-widest text-white mb-4">
+            VISTA NO DISPONIBLE
+          </p>
+          <p className="text-sm sm:text-base font-bold uppercase tracking-wider text-gray-300 leading-relaxed">
+            LA INFORMACION DE ESTE REGISTRO ES MUY ANTIGUA
+            O EL FORMATO NO ESTA HABILITADO PARA ESTA VISTA.
           </p>
         </div>
-        <button
-          onClick={() => navigate(-1)}
-          className="bg-white dark:bg-gray-900 border-4 border-black dark:border-white p-3 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none font-black uppercase flex items-center gap-2 transition-all text-black dark:text-white"
-        >
-          <ArrowLeftIcon />
-          VOLVER
-        </button>
       </div>
     )
   }
@@ -355,8 +416,15 @@ export default function RegistroPage() {
   }
   const reactions = evento.reactions ?? {}
   const currentUserId = user?.uid
-  /* Nunca exponemos el UID crudo: si no hay nombre disponible, usamos 'USUARIO' como fallback */
-  const autorNombre = autorData?.nickname || autorData?.displayName?.split(' ')[0] || 'USUARIO'
+  /*
+   * autorNombre nunca expone el UID crudo.
+   * El deep fetch ya garantiza que autorData.nickname tenga un valor real
+   * o el texto 'USUARIO DESCONOCIDO' como fallback explicito.
+   */
+  const autorNombre =
+    autorData?.nickname ||
+    autorData?.displayName?.split(' ')[0] ||
+    'USUARIO DESCONOCIDO'
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">

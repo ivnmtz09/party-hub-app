@@ -26,35 +26,15 @@ export default function SplashScreen() {
   const randomMessage = useMemo(() => LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)], [])
 
   useEffect(() => {
-    const splashAudio = new Audio('/splash-loop.mp3')
-    splashAudio.loop = true
-    splashAudio.volume = 0.4
-
-    const tryPlay = () => {
-      splashAudio.play().catch((error) => {
-        console.warn('Autoplay bloqueado por el navegador', error)
-      })
-    }
-
-    const unlock = () => {
-      tryPlay()
-      window.removeEventListener('pointerdown', unlock)
-      window.removeEventListener('touchstart', unlock)
-      window.removeEventListener('keydown', unlock)
-    }
-
-    window.addEventListener('pointerdown', unlock)
-    window.addEventListener('touchstart', unlock)
-    window.addEventListener('keydown', unlock)
-
-    tryPlay()
-
+    /*
+     * El audio del splash NO se reproduce automaticamente.
+     * El autoplay queda bloqueado para cumplir con las politicas
+     * de los navegadores modernos y mejorar la experiencia de usuario.
+     * Si en el futuro se agrega un boton "INICIAR" / "TOCA PARA ENTRAR",
+     * el metodo .play() debe invocarse UNICAMENTE dentro de su onClick.
+     */
     return () => {
-      window.removeEventListener('pointerdown', unlock)
-      window.removeEventListener('touchstart', unlock)
-      window.removeEventListener('keydown', unlock)
-      splashAudio.pause()
-      splashAudio.currentTime = 0
+      /* Cleanup: no hay instancia de audio que limpiar */
     }
   }, [])
 
