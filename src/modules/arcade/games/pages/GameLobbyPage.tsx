@@ -9,13 +9,13 @@ import {
   Loader2,
   Play,
 } from 'lucide-react'
-import { useAuth } from '../../../context/AuthContext'
+import { useAuth } from '../../../../context/AuthContext'
 import { useGameRoom } from '../hooks/useGameRoom'
-import GameHeader from '../../../components/GameHeader'
-import BackButton from '../../../components/BackButton'
+import GameHeader from '../../../../components/GameHeader'
+import BackButton from '../../../../components/BackButton'
 import VotingEngine from '../engine/VotingEngine'
-import CardGameEngine from '../../arcade/components/CardGameEngine'
-import { getDeckById } from '../../arcade/data/decks'
+import CardGameEngine from '../../components/CardGameEngine'
+import { getDeckById } from '../../data/decks'
 
 export default function GameLobbyPage() {
   const { user, userProfile } = useAuth()

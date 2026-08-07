@@ -36,7 +36,7 @@
  *   - Juego El Impostor: setup, roles, debate, votacion
  *
  * [Juego Multijugador] - Sala en tiempo real
- *   src/modules/game/
+ *   src/modules/arcade/games/
  *   - useGameRoom: hook con ciclo LOBBY -> CARD -> VOTING -> RESULTS
  *   - VotingEngine: cartas, votacion democratica, puntuacion y ganador
  *   - GameLobbyPage: crear/unirse a sala con codigo de 4 caracteres

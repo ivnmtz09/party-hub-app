@@ -10,7 +10,7 @@ import {
   siguienteRonda,
   abandonarSala,
   type Sala,
-} from '../../../firebase/services'
+} from '../../../../firebase/services'
 
 interface UseGameRoomOptions {
   userId: string

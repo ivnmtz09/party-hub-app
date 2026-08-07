@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Hand, Vote, Trophy, ChevronRight } from 'lucide-react'
-import { getDeckById } from '../../arcade/data/decks'
-import type { Sala } from '../../../firebase/services'
+import { getDeckById } from '../../data/decks'
+import type { Sala } from '../../../../firebase/services'
 
 interface Props {
   sala: Sala
