@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Smartphone, Wifi, ArrowLeft } from 'lucide-react'
+import { Smartphone, Wifi } from 'lucide-react'
 import { useGame } from '../context/GameContext'
 import GameHeader from '../../../components/GameHeader'
 import ImpostorSetupPage from './ImpostorSetupPage'
+import ImpostorOnlinePage from './ImpostorOnlinePage'
 import RoleRevealPage from './RoleRevealPage'
 import DebatePage from './DebatePage'
 import VotingPage from './VotingPage'
@@ -16,7 +17,7 @@ export default function ImpostorGameHub() {
 
   if (!state) {
     if (mode === null) return <ModeSelection onSelect={setMode} />
-    if (mode === 'online') return <OnlineComingSoon onBack={() => setMode(null)} />
+    if (mode === 'online') return <ImpostorOnlinePage onExit={() => setMode(null)} />
     return <ImpostorSetupPage />
   }
 
@@ -81,41 +82,8 @@ function ModeSelection({ onSelect }: { onSelect: (mode: GameMode) => void }) {
                 Crea una sala y juega con otros dispositivos
               </p>
             </div>
-            <span className="border-2 border-black bg-black text-white text-[10px] font-black uppercase tracking-widest px-2 py-1">
-              Proximamente
-            </span>
           </button>
         </div>
-      </div>
-    </div>
-  )
-}
-
-function OnlineComingSoon({ onBack }: { onBack: () => void }) {
-  return (
-    <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col animate-fade-in-up">
-      <div className="w-full max-w-md mx-auto p-4">
-        <GameHeader title="El Impostor" backTo="/arcade" />
-      </div>
-      <div className="flex-1 flex flex-col items-center justify-center gap-8 max-w-md mx-auto w-full p-4">
-        <div className="w-full border-4 border-black bg-white dark:bg-gray-800 p-8 shadow-[4px_4px_0px_rgba(0,0,0,1)] flex flex-col items-center gap-6">
-          <div className="w-16 h-16 border-2 border-black bg-fuchsia-300 flex items-center justify-center">
-            <Wifi size={32} strokeWidth={2.5} className="text-black" />
-          </div>
-          <p className="font-black uppercase tracking-wider text-lg text-center">
-            Sala en linea
-          </p>
-          <p className="text-xs font-bold text-gray-500 dark:text-gray-400 text-center">
-            El modo en linea llegara pronto. Mientras tanto juega en un solo celular.
-          </p>
-        </div>
-        <button
-          onClick={onBack}
-          className="w-full flex items-center justify-center gap-2 py-4 border-4 border-black bg-yellow-300 text-black font-black uppercase tracking-wider text-base shadow-[4px_4px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
-        >
-          <ArrowLeft size={22} strokeWidth={2.5} />
-          Volver al menu
-        </button>
       </div>
     </div>
   )

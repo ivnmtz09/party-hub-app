@@ -1381,3 +1381,212 @@ export function observarEventosMural(
     unsubOld()
   }
 }
+
+/* ───── El Impostor Online ───── */
+
+export type ImpostorStatus = 'LOBBY' | 'PLAYING' | 'VOTING' | 'RESULTS'
+
+export interface ImpostorPlayer {
+  id: string
+  name: string
+  avatar: string
+}
+
+export interface ImpostorSecret {
+  isImpostor: boolean
+  word: string
+  description: string
+  clue: string
+}
+
+export interface ImpostorRoom {
+  code: string
+  game: 'impostor'
+  status: ImpostorStatus
+  hostId: string
+  players: ImpostorPlayer[]
+  categories: string[]
+  cluesEnabled: boolean
+  votes: Record<string, string>
+  secrets: Record<string, ImpostorSecret>
+  impostorIds: string[]
+  rounds: number
+  winnerId: string | null
+}
+
+export interface ImpostorRoundPayload {
+  secrets: Record<string, ImpostorSecret>
+  impostorIds: string[]
+  rounds: number
+}
+
+const IMPOSTOR_CODE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+let impostorCodes = new Set<string>()
+
+function generarCodigoImpostor(): string {
+  const length = Math.random() < 0.5 ? 5 : 6
+  for (let attempt = 0; attempt < 50; attempt++) {
+    let codigo = ''
+    for (let i = 0; i < length; i++) {
+      codigo += IMPOSTOR_CODE_CHARS.charAt(Math.floor(Math.random() * IMPOSTOR_CODE_CHARS.length))
+    }
+    if (!impostorCodes.has(codigo)) {
+      impostorCodes.add(codigo)
+      return codigo
+    }
+  }
+  let codigo = ''
+  for (let i = 0; i < length; i++) {
+    codigo += IMPOSTOR_CODE_CHARS.charAt(Math.floor(Math.random() * IMPOSTOR_CODE_CHARS.length))
+  }
+  return codigo
+}
+
+export async function crearSalaImpostor(
+  userId: string,
+  displayName: string,
+  avatar: string,
+  categories: string[],
+  cluesEnabled: boolean,
+): Promise<string> {
+  const code = generarCodigoImpostor()
+  const salaRef = doc(db, 'arcade_impostor_rooms', code)
+  await setDoc(salaRef, {
+    code,
+    game: 'impostor',
+    status: 'LOBBY',
+    hostId: userId,
+    players: [{ id: userId, name: displayName, avatar }],
+    categories: categories.length > 0 ? categories : ['Animales'],
+    cluesEnabled,
+    votes: {},
+    secrets: {},
+    impostorIds: [],
+    rounds: 0,
+    winnerId: null,
+  })
+  return code
+}
+
+export async function unirseSalaImpostor(
+  codigo: string,
+  userId: string,
+  displayName: string,
+  avatar: string,
+): Promise<void> {
+  const salaRef = doc(db, 'arcade_impostor_rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) throw new Error('Sala no encontrada')
+
+  const data = snap.data() as ImpostorRoom
+  if (data.status !== 'LOBBY') throw new Error('La partida ya empezo')
+
+  const existing = data.players.find((p) => p.id === userId)
+  if (existing) {
+    await updateDoc(salaRef, {
+      players: data.players.map((p) =>
+        p.id === userId ? { id: userId, name: displayName, avatar } : p
+      ),
+    })
+  } else {
+    await updateDoc(salaRef, {
+      players: arrayUnion({ id: userId, name: displayName, avatar }),
+    })
+  }
+}
+
+export function observarSalaImpostor(
+  codigo: string,
+  callback: (sala: ImpostorRoom) => void,
+): () => void {
+  const salaRef = doc(db, 'arcade_impostor_rooms', codigo)
+  return onSnapshot(salaRef, (snap) => {
+    if (snap.exists()) {
+      callback(snap.data() as ImpostorRoom)
+    }
+  })
+}
+
+export async function actualizarConfigImpostor(
+  codigo: string,
+  config: { categories?: string[]; cluesEnabled?: boolean },
+): Promise<void> {
+  const update: Record<string, unknown> = {}
+  if (config.categories) update.categories = config.categories
+  if (config.cluesEnabled !== undefined) update.cluesEnabled = config.cluesEnabled
+  await updateDoc(doc(db, 'arcade_impostor_rooms', codigo), update)
+}
+
+export async function iniciarRondaImpostor(
+  codigo: string,
+  payload: ImpostorRoundPayload,
+): Promise<void> {
+  await updateDoc(doc(db, 'arcade_impostor_rooms', codigo), {
+    status: 'PLAYING',
+    votes: {},
+    secrets: payload.secrets,
+    impostorIds: payload.impostorIds,
+    rounds: payload.rounds,
+    winnerId: null,
+  })
+}
+
+export async function pasarAVotacionImpostor(codigo: string): Promise<void> {
+  await updateDoc(doc(db, 'arcade_impostor_rooms', codigo), {
+    status: 'VOTING',
+  })
+}
+
+export async function emitirVotoImpostor(
+  codigo: string,
+  voterId: string,
+  targetId: string,
+): Promise<void> {
+  await updateDoc(doc(db, 'arcade_impostor_rooms', codigo), {
+    [`votes.${voterId}`]: targetId,
+  })
+}
+
+export async function finalizarVotacionImpostor(codigo: string): Promise<void> {
+  const salaRef = doc(db, 'arcade_impostor_rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) return
+  const data = snap.data() as ImpostorRoom
+
+  const counts: Record<string, number> = {}
+  for (const targetId of Object.values(data.votes)) {
+    counts[targetId] = (counts[targetId] ?? 0) + 1
+  }
+
+  let maxCount = 0
+  let winnerId: string | null = null
+  for (const pid of data.players.map((p) => p.id)) {
+    const count = counts[pid] ?? 0
+    if (count > maxCount) {
+      maxCount = count
+      winnerId = pid
+    }
+  }
+
+  await updateDoc(salaRef, { status: 'RESULTS', winnerId })
+}
+
+export async function abandonarSalaImpostor(
+  codigo: string,
+  userId: string,
+): Promise<void> {
+  const salaRef = doc(db, 'arcade_impostor_rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) return
+  const data = snap.data() as ImpostorRoom
+  const players = data.players.filter((p) => p.id !== userId)
+  if (players.length === 0) {
+    await deleteDoc(salaRef)
+    return
+  }
+  const update: Record<string, unknown> = { players }
+  if (data.hostId === userId) {
+    update.hostId = players[0]!.id
+  }
+  await updateDoc(salaRef, update)
+}
