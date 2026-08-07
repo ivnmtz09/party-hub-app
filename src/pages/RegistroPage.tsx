@@ -11,7 +11,6 @@ import {
   type ReactionType,
 } from '../firebase/services'
 import { useAuth } from '../context/AuthContext'
-import { ICON_OPTIONS } from '../components/UserAvatar'
 import { playReactionSound, playCommentSendSound, playClickSound } from '../utils/audio'
 
 /* ─── Tipos de actividad ─── */
@@ -102,55 +101,6 @@ function tiempoRelativo(ts: unknown): string {
   return `hace ${Math.floor(dias / 30)}mes`
 }
 
-/* ─── Componente de Avatar en la página de detalle ─── */
-
-interface AvatarData {
-  nickname?: string
-  displayName?: string
-  avatar?: string
-  avatarType?: 'letter' | 'shape'
-  avatarIcon?: string
-}
-
-function RegistroAvatar({ data, fallbackInitial, size = 64 }: { data: AvatarData | null; fallbackInitial?: string; size?: number }) {
-  /* Cuando no hay datos de perfil del autor, mostramos la inicial del nombre de fallback o 'U' */
-  if (!data) {
-    const letra = (fallbackInitial || 'U').charAt(0).toUpperCase()
-    return (
-      <div
-        className="border-4 border-black dark:border-white flex items-center justify-center bg-yellow-300 dark:bg-yellow-500 shrink-0"
-        style={{ width: size, height: size }}
-      >
-        <span className="font-black text-black" style={{ fontSize: size * 0.4 }}>
-          {letra}
-        </span>
-      </div>
-    )
-  }
-
-  const IconComp =
-    data.avatarType === 'shape'
-      ? ICON_OPTIONS.find((o) => o.id === data.avatarIcon)?.icon
-      : null
-  /* Prioridad: nickname > displayName (solo primer word) > fallback 'U' */
-  const initial = (data.nickname || data.displayName?.split(' ')[0] || fallbackInitial || 'U').charAt(0).toUpperCase()
-
-  return (
-    <div
-      className="border-4 border-black dark:border-white flex items-center justify-center shrink-0"
-      style={{ backgroundColor: data.avatar || '#fbbf24', width: size, height: size }}
-    >
-      {data.avatarType === 'shape' && IconComp ? (
-        <IconComp size={size * 0.45} strokeWidth={2.5} className="text-black" />
-      ) : (
-        <span className="font-black text-black" style={{ fontSize: size * 0.4 }}>
-          {initial}
-        </span>
-      )}
-    </div>
-  )
-}
-
 /* ─── Render de estrellas ─── */
 
 function Stars({ value }: { value: number }) {
@@ -221,14 +171,6 @@ function ReactionIconSVG({ type }: { type: ReactionType }) {
 
 /* ─── Página principal ─── */
 
-interface MiembroSnap {
-  nickname?: string
-  displayName?: string
-  avatar?: string
-  avatarType?: 'letter' | 'shape'
-  avatarIcon?: string
-}
-
 export default function RegistroPage() {
   const { id } = useParams<{ id: string }>()
   const location = useLocation()
@@ -240,14 +182,13 @@ export default function RegistroPage() {
 
   const [estado, setEstado] = useState<'cargando' | 'ok' | 'no-existe'>('cargando')
   const [evento, setEvento] = useState<Evento | null>(null)
-  const [autorData, setAutorData] = useState<MiembroSnap | null>(null)
 
   /* Comentarios y reacciones */
   const [comments, setComments] = useState<CommentData[]>([])
   const [commentText, setCommentText] = useState('')
   const [visibleLimit, setVisibleLimit] = useState(5)
 
-  /* ─── Fetch del documento con deep fetch de usuario ─── */
+  /* ─── Fetch del documento ─── */
   useEffect(() => {
     if (!id) {
       setEstado('no-existe')
@@ -268,64 +209,6 @@ export default function RegistroPage() {
 
         const data = { id: snap.id, ...snap.data() } as Evento
         setEvento(data)
-
-        /*
-         * Deep fetch: el registro puede ser antiguo y carecer de userName.
-         * Buscamos el documento del autor en la coleccion 'users' usando
-         * cualquier campo de ID disponible (userId, creatorId, uid).
-         * El estado NO cambia a 'ok' hasta que este fetch termine,
-         * evitando el flash de 'USUARIO' antes de tener el nombre real.
-         */
-        const autorId =
-          data.userId ??
-          (data as unknown as Record<string, string>).creatorId ??
-          (data as unknown as Record<string, string>).uid ??
-          null
-
-        if (autorId) {
-          try {
-            const userSnap = await getDoc(doc(db, 'users', autorId))
-            if (userSnap.exists()) {
-              const userData = userSnap.data() as MiembroSnap & {
-                name?: string
-                userName?: string
-              }
-              /*
-               * Normaliza cualquier campo de nombre que pueda venir
-               * del documento del usuario (nickname, displayName, userName, name).
-               */
-              setAutorData({
-                nickname:
-                  userData.nickname ||
-                  userData.userName ||
-                  userData.displayName ||
-                  (userData as Record<string, string>).name ||
-                  'USUARIO DESCONOCIDO',
-                displayName: userData.displayName,
-                avatar: userData.avatar,
-                avatarType: userData.avatarType,
-                avatarIcon: userData.avatarIcon,
-              })
-            } else {
-              /* El doc de usuario no existe: mostramos fallback explícito */
-              setAutorData({
-                nickname: 'USUARIO DESCONOCIDO',
-              })
-            }
-          } catch {
-            /* Error de red al buscar el usuario: fallback gracioso */
-            setAutorData({
-              nickname: 'USUARIO DESCONOCIDO',
-            })
-          }
-        } else {
-          /* No hay ningun campo de ID de autor en el documento */
-          setAutorData({
-            nickname: 'USUARIO DESCONOCIDO',
-          })
-        }
-
-        /* El estado cambia a 'ok' solo despues de completar el deep fetch */
         setEstado('ok')
       } catch {
         setEstado('no-existe')
@@ -416,17 +299,8 @@ export default function RegistroPage() {
   }
   const reactions = evento.reactions ?? {}
   const currentUserId = user?.uid
-  /*
-   * autorNombre nunca expone el UID crudo.
-   * El deep fetch ya garantiza que autorData.nickname tenga un valor real
-   * o el texto 'USUARIO DESCONOCIDO' como fallback explicito.
-   */
-  const autorNombre =
-    autorData?.nickname ||
-    autorData?.displayName?.split(' ')[0] ||
-    'USUARIO DESCONOCIDO'
 
-  return (
+   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="w-full max-w-2xl mx-auto p-4 sm:p-6 space-y-6">
 
@@ -452,32 +326,24 @@ export default function RegistroPage() {
         {/* ─── Tarjeta principal (estilo Neobrutalista) ─── */}
         <div className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 shadow-[6px_6px_0px_rgba(0,0,0,1)]">
 
-          {/* Header de la tarjeta */}
-          <div className="flex items-center gap-4 p-4 border-b-4 border-black dark:border-white">
-            {/* Avatar — pasa autorNombre como fallbackInitial para la inicial */}
-            <RegistroAvatar data={autorData} fallbackInitial={autorNombre} size={64} />
+           {/* Header de la tarjeta */}
+           <div className="flex justify-between items-start w-full border-b-4 border-black dark:border-white px-4 pb-4 mb-4">
+             <p className="font-black text-gray-500 uppercase text-lg">
+               {tiempoRelativo(evento.timestamp)}
+             </p>
 
-            <div className="flex-1 min-w-0">
-              <p className="text-lg font-black uppercase tracking-wider truncate text-black dark:text-white">
-                {autorNombre}
-              </p>
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mt-0.5">
-                {tiempoRelativo(evento.timestamp)}
-              </p>
-            </div>
-
-            {/* Icono + badge alineados a la derecha en columna */}
-            <div className="flex flex-col items-end gap-2 shrink-0">
-              <div className="w-12 h-12 border-2 border-black dark:border-white flex items-center justify-center bg-gray-100 dark:bg-gray-700">
-                <TipoIcon tipo={evento.tipo} />
-              </div>
-              <span
-                className={`px-2 py-1 border-2 border-black dark:border-white ${tipoInfo.badgeColor} text-black font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_rgba(0,0,0,1)]`}
-              >
-                {tipoInfo.label}
-              </span>
-            </div>
-          </div>
+             {/* Icono + badge alineados a la derecha en columna */}
+             <div className="flex flex-col items-end gap-2 shrink-0">
+               <div className="w-12 h-12 border-2 border-black dark:border-white flex items-center justify-center bg-gray-100 dark:bg-gray-700">
+                 <TipoIcon tipo={evento.tipo} />
+               </div>
+               <span
+                 className={`px-2 py-1 border-2 border-black dark:border-white ${tipoInfo.badgeColor} text-black font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_rgba(0,0,0,1)]`}
+               >
+                 {tipoInfo.label}
+               </span>
+             </div>
+           </div>
 
           {/* Cuerpo: rating, nota, foto */}
           <div className="p-5 space-y-5">
