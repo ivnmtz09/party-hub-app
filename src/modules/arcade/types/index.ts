@@ -1,8 +1,9 @@
 export interface Word {
-  palabra: string
+  id: number
+  word: string
   categoria: string
-  pista: string
-  ejemplo: string
+  description: string
+  clue: string
 }
 
 export interface PlayerRole {
@@ -10,7 +11,7 @@ export interface PlayerRole {
   isImpostor: boolean
   assignedWord: string
   hint: string
-  ejemplo: string
+  description: string
 }
 
 export type GamePhase = 'Setup' | 'Reveal' | 'Debate' | 'Voting' | 'Result'
@@ -19,7 +20,7 @@ export interface GameConfig {
   playerNames: string[]
   impostorCount: number
   categories: string[]
-  includeHint: boolean
+  cluesEnabled: boolean
 }
 
 export interface GameState {
