@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Eye, EyeOff, HelpCircle } from 'lucide-react'
 
 interface ImpostorCardProps {
@@ -9,6 +9,8 @@ interface ImpostorCardProps {
   cluesEnabled: boolean
   onPass: () => void
 }
+
+const FLIP_DURATION_MS = 500
 
 const QUESTION_PATTERN =
   "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext x='6' y='42' font-family='monospace' font-size='34' font-weight='700' fill='%23404040'%3E%3F%3C/text%3E%3C/svg%3E\")"
@@ -22,15 +24,42 @@ export default function ImpostorCard({
   onPass,
 }: ImpostorCardProps) {
   const [revealed, setRevealed] = useState(false)
+  const [fading, setFading] = useState(false)
+  const passTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const revealText = isImpostor
+    ? cluesEnabled && clue
+      ? clue
+      : '¡Estas a ciegas!'
+    : word
+
+  const revealSizeClass =
+    revealText.length > 20
+      ? 'text-2xl sm:text-3xl'
+      : revealText.length > 10
+        ? 'text-3xl sm:text-4xl'
+        : 'text-4xl sm:text-5xl'
+
+  useEffect(() => {
+    return () => {
+      if (passTimeout.current !== null) clearTimeout(passTimeout.current)
+    }
+  }, [])
 
   const handlePass = () => {
+    if (fading) return
+    setFading(true)
     setRevealed(false)
-    onPass()
+    passTimeout.current = setTimeout(() => {
+      passTimeout.current = null
+      setFading(false)
+      onPass()
+    }, FLIP_DURATION_MS)
   }
 
   return (
     <div className="w-full max-w-xs mx-auto flex flex-col gap-4">
-      <div className="relative w-full aspect-[3/4] [perspective:1000px]">
+      <div className="relative w-full aspect-[3/4] overflow-hidden [perspective:1000px]">
         <div
           className="relative w-full h-full [transform-style:preserve-3d] transition-transform duration-500"
           style={{ transform: revealed ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
@@ -44,7 +73,8 @@ export default function ImpostorCard({
             </div>
             <button
               onClick={() => setRevealed(true)}
-              className="flex items-center gap-2 px-6 py-4 border-4 border-black bg-yellow-300 text-black font-black uppercase tracking-widest text-base sm:text-lg shadow-[6px_6px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
+              disabled={fading}
+              className="flex items-center gap-2 px-6 py-4 border-4 border-black bg-yellow-300 text-black font-black uppercase tracking-widest text-base sm:text-lg shadow-[6px_6px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <Eye size={22} strokeWidth={2.5} />
               Ver Rol y Palabra
@@ -66,7 +96,7 @@ export default function ImpostorCard({
                   <div className="w-14 h-14 border-4 border-black bg-black flex items-center justify-center">
                     <EyeOff size={28} strokeWidth={2.5} className="text-red-500" />
                   </div>
-                  <p className="text-4xl sm:text-5xl font-black uppercase tracking-wider text-black text-center break-words leading-tight">
+                  <p className={`${revealSizeClass} font-black uppercase tracking-wider text-black text-center break-words w-full px-2 leading-tight`}>
                     {cluesEnabled && clue ? clue : '¡Estas a ciegas!'}
                   </p>
                   {cluesEnabled && clue && (
@@ -77,10 +107,10 @@ export default function ImpostorCard({
                 </>
               ) : (
                 <>
-                  <p className="text-4xl sm:text-5xl font-black uppercase tracking-wider text-black text-center break-words leading-tight">
+                  <p className={`${revealSizeClass} font-black uppercase tracking-wider text-black text-center break-words w-full px-2 leading-tight`}>
                     {word}
                   </p>
-                  <p className="text-sm sm:text-base font-bold text-black text-center leading-snug max-w-[90%]">
+                  <p className="text-sm sm:text-base font-bold text-black text-center leading-snug break-words w-full px-2">
                     {description}
                   </p>
                 </>
