@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Smartphone, Wifi, Info } from 'lucide-react'
+import { Smartphone, Wifi, Info, X } from 'lucide-react'
 import { useGame } from '../context/GameContext'
 import GameHeader from '../../../components/GameHeader'
 import ImpostorSetupPage from './ImpostorSetupPage'
@@ -46,20 +46,13 @@ function ModeSelection({ onSelect }: { onSelect: (mode: GameMode) => void }) {
         <GameHeader title="El Impostor" backTo="/arcade" />
       </div>
       <div className="flex-1 flex flex-col items-center justify-center gap-8 max-w-md mx-auto w-full p-4">
-        <div className="relative w-full text-center space-y-2">
+        <div className="w-full text-center space-y-2">
           <p className="text-xs font-black uppercase tracking-widest text-fuchsia-500 dark:text-fuchsia-400">
             Modo de juego
           </p>
           <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-wider">
             Elige como jugar
           </h1>
-          <button
-            onClick={() => setIsInfoModalOpen(true)}
-            aria-label="Ver instrucciones"
-            className="absolute right-0 top-0 w-11 h-11 bg-yellow-400 border-4 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all flex items-center justify-center"
-          >
-            <Info size={22} strokeWidth={3} />
-          </button>
         </div>
 
         <div className="w-full space-y-5">
@@ -92,13 +85,28 @@ function ModeSelection({ onSelect }: { onSelect: (mode: GameMode) => void }) {
               </p>
             </div>
           </button>
+
+          <button
+            onClick={() => setIsInfoModalOpen(true)}
+            aria-label="Ver instrucciones"
+            className="w-full flex items-center justify-center py-4 border-4 border-black bg-yellow-400 text-black shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
+          >
+            <Info size={32} strokeWidth={2.5} />
+          </button>
         </div>
       </div>
 
       {isInfoModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-white border-4 border-black p-6 w-11/12 max-w-lg shadow-[8px_8px_0px_rgba(255,255,255,1)] flex flex-col gap-4 max-h-[90dvh] overflow-y-auto">
-            <h2 className="text-3xl sm:text-4xl font-black uppercase border-b-4 border-black pb-2">
+          <div className="relative bg-white text-black border-4 border-black p-6 w-11/12 max-w-lg shadow-[8px_8px_0px_rgba(255,255,255,1)] flex flex-col gap-4 max-h-[90dvh] overflow-y-auto">
+            <button
+              onClick={() => setIsInfoModalOpen(false)}
+              aria-label="Cerrar instrucciones"
+              className="absolute top-3 right-3 w-10 h-10 bg-red-500 text-white border-4 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all flex items-center justify-center"
+            >
+              <X size={20} strokeWidth={3} />
+            </button>
+            <h2 className="text-3xl sm:text-4xl font-black uppercase border-b-4 border-black pb-2 pr-12">
               Como jugar
             </h2>
 
