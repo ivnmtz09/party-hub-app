@@ -1,89 +1,14 @@
-import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import type { LucideIcon } from 'lucide-react'
-import { UserX, Hand, Bomb, Search, Play, Skull, AlertTriangle, RotateCw, Lock, Users } from 'lucide-react'
+import { Play, AlertTriangle, Gamepad2 } from 'lucide-react'
+import { useAppContent } from '../../../context/ContentContext'
+import { Icono } from '../../../config/iconos'
 import { playTapSound } from '../../../utils/audio'
 import ArcadeSkeleton from '../components/ArcadeSkeleton'
 
-interface GameEntry {
-  title: string
-  description: string
-  icon: LucideIcon
-  path: string
-  active: boolean
-  turbio?: boolean
-}
-
-const games: GameEntry[] = [
-  {
-    title: 'El Impostor',
-    description: 'Descubre al impostor antes de que sea demasiado tarde',
-    icon: UserX,
-    path: '/arcade/impostor',
-    active: true,
-  },
-  {
-    title: 'Ruleta Personalizada',
-    description: 'Agrega opciones, girala y descubre el resultado',
-    icon: RotateCw,
-    path: '/arcade/rouleta',
-    active: true,
-  },
-  {
-    title: 'El Dedo en la Llaga',
-    description: 'Multijugador: quien es mas probable...',
-    icon: Hand,
-    path: '/arcade/juego',
-    active: true,
-  },
-  {
-    title: 'Yo Nunca',
-    description: 'Confiesa tus pecados mas oscuros',
-    icon: Skull,
-    path: '/arcade/cartas/yo-nunca',
-    active: true,
-    turbio: true,
-  },
-  {
-    title: 'Bomba de Tiempo',
-    description: 'Responde rapido o la bomba explota',
-    icon: Bomb,
-    path: '/arcade/bomba',
-    active: true,
-    turbio: true,
-  },
-  {
-    title: 'Codigo Secreto',
-    description: 'Adivina el codigo de 4 cifras de tu rival (1v1)',
-    icon: Lock,
-    path: '/arcade/codigo-secreto',
-    active: true,
-  },
-  {
-    title: 'Frente a Frente',
-    description: 'Charadas en equipo. Adivina famosos con el celular en la frente',
-    icon: Users,
-    path: '/arcade/frente-a-frente',
-    active: true,
-  },
-  {
-    title: 'Misterio en la Mansion',
-    description: 'Deduccion y thriller psicologico',
-    icon: Search,
-    path: '#',
-    active: false,
-  },
-]
-
 export default function ArcadePage() {
-  const [loading, setLoading] = useState(true)
+  const { content, status } = useAppContent()
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 400)
-    return () => clearTimeout(timer)
-  }, [])
-
-  if (loading) {
+  if (status === 'cargando') {
     return (
       <div className="w-full max-w-md mx-auto p-4">
         <div className="h-8 w-24 bg-gray-300 dark:bg-gray-700 animate-pulse mb-2" />
@@ -107,12 +32,14 @@ export default function ArcadePage() {
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {games.map(({ title, description, icon: Icon, path, active, turbio }, i) => (
+        {content.juegos.map((juego, i) => {
+          const Icon = Icono(juego.icon, Gamepad2)
+          return (
           <div
-            key={title}
+            key={juego.id}
             style={{ animationDelay: `${i * 0.1}s` }}
             className={`flex flex-col border-4 border-black dark:border-white bg-white dark:bg-gray-800 shadow-brutal dark:shadow-brutal-dark animate-fade-in-up ${
-              active
+              juego.active
                 ? 'hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all'
                 : 'opacity-60'
             }`}
@@ -122,12 +49,12 @@ export default function ArcadePage() {
                 <Icon size={28} strokeWidth={2.5} className="text-black dark:text-gray-900" />
               </div>
               <p className="font-black uppercase tracking-wider text-sm text-black dark:text-white">
-                {title}
+                {juego.title}
               </p>
               <p className="text-xs font-bold text-gray-500 dark:text-gray-400">
-                {description}
+                {juego.description}
               </p>
-              {turbio && (
+              {juego.turbio && (
                 <div className="flex items-center gap-1 mt-2 border-2 border-red-600 bg-red-100 dark:bg-red-900/40 px-2 py-0.5">
                   <AlertTriangle size={12} strokeWidth={2.5} className="text-red-600 shrink-0" />
                   <span className="text-[10px] font-black uppercase tracking-widest text-red-600">
@@ -137,9 +64,9 @@ export default function ArcadePage() {
               )}
             </div>
 
-            {active ? (
+            {juego.active ? (
               <Link
-                to={path}
+                to={juego.path}
                 onClick={playTapSound}
                 className="w-full py-3 bg-yellow-300 dark:bg-yellow-400 border-t-4 border-black dark:border-white text-black dark:text-gray-900 font-black uppercase tracking-wider text-sm flex items-center justify-center gap-2 active:translate-y-0.5 transition-all"
               >
@@ -152,7 +79,8 @@ export default function ArcadePage() {
               </div>
             )}
           </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )

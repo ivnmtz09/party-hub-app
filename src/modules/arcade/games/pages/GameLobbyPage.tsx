@@ -15,10 +15,11 @@ import GameHeader from '../../../../components/GameHeader'
 import BackButton from '../../../../components/BackButton'
 import VotingEngine from '../engine/VotingEngine'
 import CardGameEngine from '../../components/CardGameEngine'
-import { getDeckById } from '../../data/decks'
+import { useAppContent } from '../../../../context/ContentContext'
 
 export default function GameLobbyPage() {
   const { user, userProfile } = useAuth()
+  const { getDeck } = useAppContent()
   const [mode, setMode] = useState<'menu' | 'create' | 'join' | null>('menu')
   const [joinCode, setJoinCode] = useState('')
   const [error, setError] = useState('')
@@ -30,7 +31,7 @@ export default function GameLobbyPage() {
     onError: (msg) => setError(msg),
   })
 
-  const deck = getDeckById('dedo-en-la-llaga')!
+  const deck = getDeck('dedo-en-la-llaga') ?? { id: 'dedo-en-la-llaga', titulo: 'El Dedo en la Llaga', descripcion: '', esTurbio: false, cartas: [] }
 
   const handleCreate = async () => {
     setError('')

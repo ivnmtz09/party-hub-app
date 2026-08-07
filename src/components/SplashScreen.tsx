@@ -58,6 +58,13 @@ export default function SplashScreen() {
         <p className="mt-8 text-xl font-black uppercase tracking-widest text-center text-black dark:text-white animate-pulse">
           {randomMessage}
         </p>
+
+        <div className="w-64 h-4 border-4 border-black dark:border-white bg-transparent">
+          <div
+            className="h-full bg-yellow-400 dark:bg-yellow-500"
+            style={{ animation: 'splash-progress 1.5s ease-in-out forwards' }}
+          />
+        </div>
       </div>
     </div>
   )

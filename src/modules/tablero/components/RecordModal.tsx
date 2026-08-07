@@ -6,14 +6,13 @@ import {
   Save,
   Camera,
   Trash2,
-  Flame,
-  Dumbbell,
-  Droplet,
 } from 'lucide-react'
 import type { Timestamp } from 'firebase/firestore'
 import type { Evento, Miembro } from '../../../firebase/services'
 import { updateActivityRecord } from '../../../firebase/services'
 import { useNeoToast } from '../../../components/NeoToast'
+import { useAppContent } from '../../../context/ContentContext'
+import { Icono } from '../../../config/iconos'
 
 interface AnchorRect {
   x: number
@@ -55,13 +54,6 @@ function formatoFecha(ts: Timestamp): string {
   return `${dia} ${mes} ${anio} - ${hora}:${min}`
 }
 
-const TIPO_LABEL: Record<string, string> = {
-  deposicion: 'CAGADA',
-  acto_sexual: 'CULEADA',
-  gym: 'GYM',
-  meada: 'MEADA',
-}
-
 function getModalPosition(anchor?: AnchorRect) {
   if (!anchor) return {}
   const vw = window.innerWidth
@@ -80,9 +72,11 @@ function getModalPosition(anchor?: AnchorRect) {
 export default function RecordModal(props: Props) {
   const { open, onClose, anchorRect } = props
   const { showToast } = useNeoToast()
+  const { content } = useAppContent()
 
   const isCreate = props.mode === 'create'
   const tipo = isCreate ? props.tipo : props.evento.tipo
+  const act = content.actividades.find((a) => a.tipo === tipo)
 
   const [isEditing, setIsEditing] = useState(props.mode !== 'view')
   const [rating, setRating] = useState(
@@ -176,18 +170,16 @@ export default function RecordModal(props: Props) {
 
   if (!open) return null
 
-  const icono =
-    tipo === 'deposicion' ? (
-      <Trash2 size={20} strokeWidth={2.5} className="text-orange-500" />
-    ) : tipo === 'acto_sexual' ? (
-      <Flame size={20} strokeWidth={2.5} className="text-pink-500" />
-    ) : tipo === 'meada' ? (
-      <Droplet size={20} strokeWidth={2.5} className="text-yellow-500 dark:text-yellow-400" />
-    ) : (
-      <Dumbbell size={20} strokeWidth={2.5} className="text-cyan-500" />
-    )
+  const IconComp = Icono(act?.icon)
+  const icono = (
+    <IconComp
+      size={20}
+      strokeWidth={2.5}
+      className={act?.iconColor ?? 'text-emerald-500'}
+    />
+  )
 
-  const tipoLabel = TIPO_LABEL[tipo] ?? tipo.toUpperCase()
+  const tipoLabel = act?.label ?? tipo.toUpperCase()
 
   let headerContent: React.ReactNode
   if (isCreate) {

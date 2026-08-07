@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Hand, Vote, Trophy, ChevronRight } from 'lucide-react'
-import { getDeckById } from '../../data/decks'
+import { useAppContent } from '../../../../context/ContentContext'
 import type { Sala } from '../../../../firebase/services'
 
 interface Props {
@@ -25,7 +25,8 @@ export default function VotingEngine({
   onRevealResults,
   onNextRound,
 }: Props) {
-  const deck = getDeckById(sala.deckId)
+  const { getDeck } = useAppContent()
+  const deck = getDeck(sala.deckId)
   const cartas = deck?.cartas ?? []
   const [cardIndex, setCardIndex] = useState(0)
 

@@ -1,17 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
-  ArrowUp,
-  ArrowDown,
   Award,
-  Banknote,
-  BookOpen,
-  Clock,
-  CloudRain,
-  Coins,
   Droplet,
-  Hamburger,
-  Leaf,
-  Moon,
   Pencil,
   RefreshCw,
   Save,
@@ -41,34 +31,10 @@ import {
 } from '../../../firebase/services'
 import Skeleton from '../../../components/Skeleton'
 import GroupSelector from '../../../components/GroupSelector'
+import { useAppContent } from '../../../context/ContentContext'
+import { Icono } from '../../../config/iconos'
+import { AGUA_LABEL } from '../../../firebase/content'
 import { playClickSound, playCloseSound, playDeleteSound, playSuccessSound } from '../../../utils/audio'
-
-const SUCESOS = [
-  { type: 'subi_peso', label: 'SUBÍ DE PESO', icon: ArrowUp, bg: 'bg-red-500 dark:bg-red-600 text-white' },
-  { type: 'baje_peso', label: 'BAJÉ DE PESO', icon: ArrowDown, bg: 'bg-green-400 dark:bg-green-500 text-black dark:text-gray-900' },
-  { type: 'comi_saludable', label: 'COMÍ SALUDABLE', icon: Leaf, bg: 'bg-lime-400 dark:bg-lime-500 text-black' },
-  { type: 'comi_chatarra', label: 'COMÍ CHATARRA', icon: Hamburger, bg: 'bg-orange-400 dark:bg-orange-500 text-black dark:text-gray-900' },
-  { type: 'dormi_bien', label: 'DORMÍ BIEN', icon: Moon, bg: 'bg-cyan-300 dark:bg-cyan-500 text-black dark:text-gray-900' },
-  { type: 'dormi_mal', label: 'DORMÍ MAL', icon: CloudRain, bg: 'bg-slate-400 dark:bg-slate-500 text-black dark:text-gray-900' },
-  { type: 'gane_plata', label: 'GANÉ PLATA', icon: Coins, bg: 'bg-green-400 dark:bg-green-500 text-black dark:text-gray-900' },
-  { type: 'gaste_plata', label: 'GASTÉ PLATA', icon: Banknote, bg: 'bg-yellow-300 dark:bg-yellow-500 text-black' },
-  { type: 'hice_deberes', label: 'HICE DEBERES', icon: BookOpen, bg: 'bg-blue-300 dark:bg-blue-400 text-black' },
-  { type: 'procrastine', label: 'PROCRASTINÉ', icon: Clock, bg: 'bg-pink-400 dark:bg-pink-500 text-black dark:text-gray-900' },
-] as const
-
-const SUCESO_LABEL: Record<string, string> = {
-  agua: '+1 VASO DE AGUA',
-  subi_peso: 'SUBÍ DE PESO',
-  baje_peso: 'BAJÉ DE PESO',
-  comi_chatarra: 'COMÍ CHATARRA',
-  gaste_plata: 'GASTÉ PLATA',
-  dormi_bien: 'DORMÍ BIEN',
-  gane_plata: 'GANÉ PLATA',
-  comi_saludable: 'COMÍ SALUDABLE',
-  dormi_mal: 'DORMÍ MAL',
-  hice_deberes: 'HICE DEBERES',
-  procrastine: 'PROCRASTINÉ',
-}
 
 function tiempoRelativo(ts: Timestamp | null): string {
   if (!ts) return ''
@@ -86,6 +52,12 @@ function tiempoRelativo(ts: Timestamp | null): string {
 export default function MuralPage() {
   const { user, userProfile } = useAuth()
   const { activeGroupId, setActiveGroupId } = useNotification()
+  const { content } = useAppContent()
+  const sucesos = content.sucesos
+  const sucesoLabels: Record<string, string> = useMemo(
+    () => ({ ...content.sucesoLabel, agua: AGUA_LABEL }),
+    [content.sucesoLabel],
+  )
   const [grupos, setGrupos] = useState<Grupo[]>([])
   const [eventos, setEventos] = useState<MuralEvent[]>([])
   const [loading, setLoading] = useState(true)
@@ -394,8 +366,8 @@ export default function MuralPage() {
           Sucesos Rápidos
         </h3>
         <div className="grid grid-cols-2 gap-3">
-          {SUCESOS.map((suceso) => {
-            const Icon = suceso.icon
+          {sucesos.map((suceso) => {
+            const Icon = Icono(suceso.icon)
             return (
               <button
                 key={suceso.type}
@@ -431,8 +403,8 @@ export default function MuralPage() {
               >
                 <div className="flex items-center justify-between gap-2">
                   <div>
-                    <p className="text-sm font-black uppercase tracking-wider text-black dark:text-white">
-                      {ev.userName} registró: {SUCESO_LABEL[ev.type] || ev.type}
+<p className="text-sm font-black uppercase tracking-wider text-black dark:text-white">
+                      {ev.userName} registró: {sucesoLabels[ev.type] || ev.type}
                     </p>
                     <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mt-0.5">
                       {tiempoRelativo(ev.createdAt as Timestamp)}
@@ -465,7 +437,7 @@ export default function MuralPage() {
                             <option key="agua" value="agua">
                               VASO DE AGUA
                             </option>
-                            {SUCESOS.map((s) => (
+                            {sucesos.map((s) => (
                               <option key={s.type} value={s.type}>
                                 {s.label}
                               </option>

@@ -1,5 +1,6 @@
 import { createContext, useContext, type ReactNode } from 'react'
 import { useImpostorGame } from '../hooks/useImpostorGame'
+import { useAppContent } from '../../../context/ContentContext'
 import type { GameState, GameConfig } from '../types'
 
 interface GameContextValue {
@@ -13,7 +14,8 @@ interface GameContextValue {
 const GameContext = createContext<GameContextValue | null>(null)
 
 export function GameProvider({ children }: { children: ReactNode }) {
-  const game = useImpostorGame()
+  const { content } = useAppContent()
+  const game = useImpostorGame(content.palabras)
   return (
     <GameContext.Provider value={game}>
       {children}

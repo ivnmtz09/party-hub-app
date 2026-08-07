@@ -6,23 +6,24 @@ import {
   siguienteCartaDedo,
   type DedoRoom,
 } from '../../../firebase/services'
-import { getDeckById } from '../data/decks'
 import GameHeader from '../../../components/GameHeader'
-
-const DECK = getDeckById('dedo-en-la-llaga')!
+import type { DeckContenido } from '../../../firebase/content'
 
 interface Props {
   room: DedoRoom
   userId: string
   isHost: boolean
   roomCode: string
+  deck?: DeckContenido
   usedCards: Set<string>
   onCardUsed: (card: string) => void
 }
 
-function pickRandomCard(used: Set<string>): string {
-  const available = DECK.cartas.filter((c) => !used.has(c))
-  if (available.length === 0) return DECK.cartas[Math.floor(Math.random() * DECK.cartas.length)]!
+function pickRandomCard(deck: DeckContenido | undefined, used: Set<string>): string {
+  const cartas = deck?.cartas ?? []
+  const pool = cartas.length > 0 ? cartas : ['¿Quien es mas probable que...?']
+  const available = pool.filter((c) => !used.has(c))
+  if (available.length === 0) return pool[Math.floor(Math.random() * pool.length)]!
   return available[Math.floor(Math.random() * available.length)]!
 }
 
@@ -31,6 +32,7 @@ export default function DedoLlagaOnline({
   userId,
   isHost,
   roomCode,
+  deck,
   usedCards,
   onCardUsed,
 }: Props) {
@@ -70,7 +72,7 @@ export default function DedoLlagaOnline({
   }
 
   const handleNextCard = async () => {
-    const card = pickRandomCard(usedCards)
+    const card = pickRandomCard(deck, usedCards)
     onCardUsed(card)
     try {
       await siguienteCartaDedo(roomCode, card)

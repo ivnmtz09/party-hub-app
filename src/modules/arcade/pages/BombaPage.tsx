@@ -11,7 +11,7 @@ import {
   Zap,
 } from 'lucide-react'
 import GameHeader from '../../../components/GameHeader'
-import { preguntas, penitencias } from '../data/bomba'
+import { useAppContent } from '../../../context/ContentContext'
 import { playExplosionSound } from '../../../utils/audio'
 
 type GamePhase = 'setup' | 'playing' | 'exploded' | 'resolution'
@@ -36,6 +36,9 @@ function pickRandomIndex(exclude: Set<number>, total: number): number {
 }
 
 export default function BombaPage() {
+  const { content } = useAppContent()
+  const preguntas = content.preguntas
+  const penitencias = content.penitencias
   const [phase, setPhase] = useState<GamePhase>('setup')
   const [names, setNames] = useState<string[]>(() => {
     try {

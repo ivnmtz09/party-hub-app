@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Star, Save, X, Camera, Edit, Trash2, Trash2Icon, Flame, Dumbbell, Droplets } from 'lucide-react'
 import { registrarEvento } from '../../../firebase/services'
 import { useNeoToast } from '../../../components/NeoToast'
+import { useAppContent } from '../../../context/ContentContext'
 import { playStarSound, playDeleteSound, playSuccessSound, playCloseSound, playClickSound } from '../../../utils/audio'
 
 interface Props {
@@ -11,6 +12,16 @@ interface Props {
 
 export default function ActivityCreateForm({ userId, onClose }: Props) {
   const { showToast } = useNeoToast()
+  const { content } = useAppContent()
+  const findAct = (t: string) => content.actividades.find((a) => a.tipo === t)
+
+const OPCIONES = [
+    { key: 'deposicion' as const, label: findAct('deposicion')?.label ?? 'CAGADA', Icon: Trash2Icon, color: findAct('deposicion')?.badgeColor ?? 'bg-orange-400 dark:bg-orange-500' },
+    { key: 'acto_sexual' as const, label: findAct('acto_sexual')?.label ?? 'CULEADA', Icon: Flame, color: findAct('acto_sexual')?.badgeColor ?? 'bg-pink-400 dark:bg-pink-500' },
+    { key: 'gym' as const, label: findAct('gym')?.label ?? 'GYM', Icon: Dumbbell, color: findAct('gym')?.badgeColor ?? 'bg-cyan-400 dark:bg-cyan-500' },
+    { key: 'meada' as const, label: findAct('meada')?.label ?? 'MEADA', Icon: Droplets, color: findAct('meada')?.badgeColor ?? 'bg-yellow-400 dark:bg-yellow-500' },
+  ]
+
   const [tipo, setTipo] = useState<'deposicion' | 'acto_sexual' | 'gym' | 'meada'>('deposicion')
   const [rating, setRating] = useState(0)
   const [note, setNote] = useState('')
@@ -71,12 +82,7 @@ export default function ActivityCreateForm({ userId, onClose }: Props) {
           Tipo
         </p>
         <div className="flex gap-2">
-          {([
-            { key: 'deposicion' as const, label: 'CAGADA', Icon: Trash2Icon, color: 'bg-orange-400 dark:bg-orange-500' },
-            { key: 'acto_sexual' as const, label: 'CULEADA', Icon: Flame, color: 'bg-pink-400 dark:bg-pink-500' },
-            { key: 'gym' as const, label: 'GYM', Icon: Dumbbell, color: 'bg-cyan-400 dark:bg-cyan-500' },
-            { key: 'meada' as const, label: 'MEADA', Icon: Droplets, color: 'bg-yellow-400 dark:bg-yellow-500' },
-          ]).map(({ key, label, Icon, color }) => (
+          {OPCIONES.map(({ key, label, Icon, color }) => (
             <button
               key={key}
               type="button"

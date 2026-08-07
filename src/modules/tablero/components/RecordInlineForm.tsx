@@ -11,6 +11,7 @@ import {
   Save,
 } from 'lucide-react'
 import { useNeoToast } from '../../../components/NeoToast'
+import { useAppContent } from '../../../context/ContentContext'
 import { playCagadaSound, playCuleadaSound, playGymSound, playMeadaSound, playSuccessSound, playCloseSound, playStarSound, playToggleOffSound } from '../../../utils/audio'
 
 interface Props {
@@ -20,17 +21,20 @@ interface Props {
   onSave: (tipo: 'deposicion' | 'acto_sexual' | 'gym' | 'meada', data: { rating: number; note: string; photoUrl: string }) => Promise<void>
 }
 
-const TIPO_OPTIONS = [
-  { tipo: 'deposicion' as const, label: 'CAGADA', icon: Trash2, color: 'bg-orange-400 dark:bg-orange-500', ring: 'ring-orange-400 dark:ring-orange-500' },
-  { tipo: 'acto_sexual' as const, label: 'CULEADA', icon: Flame, color: 'bg-pink-400 dark:bg-pink-500', ring: 'ring-pink-400 dark:ring-pink-500' },
-  { tipo: 'gym' as const, label: 'GYM', icon: Dumbbell, color: 'bg-cyan-400 dark:bg-cyan-500', ring: 'ring-cyan-400 dark:ring-cyan-500' },
-  { tipo: 'meada' as const, label: 'MEADA', icon: Droplets, color: 'bg-yellow-400 dark:bg-yellow-500', ring: 'ring-yellow-400 dark:ring-yellow-500' },
-]
-
-const PHOTO_DISABLED_MESSAGE = 'SUBIDA DE IMÁGENES TEMPORALMENTE DESHABILITADA'
+const PHOTO_DISABLED_MESSAGE = 'SUBIDA DE IMAGENES TEMPORALMENTE DESHABILITADA'
 
 export default function RecordInlineForm({ onClose, onSave }: Props) {
   const { showToast } = useNeoToast()
+  const { content } = useAppContent()
+  const findAct = (t: string) => content.actividades.find((a) => a.tipo === t)
+
+  const TIPO_OPTIONS = [
+    { tipo: 'deposicion' as const, label: findAct('deposicion')?.label ?? 'CAGADA', icon: Trash2, color: findAct('deposicion')?.badgeColor ?? 'bg-orange-400 dark:bg-orange-500' },
+    { tipo: 'acto_sexual' as const, label: findAct('acto_sexual')?.label ?? 'CULEADA', icon: Flame, color: findAct('acto_sexual')?.badgeColor ?? 'bg-pink-400 dark:bg-pink-500' },
+    { tipo: 'gym' as const, label: findAct('gym')?.label ?? 'GYM', icon: Dumbbell, color: findAct('gym')?.badgeColor ?? 'bg-cyan-400 dark:bg-cyan-500' },
+    { tipo: 'meada' as const, label: findAct('meada')?.label ?? 'MEADA', icon: Droplets, color: findAct('meada')?.badgeColor ?? 'bg-yellow-400 dark:bg-yellow-500' },
+  ]
+
   const [selectedTipo, setSelectedTipo] = useState<'deposicion' | 'acto_sexual' | 'gym' | 'meada' | null>(null)
   const [rating, setRating] = useState(0)
   const [note, setNote] = useState('')

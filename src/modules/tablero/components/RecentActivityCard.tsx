@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { Trash2, Flame, Dumbbell, Droplet, Check, X, Eye, Pencil } from 'lucide-react'
+import { Trash2, Check, X, Eye, Pencil } from 'lucide-react'
 import type { Timestamp } from 'firebase/firestore'
 import type { Evento, Miembro } from '../../../firebase/services'
 import { eliminarEvento } from '../../../firebase/services'
 import { ICON_OPTIONS } from '../../../components/UserAvatar'
 import ActivityDetailOrEdit from './ActivityDetailOrEdit'
+import { useAppContent } from '../../../context/ContentContext'
+import { Icono } from '../../../config/iconos'
 import { playOpenSound, playDeleteSound, playCloseSound } from '../../../utils/audio'
 
 function tiempoRelativo(ts: Timestamp | null): string {
@@ -28,6 +30,9 @@ interface Props {
 }
 
 export default function RecentActivityCard({ evento, miembros, userId, groupId }: Props) {
+  const { content } = useAppContent()
+  const act = content.actividades.find((a) => a.tipo === evento.tipo)
+  const IconComp = Icono(act?.icon)
   const [isConfirming, setIsConfirming] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
@@ -69,16 +74,13 @@ export default function RecentActivityCard({ evento, miembros, userId, groupId }
     )
   }
 
-  const icono =
-    evento.tipo === 'deposicion' ? (
-      <Trash2 size={16} strokeWidth={2.5} className="text-orange-500" />
-    ) : evento.tipo === 'acto_sexual' ? (
-      <Flame size={16} strokeWidth={2.5} className="text-pink-500" />
-    ) : evento.tipo === 'meada' ? (
-      <Droplet size={16} strokeWidth={2.5} className="text-yellow-400 dark:text-yellow-500" />
-    ) : (
-      <Dumbbell size={16} strokeWidth={2.5} className="text-cyan-500" />
-    )
+  const icono = (
+    <IconComp
+      size={16}
+      strokeWidth={2.5}
+      className={act?.iconColor ?? 'text-emerald-500'}
+    />
+  )
 
   const handleDelete = async () => {
     setIsLoading(true)
@@ -119,7 +121,7 @@ export default function RecentActivityCard({ evento, miembros, userId, groupId }
             {getMemberName()}
           </p>
           <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-            {evento.tipo === 'deposicion' ? 'Cagada' : evento.tipo === 'acto_sexual' ? 'Culeada' : evento.tipo === 'meada' ? 'Meada' : 'Gym'} &middot;{' '}
+            {act?.label ?? 'GYM'} &middot;{' '}
             {tiempoRelativo(evento.timestamp as Timestamp)}
             {hasDetails && (
               <span className="ml-1 text-yellow-500">&#9733;</span>

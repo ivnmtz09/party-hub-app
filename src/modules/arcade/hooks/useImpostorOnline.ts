@@ -16,7 +16,7 @@ import {
   finalizarVotacionImpostor,
   abandonarSalaImpostor,
 } from '../../../firebase/services'
-import { allWords } from '../data/words'
+import { useAppContent } from '../../../context/ContentContext'
 
 interface UseImpostorOnlineOptions {
   userId: string
@@ -48,6 +48,7 @@ export function useImpostorOnline({
   avatar,
   onError,
 }: UseImpostorOnlineOptions) {
+  const { content } = useAppContent()
   const [roomCode, setRoomCode] = useState<string | null>(null)
   const [room, setRoom] = useState<ImpostorRoom | null>(null)
   const [loading, setLoading] = useState(false)
@@ -128,8 +129,9 @@ export function useImpostorOnline({
 
   const buildRoundPayload = useCallback((): ImpostorRoundPayload | null => {
     if (!room) return null
-    const filtered = allWords.filter((w) => room.categories.includes(w.categoria))
-    const pool = filtered.length > 0 ? filtered : allWords
+    const palabras = content.palabras
+    const filtered = palabras.filter((w) => room.categories.includes(w.categoria))
+    const pool = filtered.length > 0 ? filtered : palabras
     const availableCategories = Array.from(new Set(pool.map((w) => w.categoria)))
     const pickedCategory =
       availableCategories[Math.floor(Math.random() * availableCategories.length)]
@@ -164,7 +166,7 @@ export function useImpostorOnline({
     }
 
     return { secrets, impostorIds, rounds: room.rounds + 1 }
-  }, [room])
+  }, [room, content.palabras])
 
   const startGame = useCallback(async () => {
     if (!roomCode || !room || room.status !== 'LOBBY') return

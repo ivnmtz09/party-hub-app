@@ -1,31 +1,14 @@
 import { useState } from 'react'
-import { LogIn, Square, CheckSquare, X, Swords, BarChart2, Users } from 'lucide-react'
+import { LogIn, Square, CheckSquare, X, Swords } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { useAppContent } from '../context/ContentContext'
+import { Icono } from '../config/iconos'
 import BrandLogo from './BrandLogo'
 import { playToggleOnSound, playOpenSound, playClickSound, playCloseSound } from '../utils/audio'
 
-const TERMINOS = `1. PRIVACIDAD: Tu cuenta de Google solo se usa para autenticacion y gestion de perfil. No vendemos tus datos.
-2. RESPONSABILIDAD: Esta es una aplicacion de entretenimiento. El contenido generado (juegos, votaciones, registros) es responsabilidad absoluta de los usuarios.
-3. COMPORTAMIENTO: Se prohibe el uso de la plataforma para acoso, bullying o difusion de contenido ilegal. El incumplimiento causara la expulsion inmediata del grupo.
-4. NATURALEZA DEL JUEGO: Al aceptar, reconoces que los juegos son de caracter recreativo y pueden incluir temas personales o sensibles. Juega con criterio.`
-
-const FEATURES = [
-  {
-    icon: Swords,
-    text: 'Destruye amistades en el Arcade con Yo Nunca y el Dedo en la Llaga.',
-  },
-  {
-    icon: BarChart2,
-    text: 'Registra las peores cagadas y el progreso en el gimnasio.',
-  },
-  {
-    icon: Users,
-    text: 'Crea grupos cerrados y mantén los secretos a salvo.',
-  },
-]
-
 export default function LoginPage() {
   const { loginWithGoogle } = useAuth()
+  const { content } = useAppContent()
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [accepted, setAccepted] = useState(false)
@@ -43,7 +26,7 @@ export default function LoginPage() {
     }
   }
 
-  const terminosParts = TERMINOS.split('\n').filter(Boolean)
+  const terminosParts = content.terminos
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-yellow-300 dark:bg-gray-950 text-black dark:text-white px-6 py-10">
@@ -58,8 +41,8 @@ export default function LoginPage() {
 
         <div className="w-full bg-cyan-300 dark:bg-cyan-900 border-4 border-black p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] space-y-4">
           <ul className="space-y-3">
-            {FEATURES.map((feat, i) => {
-              const Icon = feat.icon
+            {content.features.map((feat, i) => {
+              const Icon = Icono(feat.icon, Swords)
               return (
                 <li key={i} className="flex items-start gap-3">
                   <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center border-2 border-black bg-white dark:bg-gray-800">

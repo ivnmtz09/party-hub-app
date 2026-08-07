@@ -7,16 +7,17 @@ import {
   iniciarJuegoDedo,
   type DedoRoom,
 } from '../../../firebase/services'
-import { getDeckById } from '../data/decks'
 import GameHeader from '../../../components/GameHeader'
 import DedoLlagaOnline from './DedoLlagaOnline'
+import { useAppContent } from '../../../context/ContentContext'
+import type { DeckContenido } from '../../../firebase/content'
 import { Users, Play, Plus, LogIn, Copy, Check, Loader2, X } from 'lucide-react'
 
-const DECK = getDeckById('dedo-en-la-llaga')!
-
-function pickRandomCard(used: Set<string>): string {
-  const available = DECK.cartas.filter((c) => !used.has(c))
-  if (available.length === 0) return DECK.cartas[Math.floor(Math.random() * DECK.cartas.length)]!
+function pickRandomCard(deck: DeckContenido | undefined, used: Set<string>): string {
+  const cartas = deck?.cartas ?? []
+  const pool = cartas.length > 0 ? cartas : ['¿Quien es mas probable que...?']
+  const available = pool.filter((c) => !used.has(c))
+  if (available.length === 0) return pool[Math.floor(Math.random() * pool.length)]!
   return available[Math.floor(Math.random() * available.length)]!
 }
 
@@ -24,6 +25,8 @@ type LobbyPhase = 'menu' | 'creating' | 'joining' | 'inside'
 
 export default function DedoLlagaLobby() {
   const { user, userProfile } = useAuth()
+  const { getDeck } = useAppContent()
+  const deck = getDeck('dedo-en-la-llaga')
   const [phase, setPhase] = useState<LobbyPhase>('menu')
   const [roomCode, setRoomCode] = useState('')
   const [nameInput, setNameInput] = useState('')
@@ -80,13 +83,13 @@ export default function DedoLlagaLobby() {
     if (!roomCode) return
     setError('')
     try {
-      const card = pickRandomCard(usedCards)
+      const card = pickRandomCard(deck, usedCards)
       setUsedCards((prev) => new Set(prev).add(card))
       await iniciarJuegoDedo(roomCode, card)
     } catch {
       setError('Error al iniciar el juego')
     }
-  }, [roomCode, usedCards])
+  }, [roomCode, usedCards, deck])
 
   const handleCopyCode = () => {
     if (!roomCode) return
@@ -102,6 +105,7 @@ export default function DedoLlagaLobby() {
         userId={userId}
         isHost={isHost}
         roomCode={roomCode}
+        deck={deck}
         usedCards={usedCards}
         onCardUsed={(card) => setUsedCards((prev) => new Set(prev).add(card))}
       />

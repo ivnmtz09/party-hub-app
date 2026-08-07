@@ -7,15 +7,14 @@ import {
   Code,
   ExternalLink,
   HelpCircle,
-  Home,
-  ClipboardList,
-  Star,
-  Gamepad2,
   ChevronDown,
   User,
+  Database,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import { useAppContent } from "../context/ContentContext";
+import { Icono } from "../config/iconos";
 import { useNavigate } from "react-router-dom";
 import useLockBodyScroll from "../hooks/useLockBodyScroll";
 import UserAvatar from "./UserAvatar";
@@ -61,6 +60,7 @@ function ManualItem({
 export default function SideDrawer({ open, onClose }: Props) {
   const { user, userProfile, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { content } = useAppContent();
   const navigate = useNavigate();
   const overlayRef = useRef<HTMLDivElement>(null);
   const [showManual, setShowManual] = useState(false);
@@ -145,6 +145,18 @@ export default function SideDrawer({ open, onClose }: Props) {
 
             <button
               onClick={() => {
+                playClickSound();
+                onClose();
+                navigate("/admin");
+              }}
+              className="w-full flex items-center gap-3 px-3 py-3 border-2 border-black dark:border-white bg-white dark:bg-gray-800 font-black uppercase tracking-wider text-sm text-black dark:text-white shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+            >
+              <Database size={20} strokeWidth={2.5} />
+              <span className="flex-1 text-left">ADMIN SYNC</span>
+            </button>
+
+            <button
+              onClick={() => {
                 playToggleOnSound();
                 setShowManual(!showManual);
               }}
@@ -160,28 +172,19 @@ export default function SideDrawer({ open, onClose }: Props) {
             </button>
 
             {showManual && (
-              <div className="space-y-2 border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-800 p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+<div className="space-y-2 border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-800 p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                 <div className="space-y-1">
-                  <ManualItem
-                    icon={<Home size={16} strokeWidth={2.5} />}
-                    title="Inicio"
-                    desc="Administras tus grupos. Ves los codigos de invitacion y las tarjetas de estadisticas de cada miembro (conteo y ultima vez de Cagadas, Culeadas, Meadas y dias de Gym)."
-                  />
-                  <ManualItem
-                    icon={<ClipboardList size={16} strokeWidth={2.5} />}
-                    title="Tablero"
-                    desc="Es el registro de eventos principales. Publicas tus Cagadas, Culeadas, Meadas y Gym. Puedes reaccionar y comentar las publicaciones de tus amigos y ver graficos estadisticos mensuales."
-                  />
-                  <ManualItem
-                    icon={<Star size={16} strokeWidth={2.5} />}
-                    title="Mural (Gamificacion)"
-                    desc="Panel de habitos diarios. Registra acciones rapidas para ganar Puntos de Experiencia (XP). Habitos buenos suman +1 XP, habitos malos restan -1 XP. El peso (subir/bajar) es neutro (0 XP). Cada vaso de agua de 200ml suma +0.2 XP. El feed se limpia cada medianoche, pero el XP se acumula todo el mes para el Ranking del grupo."
-                  />
-                  <ManualItem
-                    icon={<Gamepad2 size={16} strokeWidth={2.5} />}
-                    title="Arcade"
-                    desc="Catalogo de minijuegos multijugador para pasar el rato con tu grupo: Impostor, Bomba de Tiempo, Ruleta, Dedo en la Llaga, Codigo Secreto y Frente a Frente."
-                  />
+                  {content.manual.map((item) => {
+                    const Icon = Icono(item.icon);
+                    return (
+                      <ManualItem
+                        key={item.title}
+                        icon={<Icon size={16} strokeWidth={2.5} />}
+                        title={item.title}
+                        desc={item.desc}
+                      />
+                    );
+                  })}
                 </div>
               </div>
             )}

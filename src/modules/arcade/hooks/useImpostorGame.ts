@@ -40,19 +40,19 @@ function assignRoles(config: GameConfig, words: Word[]): PlayerRole[] {
 
 const PHASE_ORDER: GamePhase[] = ['Setup', 'Reveal', 'Debate', 'Voting', 'Result']
 
-export function useImpostorGame() {
+export function useImpostorGame(words: Word[] = allWords) {
   const [state, setState] = useState<GameState | null>(null)
 
-  const startGame = useCallback((config: GameConfig) => {
-    const players = assignRoles(config, allWords)
+  const startGame = useCallback((configGame: GameConfig) => {
+    const players = assignRoles(configGame, words)
     setState({
       phase: 'Reveal',
       players,
-      config,
+      config: configGame,
       round: 1,
       votedPlayer: null,
     })
-  }, [])
+  }, [words])
 
   const nextPhase = useCallback(() => {
     setState((prev) => {

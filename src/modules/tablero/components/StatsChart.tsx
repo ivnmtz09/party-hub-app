@@ -9,6 +9,7 @@ import {
   LabelList,
 } from 'recharts'
 import type { Miembro, Evento } from '../../../firebase/services'
+import { useAppContent } from '../../../context/ContentContext'
 
 interface Props {
   miembros: Miembro[]
@@ -18,7 +19,17 @@ interface Props {
   onTimeFilterChange: (val: string) => void
 }
 
+const CHART_FILLS: Record<string, string> = {
+  deposicion: '#f97316',
+  acto_sexual: '#ec4899',
+  meada: '#facc15',
+  gym: '#06b6d4',
+}
+
 export default function StatsChart({ miembros, eventos, timeFilter, availableMonths, onTimeFilterChange }: Props) {
+  const { content } = useAppContent()
+  const acts = content.actividades
+
   const data = miembros.map((m) => {
     const eventosUsuario = eventos.filter((e) => e.userId === m.id)
     const cagadas = eventosUsuario.filter((e) => e.tipo === 'deposicion').length
@@ -28,10 +39,10 @@ export default function StatsChart({ miembros, eventos, timeFilter, availableMon
 
     return {
       name: m.nickname || m.displayName.split(' ')[0],
-      CAGADAS: cagadas,
-      CULEADAS: culeadas,
-      MEADAS: meadas,
-      GYM: gimnasio,
+      deposicion: cagadas,
+      acto_sexual: culeadas,
+      meada: meadas,
+      gym: gimnasio,
     }
   })
 
@@ -42,13 +53,17 @@ export default function StatsChart({ miembros, eventos, timeFilter, availableMon
     'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'
   ]
 
+  const titulo = acts.length > 0
+    ? acts.map((a) => a.labelPlural ?? a.label).join(' vs ')
+    : 'Cagadas vs Culeadas vs Meadas vs Gym'
+
   return (
     <div
       className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-4 shadow-brutal dark:shadow-brutal-dark"
     >
       <div className="flex flex-col gap-2 mb-4">
         <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-          Cagadas vs Culeadas vs Meadas vs Gym
+          {titulo}
         </h3>
         
         {/* Selector de Mes/Tiempo Neobrutalista */}
@@ -110,39 +125,19 @@ export default function StatsChart({ miembros, eventos, timeFilter, availableMon
           <Legend
             wrapperStyle={{ fontSize: 10, fontWeight: 700 }}
           />
-          <Bar
-            dataKey="CAGADAS"
-            fill="#f97316"
-            stroke="#000"
-            strokeWidth={2}
-            radius={[0, 0, 0, 0]}
-          >
-            <LabelList className="fill-black dark:fill-white font-black text-sm" dataKey="CAGADAS" offset={10} position="right" />
-          </Bar>
-          <Bar
-            dataKey="CULEADAS"
-            fill="#ec4899"
-            stroke="#000"
-            strokeWidth={2}
-          >
-            <LabelList className="fill-black dark:fill-white font-black text-sm" dataKey="CULEADAS" offset={10} position="right" />
-          </Bar>
-          <Bar
-            dataKey="MEADAS"
-            fill="#facc15"
-            stroke="#000"
-            strokeWidth={2}
-          >
-            <LabelList className="fill-black dark:fill-white font-black text-sm" dataKey="MEADAS" offset={10} position="right" />
-          </Bar>
-          <Bar
-            dataKey="GYM"
-            fill="#06b6d4"
-            stroke="#000"
-            strokeWidth={2}
-          >
-            <LabelList className="fill-black dark:fill-white font-black text-sm" dataKey="GYM" offset={10} position="right" />
-          </Bar>
+          {acts.map((a) => (
+            <Bar
+              key={a.tipo}
+              dataKey={a.tipo}
+              name={a.labelPlural ?? a.label}
+              fill={CHART_FILLS[a.tipo] ?? '#9ca3af'}
+              stroke="#000"
+              strokeWidth={2}
+              radius={[0, 0, 0, 0]}
+            >
+              <LabelList className="fill-black dark:fill-white font-black text-sm" dataKey={a.tipo} offset={10} position="right" />
+            </Bar>
+          ))}
         </BarChart>
       </ResponsiveContainer>
     </div>

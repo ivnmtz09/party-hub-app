@@ -4,6 +4,7 @@ import type { Evento, ReactionType, CommentData, Miembro } from '../../../fireba
 import { updateActivityRecord, toggleReaction, addComment, subscribeToComments, observarMiembros } from '../../../firebase/services'
 import { useAuth } from '../../../context/AuthContext'
 import { useNeoToast } from '../../../components/NeoToast'
+import { useAppContent } from '../../../context/ContentContext'
 import { playReactionSound, playCommentSendSound, playCloseSound, playStarSound, playDeleteSound, playSuccessSound, playClickSound } from '../../../utils/audio'
 
 interface Props {
@@ -24,16 +25,11 @@ const REACTION_CONFIG: Record<ReactionType, { icon: typeof Heart; activeBg: stri
 
 const REACTION_TYPES: ReactionType[] = ['heart', 'flame', 'smile', 'skull', 'frown']
 
-const TIPO_BADGE: Record<Evento['tipo'], { label: string; color: string }> = {
-  deposicion: { label: 'CAGADA', color: 'bg-orange-400 dark:bg-orange-500' },
-  acto_sexual: { label: 'CULEADA', color: 'bg-pink-400 dark:bg-pink-500' },
-  gym: { label: 'GYM', color: 'bg-cyan-400 dark:bg-cyan-500' },
-  meada: { label: 'MEADA', color: 'bg-yellow-400 dark:bg-yellow-500' },
-}
-
 export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose, startEditing }: Props) {
   const { user, userProfile } = useAuth()
   const { showToast } = useNeoToast()
+  const { content } = useAppContent()
+  const badge = content.actividades.find((a) => a.tipo === evento.tipo)
   const [isEditing, setIsEditing] = useState(startEditing ?? false)
   const [rating, setRating] = useState(evento.rating ?? 0)
   const [note, setNote] = useState(evento.note ?? '')
@@ -157,8 +153,8 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
     return (
       <div className="border-2 border-black dark:border-white p-4 mt-2 bg-gray-50 dark:bg-gray-900 space-y-3">
         <div className="flex items-center justify-between">
-          <span className={`px-2 py-1 border-2 border-black dark:border-white ${TIPO_BADGE[evento.tipo].color} text-black font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}>
-            {TIPO_BADGE[evento.tipo].label}
+          <span className={`px-2 py-1 border-2 border-black dark:border-white ${badge?.badgeColor ?? 'bg-gray-200 dark:bg-gray-700'} text-black font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}>
+            {badge?.label ?? 'REGISTRO'}
           </span>
           {isOwner && (
             <button

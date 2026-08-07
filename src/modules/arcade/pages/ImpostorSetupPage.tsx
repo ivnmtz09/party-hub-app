@@ -12,12 +12,14 @@ import {
 } from 'lucide-react'
 import GameHeader from '../../../components/GameHeader'
 import { useGame } from '../context/GameContext'
-import { categoryMap } from '../data/words'
+import { useAppContent } from '../../../context/ContentContext'
+import { Icono } from '../../../config/iconos'
 
 const MAX_IMPOSTORS = 3
 
 export default function ImpostorSetupPage() {
   const { startGame } = useGame()
+  const { content } = useAppContent()
 
   const [names, setNames] = useState<string[]>([])
   const [inputName, setInputName] = useState('')
@@ -28,7 +30,8 @@ export default function ImpostorSetupPage() {
         return new Set(JSON.parse(saved) as string[])
       } catch { /* ignore */ }
     }
-    return new Set([categoryMap[0]!.name])
+    const first = content.categorias[0]?.name
+    return new Set(first ? [first] : [])
   })
   const [impostorCount, setImpostorCount] = useState(1)
   const [cluesEnabled, setCluesEnabled] = useState(true)
@@ -190,12 +193,13 @@ export default function ImpostorSetupPage() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            {categoryMap.map(({ name, icon: Icon }) => {
-              const active = selectedCategories.has(name)
+            {content.categorias.map((cat) => {
+              const Icon = Icono(cat.icon)
+              const active = selectedCategories.has(cat.name)
               return (
                 <button
-                  key={name}
-                  onClick={() => toggleCategory(name)}
+                  key={cat.name}
+                  onClick={() => toggleCategory(cat.name)}
                   className={`flex items-center gap-2 px-3 py-3 border-2 border-black dark:border-white text-xs font-black uppercase tracking-wider transition-all ${
                     active
                       ? 'bg-yellow-300 dark:bg-yellow-400 text-black dark:text-gray-900 shadow-brutal-sm dark:shadow-brutal-sm-dark'
@@ -203,7 +207,7 @@ export default function ImpostorSetupPage() {
                   }`}
                 >
                   <Icon size={18} strokeWidth={2.5} />
-                  {name}
+                  {cat.name}
                 </button>
               )
             })}

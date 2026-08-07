@@ -17,6 +17,7 @@ import HomePage from '../modules/home/pages/Home'
 import NotFound from '../pages/NotFound'
 import RegistroPage from '../pages/RegistroPage'
 import ProfilePage from '../modules/profile/pages/ProfilePage'
+import AdminPage from '../pages/AdminPage'
 import LoginPage from '../components/LoginPage'
 import SplashScreen from '../components/SplashScreen'
 
@@ -63,6 +64,7 @@ export const router = createBrowserRouter([
       { path: 'mural', element: <MuralPage /> },
       { path: 'perfil', element: <ProfilePage /> },
       { path: 'historial', element: <HistorialPage /> },
+      { path: 'admin', element: <AdminPage /> },
     ],
   },
   {

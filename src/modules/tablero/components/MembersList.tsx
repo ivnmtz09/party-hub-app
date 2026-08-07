@@ -1,7 +1,9 @@
-import { Crown, Droplet, Dumbbell, Trash2, Flame } from 'lucide-react'
+import { Crown, Trash2, Flame, Droplets, Dumbbell } from 'lucide-react'
 import type { Timestamp } from 'firebase/firestore'
 import type { Grupo, Miembro } from '../../../firebase/services'
 import UserAvatar from '../../../components/UserAvatar'
+import { useAppContent } from '../../../context/ContentContext'
+import { Icono } from '../../../config/iconos'
 
 function tiempoRelativo(ts: Timestamp | null): string {
   if (!ts) return ''
@@ -69,6 +71,14 @@ interface Props {
 }
 
 export default function MembersList({ miembros, activeGroup }: Props) {
+  const { content } = useAppContent()
+  const findAct = (t: string) => content.actividades.find((a) => a.tipo === t)
+  const plural = (label: string | undefined, fallback: string) => (label ? `${label}S` : fallback)
+  const CagadaIcon = Icono(findAct('deposicion')?.icon, Trash2)
+  const CuleadaIcon = Icono(findAct('acto_sexual')?.icon, Flame)
+  const MeadaIcon = Icono(findAct('meada')?.icon, Droplets)
+  const GymIcon = Icono(findAct('gym')?.icon, Dumbbell)
+
   const getLeaderId = (key: 'deposiciones' | 'actosSexuales' | 'gym' | 'meadas'): string | null => {
     if (miembros.length === 0) return null
     const values = miembros.map((m) => m[key] || 0)
@@ -140,32 +150,32 @@ export default function MembersList({ miembros, activeGroup }: Props) {
             <div className="flex gap-6 text-sm">
               <CounterWithCrown
                 value={m.deposiciones}
-                label="CAGADAS"
-                icon={<Trash2 size={16} strokeWidth={2.5} className="text-amber-600 dark:text-amber-400" />}
+                label={plural(findAct('deposicion')?.label, 'CAGADAS')}
+                icon={<CagadaIcon size={16} strokeWidth={2.5} className="text-amber-600 dark:text-amber-400" />}
                 valueClass="text-lg font-black text-amber-600 dark:text-amber-400"
                 showCrown={showCrownCagadas}
                 crownRotation={crownRotation}
               />
               <CounterWithCrown
                 value={m.actosSexuales}
-                label="CULEADAS"
-                icon={<Flame size={16} strokeWidth={2.5} className="text-pink-600 dark:text-pink-400" />}
+                label={plural(findAct('acto_sexual')?.label, 'CULEADAS')}
+                icon={<CuleadaIcon size={16} strokeWidth={2.5} className="text-pink-600 dark:text-pink-400" />}
                 valueClass="text-lg font-black text-pink-600 dark:text-pink-400"
                 showCrown={showCrownCuleadas}
                 crownRotation={crownRotation}
               />
               <CounterWithCrown
                 value={m.meadas || 0}
-                label="MEADAS"
-                icon={<Droplet size={16} strokeWidth={2.5} className="text-yellow-400" />}
+                label={plural(findAct('meada')?.label, 'MEADAS')}
+                icon={<MeadaIcon size={16} strokeWidth={2.5} className="text-yellow-400" />}
                 valueClass="text-lg font-black text-yellow-400"
                 showCrown={showCrownMeadas}
                 crownRotation={crownRotation}
               />
               <CounterWithCrown
                 value={m.gym || 0}
-                label="GYM"
-                icon={<Dumbbell size={16} strokeWidth={2.5} className="text-blue-600 dark:text-blue-400" />}
+                label={findAct('gym')?.label ?? 'GYM'}
+                icon={<GymIcon size={16} strokeWidth={2.5} className="text-blue-600 dark:text-blue-400" />}
                 valueClass="text-lg font-black text-blue-600 dark:text-blue-400"
                 showCrown={showCrownGym}
                 crownRotation={crownRotation}
@@ -176,22 +186,22 @@ export default function MembersList({ miembros, activeGroup }: Props) {
               <div className="flex flex-col gap-1 mt-2 text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                 {ultimaDepo && (
                   <span className="flex items-center gap-1">
-                    <Trash2 size={14} strokeWidth={2.5} className="text-orange-500" /> Ultima cagada: {ultimaDepo}
+                    <CagadaIcon size={14} strokeWidth={2.5} className="text-orange-500" /> Ultima {findAct('deposicion')?.label?.toLowerCase() ?? 'cagada'}: {ultimaDepo}
                   </span>
                 )}
                 {ultimoSexo && (
                   <span className="flex items-center gap-1">
-                    <Flame size={14} strokeWidth={2.5} className="text-pink-500" /> Ultima culeada: {ultimoSexo}
+                    <CuleadaIcon size={14} strokeWidth={2.5} className="text-pink-500" /> Ultima {findAct('acto_sexual')?.label?.toLowerCase() ?? 'culeada'}: {ultimoSexo}
                   </span>
                 )}
                 {ultimaMeada && (
                   <span className="flex items-center gap-1">
-                    <Droplet size={14} strokeWidth={2.5} className="text-yellow-400" /> Ultima meada: {ultimaMeada}
+                    <MeadaIcon size={14} strokeWidth={2.5} className="text-yellow-400" /> Ultima {findAct('meada')?.label?.toLowerCase() ?? 'meada'}: {ultimaMeada}
                   </span>
                 )}
                 {ultimoGym && (
                   <span className="flex items-center gap-1">
-                    <Dumbbell size={14} strokeWidth={2.5} className="text-blue-500" /> Ultimo dia de gym: {ultimoGym}
+                    <GymIcon size={14} strokeWidth={2.5} className="text-blue-500" /> Ultimo dia de {findAct('gym')?.label?.toLowerCase() ?? 'gym'}: {ultimoGym}
                   </span>
                 )}
               </div>

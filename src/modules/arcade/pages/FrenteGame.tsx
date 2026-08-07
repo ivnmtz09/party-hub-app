@@ -4,7 +4,7 @@ import {
   type FrenteRoom,
 } from '../../../firebase/services'
 import { playWinSound, playTapSound } from '../../../utils/audio'
-import { FAMOSOS } from '../data/famosos'
+import { useAppContent } from '../../../context/ContentContext'
 import GameHeader from '../../../components/GameHeader'
 import { Check, X as XIcon, Trophy, Play, Clock } from 'lucide-react'
 
@@ -26,11 +26,13 @@ function shuffleArray<T>(arr: T[]): T[] {
 const TIEMPO_TURNO = 60
 
 export default function FrenteGame({ room, roomCode, onLeave }: Props) {
+  const { content } = useAppContent()
+  const famosos = content.famosos
   const [localPhase, setLocalPhase] = useState<'waiting' | 'playing' | 'round_over'>('waiting')
   const [timeLeft, setTimeLeft] = useState(TIEMPO_TURNO)
   const [score, setScore] = useState(0)
   const [currentName, setCurrentName] = useState('')
-  const [namesRemaining, setNamesRemaining] = useState<string[]>(() => shuffleArray(FAMOSOS))
+  const [namesRemaining, setNamesRemaining] = useState<string[]>(() => shuffleArray(famosos))
   const [nameIndex, setNameIndex] = useState(0)
   const [sending, setSending] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -40,7 +42,7 @@ export default function FrenteGame({ room, roomCode, onLeave }: Props) {
   const advanceName = useCallback(() => {
     const idx = nameIndex + 1
     if (idx >= namesRemaining.length) {
-      const reshuffled = shuffleArray(FAMOSOS)
+      const reshuffled = shuffleArray(famosos)
       setNamesRemaining(reshuffled)
       setNameIndex(0)
       setCurrentName(reshuffled[0]!)
@@ -48,7 +50,7 @@ export default function FrenteGame({ room, roomCode, onLeave }: Props) {
       setNameIndex(idx)
       setCurrentName(namesRemaining[idx]!)
     }
-  }, [nameIndex, namesRemaining])
+  }, [nameIndex, namesRemaining, famosos])
 
   useEffect(() => {
     if (namesRemaining.length > 0 && nameIndex < namesRemaining.length) {
@@ -101,7 +103,7 @@ export default function FrenteGame({ room, roomCode, onLeave }: Props) {
       setLocalPhase('waiting')
       setTimeLeft(TIEMPO_TURNO)
       setScore(0)
-      setNamesRemaining(shuffleArray(FAMOSOS))
+      setNamesRemaining(shuffleArray(famosos))
       setNameIndex(0)
     }
   }, [room.currentTeam, room.phase])

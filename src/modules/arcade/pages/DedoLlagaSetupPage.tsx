@@ -2,9 +2,7 @@ import { useState } from 'react'
 import { UserPlus, X, Play, Hand, Shuffle, Layers, Loader2 } from 'lucide-react'
 import GameHeader from '../../../components/GameHeader'
 import { useCardGame } from '../hooks/useCardGame'
-import { getDeckById } from '../data/decks'
-
-const deck = getDeckById('dedo-en-la-llaga')!
+import { useAppContent } from '../../../context/ContentContext'
 
 type GamePhase = 'setup' | 'voting' | 'resolution'
 
@@ -13,6 +11,8 @@ interface VoteCount {
 }
 
 export default function DedoLlagaSetupPage() {
+  const { getDeck } = useAppContent()
+  const deck = getDeck('dedo-en-la-llaga')
   const [phase, setPhase] = useState<GamePhase>('setup')
   const [names, setNames] = useState<string[]>([])
   const [inputName, setInputName] = useState('')
@@ -28,7 +28,7 @@ export default function DedoLlagaSetupPage() {
     cartasJugadas,
     obtenerSiguiente,
     barajar,
-  } = useCardGame(deck.cartas)
+  } = useCardGame(deck?.cartas ?? [])
 
   const addName = () => {
     const trimmed = inputName.trim()

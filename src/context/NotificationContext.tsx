@@ -20,6 +20,7 @@ import {
 } from 'firebase/firestore'
 import { db } from '../firebase/config'
 import type { Evento } from '../firebase/services'
+import { useAppContent } from './ContentContext'
 
 interface Toast {
   id: string
@@ -43,6 +44,7 @@ const TOAST_COLORS = {
 } as const
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
+  const { content } = useAppContent()
   const [activeGroupId, setActiveGroupId] = useState<string | null>(null)
   const [toasts, setToasts] = useState<Toast[]>([])
   const memberCache = useRef<Record<string, string>>({})
@@ -79,11 +81,12 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           }
         }
 
-        const label = data.tipo === 'deposicion' ? 'UNA CAGADA' : data.tipo === 'acto_sexual' ? 'UNA CULEADA' : data.tipo === 'meada' ? 'UNA MEADA' : 'UN GYM'
+        const label = content.actividades.find((a) => a.tipo === data.tipo)?.label
+          const toastLabel = label ? `UNA ${label}` : 'UN REGISTRO'
         const toastId = change.doc.id
         const newToast: Toast = {
           id: toastId,
-          message: displayName.toUpperCase() + ' REGISTRO ' + label + '!',
+          message: displayName.toUpperCase() + ' REGISTRO ' + toastLabel + '!',
           type: data.tipo,
           leaving: false,
         }

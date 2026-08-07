@@ -1,11 +1,12 @@
 import { useParams, Navigate } from 'react-router-dom'
-import { getDeckById } from '../data/decks'
 import CardGameEngine from '../components/CardGameEngine'
 import GameHeader from '../../../components/GameHeader'
+import { useAppContent } from '../../../context/ContentContext'
 
 export default function CardGamePage() {
   const { deckId } = useParams<{ deckId: string }>()
-  const deck = deckId ? getDeckById(deckId) : undefined
+  const { getDeck } = useAppContent()
+  const deck = deckId ? getDeck(deckId) : undefined
 
   if (!deck) {
     return <Navigate to="/arcade" replace />
