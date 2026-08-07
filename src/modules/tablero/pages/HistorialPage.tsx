@@ -76,10 +76,10 @@ export default function HistorialPage() {
     return (
       <div className="w-full max-w-md mx-auto p-4 space-y-6">
         <Link
-          to="/"
+          to="/tablero"
           className="bg-white border-4 border-black text-black font-black px-4 py-2 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:bg-gray-200 mb-6 inline-block"
         >
-          VOLVER AL HOME
+          VOLVER AL TABLERO
         </Link>
         <p className="text-sm font-bold text-center text-gray-500 dark:text-gray-400">
           No tienes grupos activos para mostrar su historial.
@@ -93,10 +93,10 @@ export default function HistorialPage() {
   return (
     <div className="w-full max-w-md mx-auto p-4 space-y-4">
       <Link
-        to="/"
+        to="/tablero"
         className="bg-white border-2 border-black text-black font-black px-4 py-2 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:bg-gray-200 mb-6 inline-block"
       >
-        VOLVER AL HOME
+        VOLVER AL TABLERO
       </Link>
 
       <div>
