@@ -9,7 +9,6 @@ import {
   HelpCircle,
   ChevronDown,
   User,
-  Database,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
@@ -92,7 +91,7 @@ export default function SideDrawer({ open, onClose }: Props) {
         }`}
       >
         <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between p-4 border-b-4 border-black dark:border-white bg-yellow-300 dark:bg-yellow-400 shrink-0">
+          <div className="flex items-center justify-between p-4 border-b-4 border-black dark:border-white bg-gradient-to-r from-yellow-300 to-amber-500 shrink-0">
             <h2 className="text-lg font-black uppercase tracking-wider text-black dark:text-gray-900">
               Menu
             </h2>
@@ -137,7 +136,7 @@ export default function SideDrawer({ open, onClose }: Props) {
                 onClose();
                 navigate("/perfil");
               }}
-              className="w-full flex items-center gap-3 px-3 py-3 border-2 border-black dark:border-white bg-white dark:bg-gray-800 font-black uppercase tracking-wider text-sm text-black dark:text-white shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+              className="w-full flex items-center gap-3 px-3 py-3 border-2 border-black dark:border-white bg-gradient-to-r from-gray-200 to-slate-300 dark:from-gray-700 dark:to-gray-600 font-black uppercase tracking-wider text-sm text-gray-900 dark:text-white shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
             >
               <User size={20} strokeWidth={2.5} />
               <span className="flex-1 text-left">MI PERFIL</span>
@@ -145,22 +144,10 @@ export default function SideDrawer({ open, onClose }: Props) {
 
             <button
               onClick={() => {
-                playClickSound();
-                onClose();
-                navigate("/admin");
-              }}
-              className="w-full flex items-center gap-3 px-3 py-3 border-2 border-black dark:border-white bg-white dark:bg-gray-800 font-black uppercase tracking-wider text-sm text-black dark:text-white shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
-            >
-              <Database size={20} strokeWidth={2.5} />
-              <span className="flex-1 text-left">ADMIN SYNC</span>
-            </button>
-
-            <button
-              onClick={() => {
                 playToggleOnSound();
                 setShowManual(!showManual);
               }}
-              className="w-full flex items-center gap-3 px-3 py-3 border-2 border-black dark:border-white bg-white dark:bg-gray-800 font-black uppercase tracking-wider text-sm text-black dark:text-white shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+              className="w-full flex items-center gap-3 px-3 py-3 border-2 border-black dark:border-white bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-500 font-black uppercase tracking-wider text-sm text-gray-900 dark:text-white shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
             >
               <HelpCircle size={20} strokeWidth={2.5} />
               <span className="flex-1 text-left">Como jugar</span>
@@ -194,7 +181,7 @@ export default function SideDrawer({ open, onClose }: Props) {
                 playSwitchSound();
                 toggleTheme();
               }}
-              className="w-full flex items-center gap-3 px-3 py-3 border-2 border-black dark:border-white bg-white dark:bg-gray-800 font-black uppercase tracking-wider text-sm text-black dark:text-white shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+              className="w-full flex items-center gap-3 px-3 py-3 border-2 border-black dark:border-white bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-500 font-black uppercase tracking-wider text-sm text-gray-900 dark:text-white shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
             >
               {theme === "dark" ? (
                 <Sun size={20} strokeWidth={2.5} />
@@ -211,10 +198,10 @@ export default function SideDrawer({ open, onClose }: Props) {
                 playDeleteSound();
                 setShowConfirmLogout(true);
               }}
-              className="w-full flex items-center justify-center gap-3 px-3 py-3 border-2 border-black dark:border-white bg-red-500 text-white font-black uppercase tracking-wider text-sm shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+              className="w-full flex items-center justify-center gap-3 px-3 py-3 border-2 border-black dark:border-white bg-gradient-to-r from-red-500 to-rose-600 text-white font-black uppercase tracking-wider text-sm shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
             >
               <LogOut size={20} strokeWidth={2.5} />
-              <span>Cerrar sesion</span>
+              <span>Cerrar sesión</span>
             </button>
 
             <div className="border-t-4 border-black dark:border-white p-4 -mx-4 -mb-4 bg-gray-200 dark:bg-gray-800">
@@ -243,15 +230,15 @@ export default function SideDrawer({ open, onClose }: Props) {
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
           <div className="w-full max-w-sm border-4 border-black bg-white dark:bg-gray-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 flex items-center justify-center border-2 border-black bg-red-500 text-white">
+              <div className="w-10 h-10 flex items-center justify-center border-2 border-black bg-gradient-to-br from-red-500 to-rose-600 text-white">
                 <LogOut size={20} strokeWidth={2.5} />
               </div>
               <p className="text-lg font-black uppercase tracking-tighter text-black dark:text-white">
-                Cerrar sesion
+                Cerrar sesión
               </p>
             </div>
             <p className="text-sm font-bold text-gray-600 dark:text-gray-400">
-              Estas seguro de que quieres cerrar sesion? Tendras que volver a
+              Estas seguro de que quieres cerrar sesión? Tendras que volver a
               iniciar con Google.
             </p>
             <div className="flex gap-3">
@@ -270,9 +257,9 @@ export default function SideDrawer({ open, onClose }: Props) {
                   setShowConfirmLogout(false);
                   logout();
                 }}
-                className="flex-1 py-3 border-4 border-black bg-red-500 text-white font-black uppercase tracking-wider text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
+                className="flex-1 py-3 border-4 border-black bg-gradient-to-r from-red-500 to-rose-600 text-white font-black uppercase tracking-wider text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
               >
-                Cerrar sesion
+                Cerrar sesión
               </button>
             </div>
           </div>

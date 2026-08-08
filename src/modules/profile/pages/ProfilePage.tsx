@@ -90,7 +90,7 @@ export default function ProfilePage() {
                   onClick={() => { playSwitchSound(); setAvatarType(opt.key) }}
                   className={`flex-1 py-3 border-4 border-black dark:border-white font-black uppercase tracking-wider text-sm transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
                     avatarType === opt.key
-                      ? 'bg-yellow-400 dark:bg-yellow-500 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]'
+                      ? 'bg-gradient-to-r from-yellow-300 to-amber-500 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]'
                       : 'bg-white dark:bg-gray-700 text-black dark:text-white shadow-none'
                   }`}
                 >
@@ -114,11 +114,11 @@ export default function ProfilePage() {
                       onClick={() => { playClickSound(); setAvatarIcon(opt.id) }}
                       className={`w-full aspect-square border-4 border-black dark:border-white flex items-center justify-center transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
                         avatarIcon === opt.id
-                          ? 'bg-yellow-400 dark:bg-yellow-500 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]'
-                          : 'bg-white dark:bg-gray-700 shadow-none'
+                          ? 'bg-gradient-to-br from-fuchsia-500 to-pink-600 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]'
+                          : 'bg-white dark:bg-gray-700 shadow-none hover:bg-gray-100 dark:hover:bg-gray-600'
                       }`}
                     >
-                      <Icon size={24} strokeWidth={2.5} className="text-black" />
+                      <Icon size={24} strokeWidth={2.5} className={avatarIcon === opt.id ? 'text-white' : 'text-black dark:text-white'} />
                     </button>
                   )
                 })}
@@ -135,15 +135,17 @@ export default function ProfilePage() {
                 <button
                   key={color}
                   onClick={() => { playClickSound(); setAvatar(color) }}
-                  className={`w-full aspect-square border-4 border-black dark:border-white flex items-center justify-center transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
+className={`relative w-full aspect-square border-4 border-black dark:border-white flex items-center justify-center transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-none hover:scale-105 ${
                     avatar === color
-                      ? 'shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]'
+                      ? 'shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] outline outline-2 outline-offset-2 outline-white dark:outline-black'
                       : 'shadow-none'
                   }`}
                   style={{ backgroundColor: color }}
                 >
                   {avatar === color && (
-                    <Check size={20} strokeWidth={3} className="text-white drop-shadow-[1px_1px_0px_rgba(0,0,0,1)]" />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                      <Check size={24} strokeWidth={3.5} className="text-white drop-shadow-[1px_1px_0px_rgba(0,0,0,1)]" />
+                    </div>
                   )}
                 </button>
               ))}
@@ -154,7 +156,7 @@ export default function ProfilePage() {
         <button
           onClick={handleSave}
           disabled={saving || !nickname.trim()}
-          className="w-full flex items-center justify-center gap-2 py-5 border-4 border-black dark:border-white bg-yellow-400 dark:bg-yellow-500 text-black font-black uppercase tracking-wider text-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-full flex items-center justify-center gap-2 py-5 border-4 border-black dark:border-white bg-gradient-to-r from-emerald-400 to-teal-600 text-white font-black uppercase tracking-wider text-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {saving ? (
             <span className="animate-pulse">GUARDANDO...</span>
