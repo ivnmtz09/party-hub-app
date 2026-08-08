@@ -35,7 +35,7 @@ export default function MainLayout() {
 
   return (
     <div className="min-h-[100dvh] w-full flex flex-col bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white">
-      <header className="sticky top-0 z-30 bg-yellow-300 dark:bg-yellow-400 border-b-4 border-black dark:border-white">
+      <header className="sticky top-0 z-30 bg-gradient-to-r from-yellow-300 to-amber-500 border-b-4 border-black dark:border-white">
         <div className="flex items-center justify-between h-14 px-4">
           <button
             onClick={() => setDrawerOpen(true)}
