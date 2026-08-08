@@ -5,8 +5,9 @@ import MainLayout from '../layouts/MainLayout'
 import ArcadePage from '../modules/arcade/pages/ArcadePage'
 import CardGamePage from '../modules/arcade/pages/CardGamePage'
 import RouletaPage from '../modules/arcade/pages/RouletaPage'
-import BombaPage from '../modules/arcade/pages/BombaPage'
+import BombaLobby from '../modules/arcade/pages/BombaLobby'
 import DedoLlagaLobby from '../modules/arcade/pages/DedoLlagaLobby'
+import YoNuncaLobby from '../modules/arcade/pages/YoNuncaLobby'
 import CodigoSecretoLobby from '../modules/arcade/pages/CodigoSecretoLobby'
 import FrenteLobby from '../modules/arcade/pages/FrenteLobby'
 import ImpostorGameHub from '../modules/arcade/pages/ImpostorGameHub'
@@ -14,6 +15,7 @@ import TableroPage from '../modules/tablero/pages/TableroPage'
 import HistorialPage from '../modules/tablero/pages/HistorialPage'
 import MuralPage from '../modules/mural/pages/MuralPage'
 import HomePage from '../modules/home/pages/Home'
+import UpdatePage from '../modules/home/pages/UpdatePage'
 import NotFound from '../pages/NotFound'
 import RegistroPage from '../pages/RegistroPage'
 import ProfilePage from '../modules/profile/pages/ProfilePage'
@@ -59,6 +61,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/home" replace /> },
       { path: 'home', element: <HomePage /> },
+      { path: 'novedades', element: <UpdatePage /> },
       { path: 'arcade', element: <ArcadePage /> },
       { path: 'tablero', element: <TableroPage /> },
       { path: 'mural', element: <MuralPage /> },
@@ -84,6 +87,14 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    path: '/arcade/yo-nunca',
+    element: (
+      <ProtectedRoute>
+        <YoNuncaLobby />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: '/arcade/juego',
     element: (
       <ProtectedRoute>
@@ -103,7 +114,7 @@ export const router = createBrowserRouter([
     path: '/arcade/bomba',
     element: (
       <ProtectedRoute>
-        <BombaPage />
+        <BombaLobby />
       </ProtectedRoute>
     ),
   },

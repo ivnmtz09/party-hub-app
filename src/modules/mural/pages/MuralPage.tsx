@@ -49,6 +49,19 @@ function tiempoRelativo(ts: Timestamp | null): string {
   return `hace ${Math.floor(dias / 30)}mes`
 }
 
+const SUCESO_GRADIENTS: Record<string, string> = {
+  subi_peso: 'from-red-500 to-rose-600 text-white',
+  baje_peso: 'from-green-400 to-emerald-600 text-white',
+  comi_saludable: 'from-lime-400 to-green-500 text-black',
+  comi_chatarra: 'from-orange-400 to-red-500 text-white',
+  dormi_bien: 'from-cyan-300 to-blue-600 text-white',
+  dormi_mal: 'from-slate-400 to-gray-600 text-white',
+  gane_plata: 'from-green-400 to-emerald-600 text-white',
+  gaste_plata: 'from-yellow-300 to-amber-500 text-black',
+  hice_deberes: 'from-blue-300 to-indigo-600 text-white',
+  procrastine: 'from-pink-400 to-fuchsia-600 text-white',
+}
+
 export default function MuralPage() {
   const { user, userProfile } = useAuth()
   const { activeGroupId, setActiveGroupId } = useNotification()
@@ -267,7 +280,7 @@ export default function MuralPage() {
         </h3>
         <button
           onClick={handleAgua}
-          className="w-full flex items-center justify-center gap-2 py-4 border-4 border-black bg-blue-400 dark:bg-blue-500 text-black dark:text-gray-900 font-black uppercase tracking-wider text-sm shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none active:translate-y-1 active:shadow-none transition-all"
+          className="w-full flex items-center justify-center gap-2 py-4 border-4 border-black bg-gradient-to-r from-blue-400 to-cyan-500 text-white font-black uppercase tracking-wider text-sm shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none active:translate-y-1 active:shadow-none transition-all"
         >
           <Droplet size={20} strokeWidth={2.5} />
           +1 VASO DE AGUA (200ml)
@@ -368,11 +381,12 @@ export default function MuralPage() {
         <div className="grid grid-cols-2 gap-3">
           {sucesos.map((suceso) => {
             const Icon = Icono(suceso.icon)
+            const grad = SUCESO_GRADIENTS[suceso.type] ?? suceso.bg
             return (
               <button
                 key={suceso.type}
                 onClick={() => handleSuceso(suceso.type)}
-                className={`flex items-center justify-center gap-2 py-4 px-3 border-4 border-black ${suceso.bg} font-black uppercase tracking-wider text-xs shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none active:translate-y-1 active:shadow-none transition-all`}
+                className={`flex items-center justify-center gap-2 py-4 px-3 bg-gradient-to-br border-4 border-black ${grad} font-black uppercase tracking-wider text-xs min-h-16 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none active:translate-y-1 active:shadow-none transition-all`}
               >
                 <Icon size={18} strokeWidth={2.5} />
                 {suceso.label}
@@ -415,7 +429,7 @@ export default function MuralPage() {
                       playClickSound()
                       setExpandedId(expandedId === ev.id ? null : (ev.id ?? null))
                     }}
-                    className="px-3 py-1.5 border-2 border-black dark:border-white bg-yellow-300 dark:bg-yellow-500 text-black font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all"
+                    className="px-3 py-1.5 border-2 border-black dark:border-white bg-gradient-to-r from-amber-300 to-yellow-500 text-black font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all"
                   >
                     {expandedId === ev.id ? 'OCULTAR' : 'VER REGISTRO'}
                   </button>
@@ -446,13 +460,13 @@ export default function MuralPage() {
                           <button
                             onClick={handleGuardarEdicion}
                             disabled={editingSaving}
-                            className="p-2 border-2 border-black bg-emerald-400 dark:bg-emerald-500 text-black font-black uppercase shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50"
+                            className="p-2 border-2 border-black bg-gradient-to-br from-emerald-400 to-teal-600 text-white font-black uppercase shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50"
                           >
                             {editingSaving ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}
                           </button>
                           <button
                             onClick={handleCancelarEdicion}
-                            className="p-2 border-2 border-black bg-pink-300 dark:bg-pink-500 text-black font-black uppercase shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all"
+                            className="p-2 border-2 border-black bg-gradient-to-br from-pink-400 to-rose-600 text-white font-black uppercase shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all"
                           >
                             <X size={14} />
                           </button>
@@ -493,13 +507,13 @@ export default function MuralPage() {
                               <>
                                 <button
                                   onClick={() => handleEditar(ev)}
-                                  className="p-2 border-2 border-black dark:border-white bg-cyan-300 dark:bg-cyan-500 text-black font-black shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all flex items-center justify-center"
+                                  className="p-2 border-2 border-black dark:border-white bg-gradient-to-br from-cyan-300 to-blue-600 text-white font-black shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all flex items-center justify-center"
                                 >
                                   <Pencil size={12} strokeWidth={2.5} />
                                 </button>
                                 <button
                                   onClick={() => handleConfirmarBorrado(ev)}
-                                  className="p-2 border-2 border-black dark:border-white bg-red-300 dark:bg-red-500 text-black dark:text-gray-900 font-black shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all flex items-center justify-center"
+                                  className="p-2 border-2 border-black dark:border-white bg-gradient-to-br from-red-400 to-rose-600 text-white font-black shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all flex items-center justify-center"
                                 >
                                   <Trash2 size={12} strokeWidth={2.5} />
                                 </button>

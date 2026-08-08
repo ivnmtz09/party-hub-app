@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Hand, Loader2, Crown } from 'lucide-react'
 import {
   emitirVotoDedo,
@@ -7,6 +7,7 @@ import {
   type DedoRoom,
 } from '../../../firebase/services'
 import GameHeader from '../../../components/GameHeader'
+import GameInfoModal from '../../../components/GameInfoModal'
 import UserAvatar from '../../../components/UserAvatar'
 import type { DeckContenido } from '../../../firebase/content'
 
@@ -55,6 +56,15 @@ export default function DedoLlagaOnline({
   const totalVotes = Object.keys(votes).length
   const myVote = votes[userId] ?? null
   const hasVotedLocal = useRef(false)
+  const [showInfo, setShowInfo] = useState(false)
+
+  const rules = [
+    'Lee la carta en voz alta: "¿Quien es mas probable que...?"',
+    'Cada jugador vota por quien cree que haria lo que dice la carta.',
+    'El mas votado recibe la penitencia: un shot.',
+    'En caso de empate, los empatados se toman un shot.',
+    'El anfitrion avanza a la siguiente carta con SIGUIENTE CARTA.',
+  ]
 
   useEffect(() => {
     if (hasVotedLocal.current && !myVote) {
@@ -115,7 +125,7 @@ export default function DedoLlagaOnline({
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col p-4 sm:p-6 transition-colors">
         <div className="w-full max-w-md mx-auto pt-2 pb-8">
-          <GameHeader title="¿Quién Es Más Probable...?" backTo="/arcade" />
+          <GameHeader title="¿Quién Es Más Probable...?" backTo="/arcade" onInfo={() => setShowInfo(true)} />
         </div>
 
         <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md mx-auto pb-12 gap-6">
@@ -198,7 +208,7 @@ export default function DedoLlagaOnline({
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col p-4 sm:p-6 transition-colors">
       <div className="w-full max-w-3xl mx-auto pt-2 pb-8">
-        <GameHeader title="¿Quién Es Más Probable...?" backTo="/arcade" />
+        <GameHeader title="¿Quién Es Más Probable...?" backTo="/arcade" onInfo={() => setShowInfo(true)} />
       </div>
 
       <div className="flex-1 flex flex-col items-center w-full max-w-3xl mx-auto pb-12">
@@ -250,6 +260,14 @@ export default function DedoLlagaOnline({
           </>
         )}
       </div>
+
+      {showInfo && (
+        <GameInfoModal
+          title="¿Quién Es Más Probable...?"
+          rules={rules}
+          onClose={() => setShowInfo(false)}
+        />
+      )}
     </div>
   )
 }

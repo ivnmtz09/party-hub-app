@@ -6,6 +6,8 @@ import {
 import { playWinSound, playTapSound } from '../../../utils/audio'
 import { useAppContent } from '../../../context/ContentContext'
 import GameHeader from '../../../components/GameHeader'
+import GameInfoModal from '../../../components/GameInfoModal'
+import { FRENTE_RULES } from '../data/frenteRules'
 import { Check, X as XIcon, Trophy, Play, Clock } from 'lucide-react'
 
 interface Props {
@@ -35,6 +37,8 @@ export default function FrenteGame({ room, roomCode, onLeave }: Props) {
   const [namesRemaining, setNamesRemaining] = useState<string[]>(() => shuffleArray(famosos))
   const [nameIndex, setNameIndex] = useState(0)
   const [sending, setSending] = useState(false)
+  const [showInfo, setShowInfo] = useState(false)
+  const [scorePop, setScorePop] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const currentTeam = room.teams[room.currentTeam]
   const isFinished = room.phase === 'finished'
@@ -112,6 +116,8 @@ export default function FrenteGame({ room, roomCode, onLeave }: Props) {
     if (localPhase !== 'playing') return
     playWinSound()
     setScore((prev) => prev + 1)
+    setScorePop(true)
+    setTimeout(() => setScorePop(false), 600)
     advanceName()
   }
 
@@ -127,7 +133,7 @@ export default function FrenteGame({ room, roomCode, onLeave }: Props) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col p-4 sm:p-6 transition-colors">
         <div className="w-full max-w-md mx-auto pt-2 pb-8">
-          <GameHeader title="Frente a Frente" backTo="/arcade" />
+          <GameHeader title="Frente a Frente" backTo="/arcade" onInfo={() => setShowInfo(true)} />
         </div>
 
         <div className="flex-1 w-full max-w-md mx-auto flex flex-col gap-6">
@@ -180,7 +186,7 @@ export default function FrenteGame({ room, roomCode, onLeave }: Props) {
       {localPhase === 'waiting' && (
         <div className="h-screen flex flex-col p-4 sm:p-6">
           <div className="w-full max-w-md mx-auto pt-2 pb-8">
-            <GameHeader title="Frente a Frente" backTo="/arcade" />
+            <GameHeader title="Frente a Frente" backTo="/arcade" onInfo={() => setShowInfo(true)} />
           </div>
 
           <div className="flex-1 w-full max-w-md mx-auto flex flex-col items-center justify-center gap-8">
@@ -242,7 +248,7 @@ export default function FrenteGame({ room, roomCode, onLeave }: Props) {
             <span className="text-lg font-black text-black dark:text-white">{timeLeft}s</span>
           </div>
           <div className="absolute top-4 right-4 z-40 flex items-center gap-2 border-2 border-black dark:border-white bg-white dark:bg-gray-800 px-3 py-1.5">
-            <span className="text-lg font-black text-purple-500 dark:text-purple-400">{score}</span>
+             <span className={`text-lg font-black text-purple-500 dark:text-purple-400 transition-transform ${scorePop ? 'scale-125 animate-pop' : ''}`}>{score}</span>
           </div>
 
           {/* Rotated content (for forehead mode) */}
@@ -252,7 +258,7 @@ export default function FrenteGame({ room, roomCode, onLeave }: Props) {
           >
             <p
               key={currentName}
-              className="text-6xl sm:text-7xl md:text-8xl font-black uppercase text-center text-black dark:text-white px-8 leading-tight"
+               className="text-6xl sm:text-7xl md:text-8xl font-black uppercase text-center text-black dark:text-white px-8 leading-tight animate-charade-flip"
             >
               {currentName}
             </p>
@@ -308,6 +314,8 @@ export default function FrenteGame({ room, roomCode, onLeave }: Props) {
           </div>
         </div>
       )}
+
+      {showInfo && <GameInfoModal title="FRENTE A FRENTE" rules={FRENTE_RULES} onClose={() => setShowInfo(false)} />}
     </div>
   )
 }

@@ -178,7 +178,7 @@ export default function TableroPage() {
         </p>
         <Link
           to="/home"
-          className="w-full flex items-center justify-center gap-3 py-4 border-4 border-black dark:border-white bg-yellow-300 dark:bg-yellow-400 text-black font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-y-1 active:shadow-none transition-all"
+          className="w-full flex items-center justify-center gap-3 py-4 border-4 border-black dark:border-white bg-gradient-to-r from-yellow-300 to-amber-500 text-black font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-y-1 active:shadow-none transition-all"
         >
           IR A HOME PARA SELECCIONAR UN GRUPO
         </Link>
@@ -218,7 +218,7 @@ export default function TableroPage() {
       <button
         onClick={() => { playOpenSound(); setShowInlineForm(!showInlineForm) }}
         disabled={isSubmitting}
-        className={`w-full flex items-center justify-center gap-3 py-6 border-4 border-black dark:border-white bg-emerald-400 dark:bg-emerald-500 text-black font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed text-lg ${showInlineForm ? 'border-b-0 rounded-b-none' : ''}`}
+        className={`w-full flex items-center justify-center gap-3 py-6 border-4 border-black dark:border-white bg-gradient-to-r from-emerald-400 to-teal-600 text-white font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed text-lg ${showInlineForm ? 'border-b-0 rounded-b-none' : ''}`}
       >
         {showInlineForm ? <X size={24} strokeWidth={2.5} /> : <Plus size={24} strokeWidth={2.5} />}
         {showInlineForm ? 'CERRAR' : 'CREAR NUEVO REGISTRO'}
@@ -244,7 +244,7 @@ export default function TableroPage() {
 
       <Link
         to="/historial"
-        className="w-full flex items-center justify-center py-3 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+        className="w-full flex items-center justify-center py-3 px-4 border-4 border-black dark:border-white bg-gradient-to-r from-cyan-400 to-blue-600 text-white font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
       >
         {eventos.length >= 300 ? 'VER ÚLTIMOS 300 REGISTROS' : 'VER TODOS LOS REGISTROS'}
       </Link>

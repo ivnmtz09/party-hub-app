@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import ImpostorCard from '../components/ImpostorCard'
 import GameHeader from '../../../components/GameHeader'
+import GameInfoModal from '../../../components/GameInfoModal'
 import { useGame } from '../context/GameContext'
+import { IMPOSTOR_RULES } from '../data/impostorRules'
 
 export default function RoleRevealPage() {
   const { state, nextPhase } = useGame()
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [showInfo, setShowInfo] = useState(false)
 
   if (!state || state.phase !== 'Reveal') {
     return (
@@ -31,7 +34,7 @@ export default function RoleRevealPage() {
 
   return (
     <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col animate-fade-in-up">
-      <GameHeader title="El Impostor" backTo="/arcade" />
+      <GameHeader title="El Impostor" backTo="/arcade" onInfo={() => setShowInfo(true)} />
       <div className="flex-1 flex flex-col items-center justify-center gap-6 max-w-md mx-auto w-full p-4">
         <div className="text-center">
           <p className="text-xs font-black uppercase tracking-widest text-fuchsia-500 dark:text-fuchsia-400">
@@ -62,6 +65,14 @@ export default function RoleRevealPage() {
           Asegurate de que los demas jugadores no vean la pantalla en el momento de tu rol
         </p>
       </div>
+
+      {showInfo && (
+        <GameInfoModal
+          title="El Impostor"
+          rules={IMPOSTOR_RULES}
+          onClose={() => setShowInfo(false)}
+        />
+      )}
     </div>
   )
 }

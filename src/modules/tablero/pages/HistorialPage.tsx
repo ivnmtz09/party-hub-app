@@ -113,7 +113,7 @@ export default function HistorialPage() {
       <div className="sticky top-0 z-30">
         <button
           onClick={() => { showCreateForm ? playCloseSound() : playOpenSound(); setShowCreateForm((prev) => !prev) }}
-          className="w-full flex items-center justify-center gap-3 py-3 border-4 border-black dark:border-white bg-emerald-400 dark:bg-emerald-500 text-black font-black uppercase tracking-wider shadow-[4px_4px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
+          className="w-full flex items-center justify-center gap-3 py-3 border-4 border-black dark:border-white bg-gradient-to-r from-emerald-400 to-teal-600 text-white font-black uppercase tracking-wider shadow-[4px_4px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
         >
           <Plus size={20} strokeWidth={2.5} />
           {showCreateForm ? 'CERRAR FORMULARIO' : 'NUEVO REGISTRO'}

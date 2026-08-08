@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Check, Copy, FolderPlus, Loader2, LogIn, Settings, Users } from 'lucide-react'
 import { useAuth } from '../../../context/AuthContext'
 import { useNotification } from '../../../context/NotificationContext'
@@ -13,10 +14,12 @@ import Skeleton from '../../../components/Skeleton'
 import MembersList from '../../tablero/components/MembersList'
 import CreateGroupModal from '../../tablero/components/CreateGroupModal'
 import GroupSettingsModal from '../../tablero/components/GroupSettingsModal'
+import { UPDATE_CARDS_STORAGE_KEY } from '../data/updateCards'
 import { playOpenSound, playClickSound, playCloseSound, playCopySound, playSuccessSound } from '../../../utils/audio'
 export default function Home() {
   const { user } = useAuth()
   const { activeGroupId, setActiveGroupId } = useNotification()
+  const navigate = useNavigate()
   const [grupos, setGrupos] = useState<Grupo[]>([])
   const [miembros, setMiembros] = useState<Miembro[]>([])
   const [initialized, setInitialized] = useState(false)
@@ -50,6 +53,12 @@ export default function Home() {
     })
     return unsub
   }, [activeGroupId])
+
+  useEffect(() => {
+    if (!user) return
+    const seen = localStorage.getItem(UPDATE_CARDS_STORAGE_KEY(user.uid))
+    if (!seen) navigate('/novedades')
+  }, [user, navigate])
 
   const activeGroup = grupos.find((g) => g.id === activeGroupId)
 
@@ -97,14 +106,14 @@ export default function Home() {
       <div className="flex flex-col gap-3">
         <button
           onClick={() => { playOpenSound(); setShowCreateGroup(true) }}
-          className="w-full flex items-center justify-center gap-3 py-5 border-4 border-black dark:border-white bg-emerald-300 dark:bg-emerald-500 text-black dark:text-gray-900 font-black uppercase tracking-wider shadow-[4px_4px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
+          className="w-full flex items-center justify-center gap-3 py-5 border-4 border-black dark:border-white bg-gradient-to-r from-emerald-400 to-teal-600 text-white font-black uppercase tracking-wider shadow-[4px_4px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
         >
           <FolderPlus size={22} strokeWidth={2.5} />
           Crear Nuevo Grupo
         </button>
         <button
           onClick={() => { playClickSound(); setIsJoinDropdownOpen((prev) => !prev) }}
-          className="w-full flex items-center justify-center gap-3 py-5 border-4 border-black dark:border-white bg-blue-300 dark:bg-blue-500 text-black dark:text-gray-900 font-black uppercase tracking-wider shadow-[4px_4px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
+          className="w-full flex items-center justify-center gap-3 py-5 border-4 border-black dark:border-white bg-gradient-to-r from-blue-400 to-indigo-600 text-white font-black uppercase tracking-wider shadow-[4px_4px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
         >
           <LogIn size={22} strokeWidth={2.5} />
           Unirse a un Grupo
@@ -128,7 +137,7 @@ export default function Home() {
             <button
               onClick={handleJoin}
               disabled={joinLoading || joinCodigo.trim().length !== 6}
-              className="w-full flex items-center justify-center gap-2 bg-yellow-400 dark:bg-yellow-500 border-4 border-black dark:border-white font-black uppercase p-3 hover:translate-y-1 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-300 to-amber-500 border-4 border-black dark:border-white font-black uppercase p-3 hover:translate-y-1 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {joinLoading ? (
                 <Loader2 size={18} className="animate-spin" strokeWidth={2.5} />

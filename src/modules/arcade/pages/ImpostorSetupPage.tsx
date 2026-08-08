@@ -11,9 +11,11 @@ import {
   HelpCircle,
 } from 'lucide-react'
 import GameHeader from '../../../components/GameHeader'
+import GameInfoModal from '../../../components/GameInfoModal'
 import { useGame } from '../context/GameContext'
 import { useAppContent } from '../../../context/ContentContext'
 import { Icono } from '../../../config/iconos'
+import { IMPOSTOR_RULES } from '../data/impostorRules'
 
 const MAX_IMPOSTORS = 3
 
@@ -35,6 +37,7 @@ export default function ImpostorSetupPage() {
   })
   const [impostorCount, setImpostorCount] = useState(1)
   const [cluesEnabled, setCluesEnabled] = useState(true)
+  const [showInfo, setShowInfo] = useState(false)
 
   useEffect(() => {
     cargarPartidaImpostor().then((saved) => {
@@ -87,7 +90,7 @@ export default function ImpostorSetupPage() {
   return (
     <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white">
       <div className="w-full max-w-md mx-auto p-4 space-y-5">
-        <GameHeader title="El Impostor" backTo="/arcade" />
+        <GameHeader title="El Impostor" backTo="/arcade" onInfo={() => setShowInfo(true)} />
         <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center">
           Configura la partida en un solo celular
         </p>
@@ -252,6 +255,14 @@ export default function ImpostorSetupPage() {
           Iniciar Partida
         </button>
       </div>
+
+      {showInfo && (
+        <GameInfoModal
+          title="El Impostor"
+          rules={IMPOSTOR_RULES}
+          onClose={() => setShowInfo(false)}
+        />
+      )}
     </div>
   )
 }

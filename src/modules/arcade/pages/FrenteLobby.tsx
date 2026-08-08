@@ -11,25 +11,35 @@ import {
   type FrenteRoom,
 } from '../../../firebase/services'
 import GameHeader from '../../../components/GameHeader'
+import GameInfoModal from '../../../components/GameInfoModal'
+import UserAvatar, { type AvatarType } from '../../../components/UserAvatar'
 import FrenteGame from './FrenteGame'
 import { Users, Plus, LogIn, Copy, Check, Loader2, X, Shuffle } from 'lucide-react'
+import { FRENTE_RULES } from '../data/frenteRules'
+import CreateRoomButton from '../components/CreateRoomButton'
 
 type LobbyPhase = 'menu' | 'joining' | 'inside'
 
 export default function FrenteLobby() {
   const { user, userProfile } = useAuth()
+  const userId = user?.uid ?? ''
+  const avatarColor = userProfile?.avatar || '#a78bfa'
+  const avatarType = userProfile?.avatarType || 'letter'
+  const avatarIcon = userProfile?.avatarIcon || 'Users'
+  const perfilName = userProfile?.nickname || user?.displayName || ''
   const [phase, setPhase] = useState<LobbyPhase>('menu')
   const [roomCode, setRoomCode] = useState('')
-  const [nameInput, setNameInput] = useState('')
+  const [nameInput, setNameInput] = useState(perfilName)
   const [codeInput, setCodeInput] = useState('')
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
   const [room, setRoom] = useState<FrenteRoom | null>(null)
   const [loading, setLoading] = useState(false)
+  const [showInfo, setShowInfo] = useState(false)
 
-  const userId = user?.uid ?? ''
-  const displayName = userProfile?.nickname || user?.displayName || (nameInput.trim() || 'Invitado')
+  const displayName = perfilName || nameInput.trim() || 'Invitado'
   const isHost = room?.hostId === userId
+  const rules = FRENTE_RULES
 
   useEffect(() => {
     if (!roomCode) return
@@ -44,7 +54,7 @@ export default function FrenteLobby() {
     setLoading(true)
     setError('')
     try {
-      const code = await crearSalaFrente(userId, displayName)
+      const code = await crearSalaFrente(userId, displayName, avatarColor, avatarType, avatarIcon)
       setRoomCode(code)
       setPhase('inside')
     } catch {
@@ -55,11 +65,20 @@ export default function FrenteLobby() {
   }
 
   const handleJoin = async () => {
-    if (!userId || codeInput.trim().length !== 4 || !nameInput.trim()) return
+    if (!userId || codeInput.trim().length !== 4) return
+    const joinName = nameInput.trim() || perfilName || 'Invitado'
     setLoading(true)
     setError('')
     try {
-      await unirseSalaFrente(codeInput.trim().toUpperCase(), userId, nameInput.trim(), 0)
+      await unirseSalaFrente(
+        codeInput.trim().toUpperCase(),
+        userId,
+        joinName,
+        0,
+        avatarColor,
+        avatarType,
+        avatarIcon,
+      )
       setRoomCode(codeInput.trim().toUpperCase())
       setPhase('inside')
     } catch (e) {
@@ -120,14 +139,15 @@ export default function FrenteLobby() {
     const myTeamIndex = myPlayer?.teamIndex ?? 0
 
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col p-4 sm:p-6 transition-colors">
+      <>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col p-4 sm:p-6 transition-colors">
         <div className="w-full max-w-md mx-auto pt-2 pb-8">
-          <GameHeader title="Frente a Frente" backTo="/arcade" />
+          <GameHeader title="Frente a Frente" backTo="/arcade" onInfo={() => setShowInfo(true)} />
         </div>
 
         <div className="flex-1 w-full max-w-md mx-auto flex flex-col gap-6">
           <div className="text-center">
-            <div className="w-16 h-16 border-4 border-black dark:border-white bg-purple-300 dark:bg-purple-500 flex items-center justify-center mx-auto mb-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+            <div className="w-16 h-16 border-4 border-black dark:border-white bg-purple-300 dark:bg-purple-500 flex items-center justify-center mx-auto mb-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] animate-pulse">
               <Users size={32} strokeWidth={2.5} className="text-black dark:text-gray-900" />
             </div>
             <p className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
@@ -199,8 +219,16 @@ export default function FrenteLobby() {
                       {teamPlayers.map((p) => (
                         <span
                           key={p.id}
-                          className="text-[10px] font-bold uppercase tracking-wider bg-white dark:bg-gray-600 border border-black dark:border-white px-1.5 py-0.5 text-black dark:text-white"
+                          className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-white dark:bg-gray-600 border border-black dark:border-white px-1.5 py-0.5 text-black dark:text-white"
                         >
+                          <UserAvatar
+                            color={p.avatar}
+                            type={p.avatarType as AvatarType | undefined}
+                            avatarIcon={p.avatarIcon}
+                            name={p.name}
+                            size={14}
+                            className="border border-black dark:border-white"
+                          />
                           {p.name.split(' ')[0]}
                           {p.id === room.hostId && ' (Host)'}
                         </span>
@@ -252,28 +280,28 @@ export default function FrenteLobby() {
           </button>
         </div>
       </div>
+
+      {showInfo && <GameInfoModal title="FRENTE A FRENTE" rules={rules} onClose={() => setShowInfo(false)} />}
+      </>
     )
   }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col p-4 sm:p-6 text-black dark:text-white transition-colors">
       <div className="w-full max-w-md mx-auto pt-2 pb-8">
-        <GameHeader title="FRENTE A FRENTE" backTo="/arcade" />
+        <GameHeader title="FRENTE A FRENTE" backTo="/arcade" onInfo={() => setShowInfo(true)} />
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md mx-auto pb-12 gap-6">
-        <button
+        <CreateRoomButton
+          themeId="frente"
           onClick={handleCreate}
-          disabled={loading || !userId}
-          className="w-full flex flex-col items-center justify-center gap-4 py-10 border-4 border-black dark:border-white bg-purple-400 dark:bg-purple-500 text-black dark:text-gray-900 font-black uppercase tracking-wider shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          {loading ? (
-            <Loader2 size={28} className="animate-spin" strokeWidth={2.5} />
-          ) : (
-            <Plus size={28} strokeWidth={2.5} />
-          )}
-          <span className="text-xl">CREAR SALA</span>
-        </button>
+          disabled={!userId}
+          loading={loading}
+          title="CREAR SALA"
+          subtitle="Charadas en equipo con el celular en la frente"
+          icon={<Plus size={24} strokeWidth={2.5} />}
+        />
 
         {phase === 'joining' ? (
           <div className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] space-y-4">
@@ -326,6 +354,8 @@ export default function FrenteLobby() {
           </button>
         )}
       </div>
+
+      {showInfo && <GameInfoModal title="FRENTE A FRENTE" rules={rules} onClose={() => setShowInfo(false)} />}
     </div>
   )
 }

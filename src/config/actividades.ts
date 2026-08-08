@@ -53,6 +53,17 @@ export function getActividad(tipo: string): Actividad {
   return ACTIVIDADES_DEFAULT.find((a) => a.tipo === tipo) ?? ACTIVIDADES_DEFAULT[0]!
 }
 
+export const ACTIVIDAD_GRADIENTS: Record<string, string> = {
+  deposicion: 'from-orange-400 to-red-500',
+  acto_sexual: 'from-pink-400 to-fuchsia-600',
+  meada: 'from-yellow-300 to-amber-500',
+  gym: 'from-cyan-400 to-blue-600',
+}
+
+export function getActividadGradient(tipo: string): string {
+  return ACTIVIDAD_GRADIENTS[tipo] ?? 'from-gray-400 to-gray-600'
+}
+
 export function getLabelActividad(tipo: string): string {
   return getActividad(tipo).label
 }

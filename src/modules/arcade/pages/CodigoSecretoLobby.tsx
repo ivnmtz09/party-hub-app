@@ -10,7 +10,11 @@ import {
   type CodigoRoom,
 } from '../../../firebase/services'
 import GameHeader from '../../../components/GameHeader'
+import GameInfoModal from '../../../components/GameInfoModal'
+import UserAvatar, { type AvatarType } from '../../../components/UserAvatar'
 import CodigoSecretoGame from './CodigoSecretoGame'
+import { CODIGO_RULES } from '../data/codigoRules'
+import CreateRoomButton from '../components/CreateRoomButton'
 import { Users, Plus, LogIn, Copy, Check, Loader2, X, Shuffle, Lock, Unlock } from 'lucide-react'
 
 function generarCodigoAleatorio(): string {
@@ -28,19 +32,25 @@ export default function CodigoSecretoLobby() {
   const { user, userProfile } = useAuth()
   const [phase, setPhase] = useState<LobbyPhase>('menu')
   const [roomCode, setRoomCode] = useState('')
-  const [nameInput, setNameInput] = useState('')
+  const [nameInput, setNameInput] = useState(userProfile?.nickname || user?.displayName || '')
   const [codeInput, setCodeInput] = useState('')
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
   const [room, setRoom] = useState<CodigoRoom | null>(null)
   const [loading, setLoading] = useState(false)
+  const [showInfo, setShowInfo] = useState(false)
 
   const [secretDigits, setSecretDigits] = useState<string[]>(['', '', '', ''])
   const secretInputRefs = useRef<(HTMLInputElement | null)[]>([])
 
+  const avatarColor = userProfile?.avatar || '#3b82f6'
+  const avatarType = (userProfile?.avatarType || 'letter') as AvatarType
+  const avatarIcon = userProfile?.avatarIcon || 'Users'
+  const perfilName = userProfile?.nickname || user?.displayName || ''
   const userId = user?.uid ?? ''
-  const displayName = userProfile?.nickname || user?.displayName || (nameInput.trim() || 'Invitado')
+  const displayName = perfilName || nameInput.trim() || 'Invitado'
   const isHost = room?.hostId === userId
+  const rules = CODIGO_RULES
 
   useEffect(() => {
     if (!roomCode) return
@@ -55,7 +65,7 @@ export default function CodigoSecretoLobby() {
     setLoading(true)
     setError('')
     try {
-      const code = await crearSalaCodigo(userId, displayName)
+      const code = await crearSalaCodigo(userId, displayName, avatarColor, avatarType, avatarIcon)
       setRoomCode(code)
       setPhase('inside')
     } catch {
@@ -66,11 +76,18 @@ export default function CodigoSecretoLobby() {
   }
 
   const handleJoin = async () => {
-    if (!userId || codeInput.trim().length !== 4 || !nameInput.trim()) return
+    if (!userId || codeInput.trim().length !== 4) return
     setLoading(true)
     setError('')
     try {
-      await unirseSalaCodigo(codeInput.trim().toUpperCase(), userId, nameInput.trim())
+      await unirseSalaCodigo(
+        codeInput.trim().toUpperCase(),
+        userId,
+        nameInput.trim() || perfilName || 'Invitado',
+        avatarColor,
+        avatarType,
+        avatarIcon,
+      )
       setRoomCode(codeInput.trim().toUpperCase())
       setPhase('inside')
     } catch (e) {
@@ -172,7 +189,7 @@ export default function CodigoSecretoLobby() {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col p-4 sm:p-6 transition-colors">
         <div className="w-full max-w-md mx-auto pt-2 pb-8">
-          <GameHeader title="Codigo Secreto" backTo="/arcade" />
+                   <GameHeader title="Codigo Secreto" backTo="/arcade" onInfo={() => setShowInfo(true)} />
         </div>
 
         <div className="flex-1 w-full max-w-md mx-auto flex flex-col gap-6">
@@ -217,24 +234,22 @@ export default function CodigoSecretoLobby() {
                   Jugadores ({room.players.length}/2)
                 </p>
                 <div className="space-y-2">
-                  {room.players.map((p) => (
-                    <div
-                      key={p.id}
-                      className="flex items-center gap-3 border-2 border-black dark:border-white bg-gray-50 dark:bg-gray-700 px-3 py-2"
-                    >
-                      <div className="w-8 h-8 border-2 border-black dark:border-white bg-cyan-300 dark:bg-cyan-500 flex items-center justify-center text-xs font-black text-black dark:text-gray-900">
-                        {p.name.charAt(0).toUpperCase()}
-                      </div>
-                      <span className="font-bold text-sm uppercase tracking-wider text-black dark:text-white">
-                        {p.name.split(' ')[0]}
-                        {p.id === room.hostId && (
-                          <span className="text-[10px] text-cyan-500 dark:text-cyan-400 ml-2">
-                            (Anfitrion)
-                          </span>
-                        )}
-                      </span>
-                    </div>
-                  ))}
+                   {room.players.map((p) => (
+                     <div
+                       key={p.id}
+                       className="flex items-center gap-3 border-2 border-black dark:border-white bg-gray-50 dark:bg-gray-700 px-3 py-2"
+                     >
+                       <UserAvatar color={p.avatar || '#3b82f6'} type={p.avatarType as AvatarType | undefined} avatarIcon={p.avatarIcon} name={p.name} size={20} />
+                       <span className="font-bold text-sm uppercase tracking-wider text-black dark:text-white">
+                         {p.name.split(' ')[0]}
+                         {p.id === room.hostId && (
+                           <span className="text-[10px] text-cyan-500 dark:text-cyan-400 ml-2">
+                             (Anfitrion)
+                           </span>
+                         )}
+                       </span>
+                     </div>
+                   ))}
                 </div>
               </div>
 
@@ -382,6 +397,8 @@ export default function CodigoSecretoLobby() {
             </>
           )}
         </div>
+
+        {showInfo && <GameInfoModal title="Codigo Secreto" rules={rules} onClose={() => setShowInfo(false)} />}
       </div>
     )
   }
@@ -389,22 +406,19 @@ export default function CodigoSecretoLobby() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col p-4 sm:p-6 text-black dark:text-white transition-colors">
       <div className="w-full max-w-md mx-auto pt-2 pb-8">
-        <GameHeader title="CODIGO SECRETO" backTo="/arcade" />
+        <GameHeader title="CODIGO SECRETO" backTo="/arcade" onInfo={() => setShowInfo(true)} />
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md mx-auto pb-12 gap-6">
-        <button
+        <CreateRoomButton
+          themeId="codigo-secreto"
           onClick={handleCreate}
-          disabled={loading || !userId}
-          className="w-full flex flex-col items-center justify-center gap-4 py-10 border-4 border-black dark:border-white bg-cyan-400 dark:bg-cyan-500 text-black dark:text-gray-900 font-black uppercase tracking-wider shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          {loading ? (
-            <Loader2 size={28} className="animate-spin" strokeWidth={2.5} />
-          ) : (
-            <Plus size={28} strokeWidth={2.5} />
-          )}
-          <span className="text-xl">CREAR SALA</span>
-        </button>
+          disabled={!userId}
+          loading={loading}
+          title="CREAR SALA"
+          subtitle="Descifra el codigo de 4 cifras de tu rival"
+          icon={<Plus size={24} strokeWidth={2.5} />}
+        />
 
         {phase === 'joining' ? (
           <div className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] space-y-4">
@@ -457,6 +471,8 @@ export default function CodigoSecretoLobby() {
           </button>
         )}
       </div>
+
+      {showInfo && <GameInfoModal title="CODIGO SECRETO" rules={rules} onClose={() => setShowInfo(false)} />}
     </div>
   )
 }

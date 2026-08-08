@@ -4,6 +4,9 @@ import {
   type CodigoRoom,
 } from '../../../firebase/services'
 import GameHeader from '../../../components/GameHeader'
+import GameInfoModal from '../../../components/GameInfoModal'
+import UserAvatar, { type AvatarType } from '../../../components/UserAvatar'
+import { CODIGO_RULES } from '../data/codigoRules'
 import { ArrowRight, RotateCcw, X, Trophy, Frown } from 'lucide-react'
 
 interface Props {
@@ -44,6 +47,7 @@ export default function CodigoSecretoGame({ room, userId, roomCode, onReplay, on
   const [digits, setDigits] = useState<string[]>(['', '', '', ''])
   const [error, setError] = useState('')
   const [sending, setSending] = useState(false)
+  const [showInfo, setShowInfo] = useState(false)
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
   const isFinished = room.phase === 'finished'
@@ -96,7 +100,7 @@ export default function CodigoSecretoGame({ room, userId, roomCode, onReplay, on
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col p-4 sm:p-6 transition-colors">
       <div className="w-full max-w-md mx-auto pt-2 pb-4">
-        <GameHeader title="Codigo Secreto" backTo="/arcade" />
+           <GameHeader title="Codigo Secreto" backTo="/arcade" onInfo={() => setShowInfo(true)} />
       </div>
 
       {isFinished && (
@@ -212,8 +216,9 @@ export default function CodigoSecretoGame({ room, userId, roomCode, onReplay, on
                   value={d}
                   onChange={(e) => handleDigitChange(i, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(i, e)}
-                  className="w-14 h-14 text-center border-4 border-black dark:border-white bg-white dark:bg-gray-700 text-black dark:text-white font-black text-2xl outline-none"
-                />
+                   className="w-14 h-14 text-center border-4 border-black dark:border-white bg-white dark:bg-gray-700 text-black dark:text-white font-black text-2xl outline-none focus:ring-2 focus:ring-cyan-400 focus:scale-105 transition-all animate-fade-in-up"
+                   style={{ animationDelay: `${i * 70}ms` }}
+                 />
               ))}
             </div>
 
@@ -303,15 +308,20 @@ export default function CodigoSecretoGame({ room, userId, roomCode, onReplay, on
 
         {opponent && (
           <div className="flex items-center justify-between border-2 border-black dark:border-white bg-white dark:bg-gray-800 px-4 py-3 shadow-brutal-sm dark:shadow-brutal-sm-dark">
-            <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-              {opponent.name.split(' ')[0]}
-            </span>
+            <div className="flex items-center gap-2">
+              <UserAvatar color={opponent.avatar || '#3b82f6'} type={opponent.avatarType as AvatarType | undefined} avatarIcon={opponent.avatarIcon} name={opponent.name} size={18} />
+              <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                {opponent.name.split(' ')[0]}
+              </span>
+            </div>
             <span className="text-xs font-black text-cyan-500 dark:text-cyan-400">
               {opponentGuesses.length}/{INTENTOS_MAX} intentos
             </span>
           </div>
         )}
       </div>
+
+      {showInfo && <GameInfoModal title="Codigo Secreto" rules={CODIGO_RULES} onClose={() => setShowInfo(false)} />}
     </div>
   )
 }

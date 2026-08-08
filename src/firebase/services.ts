@@ -9,14 +9,15 @@ import {
   addDoc,
   query,
   where,
-   orderBy,
-   onSnapshot,
+  orderBy,
+  onSnapshot,
   serverTimestamp,
   increment,
   arrayUnion,
-   arrayRemove,
-   type QuerySnapshot,
-   type Timestamp,
+  arrayRemove,
+  runTransaction,
+  type QuerySnapshot,
+  type Timestamp,
 } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { db, storage } from './config'
@@ -375,6 +376,12 @@ export async function actualizarNombreGrupo(groupId: string, nuevoNombre: string
 }
 
 export async function eliminarGrupo(groupId: string): Promise<void> {
+  const miembrosSnap = await getDocs(collection(db, 'grupos', groupId, 'miembros'))
+  const eventosSnap = await getDocs(collection(db, 'grupos', groupId, 'eventos'))
+  await Promise.all([
+    ...miembrosSnap.docs.map((d) => deleteDoc(doc(db, 'grupos', groupId, 'miembros', d.id))),
+    ...eventosSnap.docs.map((d) => deleteDoc(doc(db, 'grupos', groupId, 'eventos', d.id))),
+  ])
   await deleteDoc(doc(db, 'grupos', groupId))
 }
 
@@ -807,23 +814,6 @@ export interface DedoRoom {
   votes: Record<string, string>
 }
 
-let dedoCodes = new Set<string>()
-
-function generarCodigoDedo(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-  for (let attempt = 0; attempt < 50; attempt++) {
-    let codigo = ''
-    for (let i = 0; i < 4; i++) {
-      codigo += chars.charAt(Math.floor(Math.random() * chars.length))
-    }
-    if (!dedoCodes.has(codigo)) {
-      dedoCodes.add(codigo)
-      return codigo
-    }
-  }
-  return `${Date.now().toString(36).slice(-4).toUpperCase()}`
-}
-
 export async function crearSalaDedo(
   userId: string,
   displayName: string,
@@ -831,7 +821,7 @@ export async function crearSalaDedo(
   avatarType?: string,
   avatarIcon?: string,
 ): Promise<string> {
-  const code = generarCodigoDedo()
+  const code = generarCodigoSala()
   const salaRef = doc(db, 'arcade_rooms', code)
   await setDoc(salaRef, {
     code,
@@ -935,11 +925,124 @@ export async function abandonarSalaDedo(
   await updateDoc(salaRef, update)
 }
 
+/* ───── Yo Nunca Online ───── */
+
+export interface YoNuncaPlayer {
+  id: string
+  name: string
+  avatar: string
+  avatarType?: string
+  avatarIcon?: string
+}
+
+export interface YoNuncaRoom {
+  code: string
+  game: string
+  hostId: string
+  players: YoNuncaPlayer[]
+  phase: 'lobby' | 'playing'
+  currentCard: string
+}
+
+export async function crearSalaYoNunca(
+  userId: string,
+  displayName: string,
+  avatar: string,
+  avatarType?: string,
+  avatarIcon?: string,
+): Promise<string> {
+  const code = generarCodigo()
+  const salaRef = doc(db, 'arcade_rooms', code)
+  await setDoc(salaRef, {
+    code,
+    game: 'yo_nunca',
+    hostId: userId,
+    players: [{ id: userId, name: displayName, avatar, avatarType, avatarIcon }],
+    phase: 'lobby',
+    currentCard: '',
+  })
+  return code
+}
+
+export async function unirseSalaYoNunca(
+  codigo: string,
+  userId: string,
+  displayName: string,
+  avatar: string,
+  avatarType?: string,
+  avatarIcon?: string,
+): Promise<void> {
+  const salaRef = doc(db, 'arcade_rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) throw new Error('Sala no encontrada')
+
+  const data = snap.data() as YoNuncaRoom
+  if (data.game !== 'yo_nunca') throw new Error('La sala no es de Yo Nunca')
+  if (data.phase !== 'lobby') throw new Error('La partida ya empezo')
+
+  const exists = data.players.some((p) => p.id === userId)
+  if (!exists) {
+    await updateDoc(salaRef, {
+      players: arrayUnion({ id: userId, name: displayName, avatar, avatarType, avatarIcon }),
+    })
+  }
+}
+
+export function observarSalaYoNunca(
+  codigo: string,
+  callback: (sala: YoNuncaRoom) => void,
+): () => void {
+  const salaRef = doc(db, 'arcade_rooms', codigo)
+  return onSnapshot(salaRef, (snap) => {
+    if (snap.exists()) {
+      callback(snap.data() as YoNuncaRoom)
+    }
+  })
+}
+
+export async function iniciarJuegoYoNunca(
+  codigo: string,
+  card: string,
+): Promise<void> {
+  await updateDoc(doc(db, 'arcade_rooms', codigo), {
+    phase: 'playing',
+    currentCard: card,
+  })
+}
+
+export async function siguienteCartaYoNunca(
+  codigo: string,
+  card: string,
+): Promise<void> {
+  await updateDoc(doc(db, 'arcade_rooms', codigo), {
+    currentCard: card,
+  })
+}
+
+export async function abandonarSalaYoNunca(
+  codigo: string,
+  userId: string,
+): Promise<void> {
+  const salaRef = doc(db, 'arcade_rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) return
+  const data = snap.data() as YoNuncaRoom
+  const players = data.players.filter((p) => p.id !== userId)
+  const update: Record<string, unknown> = { players }
+  if (data.hostId === userId && players.length > 0) {
+    update.hostId = players[0]!.id
+  }
+  await updateDoc(salaRef, update)
+}
+
 /* ───── Codigo Secreto ───── */
 
 export interface CodigoPlayer {
   id: string
   name: string
+  avatar: string
+  avatarType?: string
+  avatarIcon?: string
 }
 
 export interface Guess {
@@ -979,6 +1082,9 @@ function generarCodigoCodigo(): string {
 export async function crearSalaCodigo(
   userId: string,
   displayName: string,
+  avatar: string,
+  avatarType?: string,
+  avatarIcon?: string,
 ): Promise<string> {
   const code = generarCodigoCodigo()
   const salaRef = doc(db, 'codigo_rooms', code)
@@ -986,7 +1092,7 @@ export async function crearSalaCodigo(
     code,
     game: 'codigo_secreto',
     hostId: userId,
-    players: [{ id: userId, name: displayName }],
+    players: [{ id: userId, name: displayName, avatar, avatarType, avatarIcon }],
     phase: 'lobby',
     secretCode: { p1: '', p2: '' },
     guesses: { p1: [], p2: [] },
@@ -999,6 +1105,9 @@ export async function unirseSalaCodigo(
   codigo: string,
   userId: string,
   displayName: string,
+  avatar: string,
+  avatarType?: string,
+  avatarIcon?: string,
 ): Promise<void> {
   const salaRef = doc(db, 'codigo_rooms', codigo)
   const snap = await getDoc(salaRef)
@@ -1011,7 +1120,7 @@ export async function unirseSalaCodigo(
   const exists = data.players.some((p) => p.id === userId)
   if (!exists) {
     await updateDoc(salaRef, {
-      players: arrayUnion({ id: userId, name: displayName }),
+      players: arrayUnion({ id: userId, name: displayName, avatar, avatarType, avatarIcon }),
       phase: 'setup',
     })
   }
@@ -1124,6 +1233,9 @@ export async function abandonarSalaCodigo(
 export interface FrentePlayer {
   id: string
   name: string
+  avatar: string
+  avatarType?: string
+  avatarIcon?: string
   teamIndex: number
 }
 
@@ -1163,6 +1275,9 @@ function generarCodigoFrente(): string {
 export async function crearSalaFrente(
   userId: string,
   displayName: string,
+  avatar: string,
+  avatarType?: string,
+  avatarIcon?: string,
 ): Promise<string> {
   const code = generarCodigoFrente()
   const salaRef = doc(db, 'frente_rooms', code)
@@ -1170,7 +1285,7 @@ export async function crearSalaFrente(
     code,
     game: 'frente_a_frente',
     hostId: userId,
-    players: [{ id: userId, name: displayName, teamIndex: 0 }],
+    players: [{ id: userId, name: displayName, avatar, avatarType, avatarIcon, teamIndex: 0 }],
     phase: 'lobby',
     currentTeam: 0,
     teams: [
@@ -1186,6 +1301,9 @@ export async function unirseSalaFrente(
   userId: string,
   displayName: string,
   teamIndex: number,
+  avatar: string,
+  avatarType?: string,
+  avatarIcon?: string,
 ): Promise<void> {
   const salaRef = doc(db, 'frente_rooms', codigo)
   const snap = await getDoc(salaRef)
@@ -1197,7 +1315,7 @@ export async function unirseSalaFrente(
   const exists = data.players.some((p) => p.id === userId)
   if (!exists) {
     await updateDoc(salaRef, {
-      players: arrayUnion({ id: userId, name: displayName, teamIndex }),
+      players: arrayUnion({ id: userId, name: displayName, avatar, avatarType, avatarIcon, teamIndex }),
     })
   }
 }
@@ -1599,4 +1717,252 @@ export async function abandonarSalaImpostor(
     update.hostId = players[0]!.id
   }
   await updateDoc(salaRef, update)
+}
+
+/* ───── Bomba de Tiempo Online ───── */
+
+export type BombaPenitenceMode = 'aleatoria' | 'personalizada'
+export type BombaPhase = 'lobby' | 'playing' | 'exploded' | 'resolution'
+
+export interface BombaPlayer {
+  id: string
+  name: string
+  avatar: string
+  avatarType?: string
+  avatarIcon?: string
+}
+
+export interface BombaRoom {
+  code: string
+  game: string
+  hostId: string
+  players: BombaPlayer[]
+  phase: BombaPhase
+  order: string[]
+  currentPlayerId: string
+  currentQuestion: string
+  turnCount: number
+  deadline: number
+  totalTime: number
+  penitenceMode: BombaPenitenceMode
+  penitencia: string
+  customPenitencia: string
+  usedQuestions: string[]
+  usedPenitencias: string[]
+}
+
+export async function crearSalaBomba(
+  userId: string,
+  displayName: string,
+  avatar: string,
+  avatarType?: string,
+  avatarIcon?: string,
+): Promise<string> {
+  const code = generarCodigoSala()
+  await setDoc(doc(db, 'arcade_rooms', code), {
+    code,
+    game: 'bomba',
+    hostId: userId,
+    players: [{ id: userId, name: displayName, avatar, avatarType, avatarIcon }],
+    phase: 'lobby',
+    order: [],
+    currentPlayerId: '',
+    currentQuestion: '',
+    turnCount: 1,
+    deadline: 0,
+    totalTime: 0,
+    penitenceMode: 'aleatoria',
+    penitencia: '',
+    customPenitencia: '',
+    usedQuestions: [],
+    usedPenitencias: [],
+  })
+  return code
+}
+
+export async function unirseSalaBomba(
+  codigo: string,
+  userId: string,
+  displayName: string,
+  avatar: string,
+  avatarType?: string,
+  avatarIcon?: string,
+): Promise<void> {
+  const salaRef = doc(db, 'arcade_rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) throw new Error('Sala no encontrada')
+
+  const data = snap.data() as BombaRoom
+  if (data.game !== 'bomba') throw new Error('El codigo no corresponde a una sala de Bomba')
+  if (data.phase !== 'lobby') throw new Error('La partida ya empezo')
+
+  const exists = data.players.some((p) => p.id === userId)
+  if (!exists) {
+    await updateDoc(salaRef, {
+      players: arrayUnion({ id: userId, name: displayName, avatar, avatarType, avatarIcon }),
+    })
+  }
+}
+
+export function observarSalaBomba(
+  codigo: string,
+  callback: (sala: BombaRoom) => void,
+): () => void {
+  const salaRef = doc(db, 'arcade_rooms', codigo)
+  return onSnapshot(salaRef, (snap) => {
+    if (snap.exists()) {
+      callback(snap.data() as BombaRoom)
+    }
+  })
+}
+
+export async function iniciarJuegoBomba(
+  codigo: string,
+  opts: {
+    question: string
+    totalTime: number
+    order: string[]
+    penitenceMode: BombaPenitenceMode
+  },
+): Promise<void> {
+  await updateDoc(doc(db, 'arcade_rooms', codigo), {
+    phase: 'playing',
+    order: opts.order,
+    currentPlayerId: opts.order[0] ?? '',
+    currentQuestion: opts.question,
+    turnCount: 1,
+    totalTime: opts.totalTime,
+    deadline: Date.now() + opts.totalTime * 1000,
+    penitenceMode: opts.penitenceMode,
+    penitencia: '',
+    customPenitencia: '',
+    usedQuestions: [opts.question],
+  })
+}
+
+export async function pasarTurnoBomba(
+  codigo: string,
+  userId: string,
+  opts: {
+    question: string
+    totalTime: number
+    nextPlayerId: string
+    turnCount: number
+  },
+): Promise<boolean> {
+  let ok = false
+  await runTransaction(db, async (tx) => {
+    const salaRef = doc(db, 'arcade_rooms', codigo)
+    const snap = await tx.get(salaRef)
+    if (!snap.exists()) return
+    const data = snap.data() as BombaRoom
+    if (data.phase !== 'playing') return
+    if (data.currentPlayerId !== userId && data.hostId !== userId) return
+    tx.update(salaRef, {
+      currentPlayerId: opts.nextPlayerId,
+      currentQuestion: opts.question,
+      turnCount: opts.turnCount,
+      totalTime: opts.totalTime,
+      deadline: Date.now() + opts.totalTime * 1000,
+      usedQuestions: [...data.usedQuestions, opts.question],
+    })
+    ok = true
+  })
+  return ok
+}
+
+export async function explotarBomba(
+  codigo: string,
+  callerId: string,
+  opts: { penitencia?: string },
+): Promise<boolean> {
+  let ok = false
+  await runTransaction(db, async (tx) => {
+    const salaRef = doc(db, 'arcade_rooms', codigo)
+    const snap = await tx.get(salaRef)
+    if (!snap.exists()) return
+    const data = snap.data() as BombaRoom
+    if (data.phase !== 'playing') return
+    if (data.currentPlayerId !== callerId && data.hostId !== callerId) return
+    tx.update(salaRef, {
+      phase: 'exploded',
+      penitencia: opts.penitencia ?? '',
+      updatedAt: Date.now(),
+    })
+    ok = true
+  })
+  return ok
+}
+
+export async function continuarBomba(codigo: string): Promise<void> {
+  await updateDoc(doc(db, 'arcade_rooms', codigo), { phase: 'resolution' })
+}
+
+export async function nuevaRondaBomba(
+  codigo: string,
+  opts: {
+    question: string
+    totalTime: number
+    order: string[]
+    turnCount: number
+    usedQuestions: string[]
+  },
+): Promise<void> {
+  await updateDoc(doc(db, 'arcade_rooms', codigo), {
+    phase: 'playing',
+    currentPlayerId: opts.order[0] ?? '',
+    currentQuestion: opts.question,
+    turnCount: opts.turnCount,
+    totalTime: opts.totalTime,
+    deadline: Date.now() + opts.totalTime * 1000,
+    usedQuestions: opts.usedQuestions,
+    penitencia: '',
+    customPenitencia: '',
+  })
+}
+
+export async function actualizarPenitenciaPersonalizada(
+  codigo: string,
+  text: string,
+): Promise<void> {
+  await updateDoc(doc(db, 'arcade_rooms', codigo), {
+    customPenitencia: text,
+  })
+}
+
+export async function abandonarSalaBomba(codigo: string, userId: string): Promise<void> {
+  const salaRef = doc(db, 'arcade_rooms', codigo)
+  const snap = await getDoc(salaRef)
+  if (!snap.exists()) return
+  const data = snap.data() as BombaRoom
+  const players = data.players.filter((p) => p.id !== userId)
+  if (players.length === 0) {
+    await deleteDoc(salaRef)
+    return
+  }
+  const order = data.order.filter((id) => id !== userId)
+  const update: Record<string, unknown> = { players, order }
+  if (data.hostId === userId) {
+    update.hostId = players[0]!.id
+  }
+  if (data.currentPlayerId === userId) {
+    update.currentPlayerId = order[0] ?? ''
+  }
+  await updateDoc(salaRef, update)
+}
+
+export async function reiniciarSalaBomba(codigo: string): Promise<void> {
+  await updateDoc(doc(db, 'arcade_rooms', codigo), {
+    phase: 'lobby',
+    order: [],
+    currentPlayerId: '',
+    currentQuestion: '',
+    turnCount: 1,
+    deadline: 0,
+    totalTime: 0,
+    penitencia: '',
+    customPenitencia: '',
+    usedQuestions: [],
+    usedPenitencias: [],
+  })
 }

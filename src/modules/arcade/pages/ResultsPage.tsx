@@ -1,14 +1,17 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Trophy, Frown, RotateCcw, Home } from 'lucide-react'
 import { useGame } from '../context/GameContext'
 import GameHeader from '../../../components/GameHeader'
+import GameInfoModal from '../../../components/GameInfoModal'
+import { IMPOSTOR_RULES } from '../data/impostorRules'
 import { guardarPartidaImpostor } from '../../../firebase/services'
 import { playWinSound, playLoseSound } from '../../../utils/audio'
 
 export default function ResultsPage() {
   const navigate = useNavigate()
   const { state, resetGame } = useGame()
+  const [showInfo, setShowInfo] = useState(false)
 
   useEffect(() => {
     if (!state) return
@@ -63,7 +66,7 @@ export default function ResultsPage() {
         ? 'bg-emerald-500 dark:bg-emerald-700'
         : 'bg-red-600 dark:bg-red-800'
     }`}>
-      <GameHeader title="Resultados" backTo="/arcade" />
+      <GameHeader title="Resultados" backTo="/arcade" onInfo={() => setShowInfo(true)} />
       <div className="flex-1 flex flex-col items-center justify-center gap-6 max-w-md mx-auto w-full">
         <div className="w-20 h-20 border-4 border-black dark:border-white flex items-center justify-center bg-white dark:bg-gray-900 shadow-brutal dark:shadow-brutal-dark">
           {civiliansWin ? (
@@ -146,6 +149,14 @@ export default function ResultsPage() {
           Volver al Arcade
         </button>
       </div>
+
+      {showInfo && (
+        <GameInfoModal
+          title="El Impostor"
+          rules={IMPOSTOR_RULES}
+          onClose={() => setShowInfo(false)}
+        />
+      )}
     </div>
   )
 }

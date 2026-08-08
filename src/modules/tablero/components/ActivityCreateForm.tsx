@@ -3,6 +3,7 @@ import { Star, Save, X, Camera, Edit, Trash2, Trash2Icon, Flame, Dumbbell, Dropl
 import { registrarEvento } from '../../../firebase/services'
 import { useNeoToast } from '../../../components/NeoToast'
 import { useAppContent } from '../../../context/ContentContext'
+import { getActividadGradient } from '../../../config/actividades'
 import { playStarSound, playDeleteSound, playSuccessSound, playCloseSound, playClickSound } from '../../../utils/audio'
 
 interface Props {
@@ -82,14 +83,14 @@ const OPCIONES = [
           Tipo
         </p>
         <div className="flex gap-2">
-          {OPCIONES.map(({ key, label, Icon, color }) => (
+          {OPCIONES.map(({ key, label, Icon }) => (
             <button
               key={key}
               type="button"
               onClick={() => { playClickSound(); setTipo(key) }}
               className={`flex-1 flex flex-col items-center gap-1 py-2 px-1 border-2 border-black dark:border-white font-black text-[9px] uppercase tracking-wider transition-all ${
                 tipo === key
-                  ? `${color} text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`
+                  ? `bg-gradient-to-r ${getActividadGradient(key)} text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`
                   : 'bg-white dark:bg-gray-800 text-black dark:text-white'
               }`}
             >
@@ -170,7 +171,7 @@ const OPCIONES = [
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex-1 flex items-center justify-center gap-1 py-2 border-2 border-black dark:border-white bg-emerald-300 dark:bg-emerald-500 text-black dark:text-gray-900 font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50"
+          className="flex-1 flex items-center justify-center gap-1 py-2 border-2 border-black dark:border-white bg-gradient-to-r from-emerald-400 to-teal-600 text-white font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50"
         >
           <Save size={12} strokeWidth={2.5} />
           {saving ? 'Guardando...' : 'Registrar'}

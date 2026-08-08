@@ -1,64 +1,67 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../../../context/AuthContext'
 import {
-  crearSalaDedo,
-  unirseSalaDedo,
-  observarSalaDedo,
-  iniciarJuegoDedo,
-  type DedoRoom,
+  crearSalaBomba,
+  unirseSalaBomba,
+  observarSalaBomba,
+  iniciarJuegoBomba,
+  type BombaRoom,
+  type BombaPenitenceMode,
 } from '../../../firebase/services'
 import GameHeader from '../../../components/GameHeader'
 import GameInfoModal from '../../../components/GameInfoModal'
 import UserAvatar from '../../../components/UserAvatar'
-import DedoLlagaOnline from './DedoLlagaOnline'
+import BombaOnline from './BombaOnline'
 import { useAppContent } from '../../../context/ContentContext'
-import type { DeckContenido } from '../../../firebase/content'
 import CreateRoomButton from '../components/CreateRoomButton'
-import { Users, Play, Plus, LogIn, Copy, Check, Loader2, X } from 'lucide-react'
-
-function pickRandomCard(deck: DeckContenido | undefined, used: Set<string>): string {
-  const cartas = deck?.cartas ?? []
-  const pool = cartas.length > 0 ? cartas : ['¿Quien es mas probable que...?']
-  const available = pool.filter((c) => !used.has(c))
-  if (available.length === 0) return pool[Math.floor(Math.random() * pool.length)]!
-  return available[Math.floor(Math.random() * available.length)]!
-}
+import { Play, Plus, LogIn, Copy, Check, Loader2, X, Bomb } from 'lucide-react'
+import { BOMBA_RULES } from '../data/bombaRules'
 
 type LobbyPhase = 'menu' | 'creating' | 'joining' | 'inside'
 
-export default function DedoLlagaLobby() {
+const INITIAL_TIME = 25
+
+function pickRandom<T>(pool: T[], used: Set<T>, fallback: T): T {
+  const available = pool.filter((c) => !used.has(c))
+  if (available.length === 0) return fallback
+  return available[Math.floor(Math.random() * available.length)]!
+}
+
+function shuffleIds(ids: string[]): string[] {
+  const a = [...ids]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j]!, a[i]!]
+  }
+  return a
+}
+
+export default function BombaLobby() {
   const { user, userProfile } = useAuth()
-  const { getDeck } = useAppContent()
-  const deck = getDeck('dedo-en-la-llaga')
+  const { content } = useAppContent()
+  const preguntas = content.preguntas
+  const penitencias = content.penitencias
   const [phase, setPhase] = useState<LobbyPhase>('menu')
   const [roomCode, setRoomCode] = useState('')
   const [codeInput, setCodeInput] = useState('')
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
-  const [room, setRoom] = useState<DedoRoom | null>(null)
-  const [usedCards, setUsedCards] = useState<Set<string>>(new Set())
+  const [room, setRoom] = useState<BombaRoom | null>(null)
   const [loading, setLoading] = useState(false)
   const [showInfo, setShowInfo] = useState(false)
-
-  const rules = [
-    'El anfitrion crea una sala y comparte el codigo de 4 caracteres con sus amigos.',
-    'Cada jugador se une con el codigo y espera en la sala de juego.',
-    'Aparece una carta: "¿Quien es mas probable que...?" y todos votan por el jugador que creen que lo haria.',
-    'El jugador mas votado recibe la penitencia: un shot.',
-    'En caso de empate, los jugadores empatados se toman un shot.',
-    'El anfitrion avanza a la siguiente carta con el boton SIGUIENTE CARTA.',
-  ]
+  const [penitenceMode, setPenitenceMode] = useState<BombaPenitenceMode>('aleatoria')
 
   const userId = user?.uid ?? ''
   const displayName = userProfile?.nickname || user?.displayName || 'Invitado'
-  const avatarColor = userProfile?.avatar || '#fbbf24'
+  const avatarColor = userProfile?.avatar || '#fca5a5'
   const avatarType = userProfile?.avatarType || 'letter'
-  const avatarIcon = userProfile?.avatarIcon || 'Gamepad2'
+  const avatarIcon = userProfile?.avatarIcon || 'Bomb'
   const isHost = room?.hostId === userId
+  const usedQuestionsRef = useRef<Set<string>>(new Set())
 
   useEffect(() => {
     if (!roomCode) return
-    const unsub = observarSalaDedo(roomCode, (data) => {
+    const unsub = observarSalaBomba(roomCode, (data) => {
       setRoom(data)
     })
     return unsub
@@ -69,7 +72,7 @@ export default function DedoLlagaLobby() {
     setLoading(true)
     setError('')
     try {
-      const code = await crearSalaDedo(userId, displayName, avatarColor, avatarType, avatarIcon)
+      const code = await crearSalaBomba(userId, displayName, avatarColor, avatarType, avatarIcon)
       setRoomCode(code)
       setPhase('inside')
     } catch (e) {
@@ -84,7 +87,14 @@ export default function DedoLlagaLobby() {
     setLoading(true)
     setError('')
     try {
-      await unirseSalaDedo(codeInput.trim().toUpperCase(), userId, displayName, avatarColor, avatarType, avatarIcon)
+      await unirseSalaBomba(
+        codeInput.trim().toUpperCase(),
+        userId,
+        displayName,
+        avatarColor,
+        avatarType,
+        avatarIcon,
+      )
       setRoomCode(codeInput.trim().toUpperCase())
       setPhase('inside')
     } catch (e) {
@@ -94,17 +104,23 @@ export default function DedoLlagaLobby() {
     }
   }
 
-  const handleStartGame = useCallback(async () => {
+  const handleStartGame = async () => {
     if (!roomCode) return
     setError('')
     try {
-      const card = pickRandomCard(deck, usedCards)
-      setUsedCards((prev) => new Set(prev).add(card))
-      await iniciarJuegoDedo(roomCode, card)
+      const question = pickRandom(preguntas, usedQuestionsRef.current, '¡Responde ya!')
+      usedQuestionsRef.current.add(question)
+      const order = shuffleIds(room!.players.map((p) => p.id))
+      await iniciarJuegoBomba(roomCode, {
+        question,
+        totalTime: INITIAL_TIME,
+        order,
+        penitenceMode,
+      })
     } catch {
       setError('Error al iniciar el juego')
     }
-  }, [roomCode, usedCards, deck])
+  }
 
   const handleCopyCode = () => {
     if (!roomCode) return
@@ -115,14 +131,13 @@ export default function DedoLlagaLobby() {
 
   if (room && room.phase !== 'lobby') {
     return (
-      <DedoLlagaOnline
-        room={room}
+      <BombaOnline
+        sala={room}
         userId={userId}
         isHost={isHost}
         roomCode={roomCode}
-        deck={deck}
-        usedCards={usedCards}
-        onCardUsed={(card) => setUsedCards((prev) => new Set(prev).add(card))}
+        preguntas={preguntas}
+        penitencias={penitencias}
       />
     )
   }
@@ -131,13 +146,13 @@ export default function DedoLlagaLobby() {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col p-4 sm:p-6 transition-colors">
         <div className="w-full max-w-md mx-auto pt-2 pb-8">
-          <GameHeader title="¿Quién Es Más Probable...?" backTo="/arcade" onInfo={() => setShowInfo(true)} />
+          <GameHeader title="Bomba de Tiempo" backTo="/arcade" onInfo={() => setShowInfo(true)} />
         </div>
 
         <div className="flex-1 w-full max-w-md mx-auto flex flex-col gap-6">
           <div className="text-center">
-            <div className="w-16 h-16 border-4 border-black dark:border-white bg-fuchsia-300 dark:bg-fuchsia-500 flex items-center justify-center mx-auto mb-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-              <Users size={32} strokeWidth={2.5} className="text-black dark:text-gray-900" />
+            <div className="w-16 h-16 border-4 border-black dark:border-white bg-red-300 dark:bg-red-500 flex items-center justify-center mx-auto mb-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+              <Bomb size={32} strokeWidth={2.5} className="text-black dark:text-gray-900" />
             </div>
             <p className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
               Sala de Juego
@@ -150,7 +165,7 @@ export default function DedoLlagaLobby() {
             </p>
             <button
               onClick={handleCopyCode}
-              className="inline-flex items-center gap-2 text-4xl font-black tracking-widest text-fuchsia-500 dark:text-fuchsia-400 hover:underline underline-offset-4"
+              className="inline-flex items-center gap-2 text-4xl font-black tracking-widest text-red-500 dark:text-red-400 hover:underline underline-offset-4"
             >
               {copied ? (
                 <>
@@ -181,22 +196,50 @@ export default function DedoLlagaLobby() {
                 >
                   <UserAvatar
                     name={p.name}
-                    color={p.avatar || '#fbbf24'}
+                    color={p.avatar || '#fca5a5'}
                     type={p.avatarType === 'shape' ? 'shape' : 'letter'}
-                    avatarIcon={p.avatarIcon || 'Gamepad2'}
+                    avatarIcon={p.avatarIcon || 'Bomb'}
                     size={32}
                     className="shrink-0"
                   />
                   <span className="font-bold text-sm uppercase tracking-wider text-black dark:text-white">
                     {p.name.split(' ')[0]}
                     {p.id === room.hostId && (
-                      <span className="text-[10px] text-fuchsia-500 dark:text-fuchsia-400 ml-2">
+                      <span className="text-[10px] text-red-500 dark:text-red-400 ml-2">
                         (Anfitrion)
                       </span>
                     )}
                   </span>
                 </div>
               ))}
+            </div>
+          </div>
+
+          <div className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)]">
+            <p className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-3">
+              Tipo de Penitencia
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setPenitenceMode('aleatoria')}
+                className={`py-3 border-2 border-black dark:border-white text-xs font-black uppercase tracking-wider transition-all ${
+                  penitenceMode === 'aleatoria'
+                    ? 'bg-yellow-300 dark:bg-yellow-400 text-black dark:text-gray-900 shadow-[3px_3px_0px_rgba(0,0,0,1)]'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+                }`}
+              >
+                Aleatoria
+              </button>
+              <button
+                onClick={() => setPenitenceMode('personalizada')}
+                className={`py-3 border-2 border-black dark:border-white text-xs font-black uppercase tracking-wider transition-all ${
+                  penitenceMode === 'personalizada'
+                    ? 'bg-yellow-300 dark:bg-yellow-400 text-black dark:text-gray-900 shadow-[3px_3px_0px_rgba(0,0,0,1)]'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+                }`}
+              >
+                Personalizada
+              </button>
             </div>
           </div>
 
@@ -209,8 +252,8 @@ export default function DedoLlagaLobby() {
           {isHost ? (
             <button
               onClick={handleStartGame}
-              disabled={room.players.length < 3}
-              className="w-full flex items-center justify-center gap-2 py-4 border-4 border-black dark:border-white bg-yellow-400 dark:bg-yellow-500 text-black font-black uppercase tracking-wider text-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              disabled={room.players.length < 2}
+              className="w-full flex items-center justify-center gap-2 py-4 border-4 border-black dark:border-white bg-red-500 dark:bg-red-600 text-white font-black uppercase tracking-wider text-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Play size={22} strokeWidth={2.5} />
               EMPEZAR JUEGO
@@ -235,6 +278,10 @@ export default function DedoLlagaLobby() {
             </div>
           </button>
         </div>
+
+        {showInfo && (
+          <GameInfoModal title="Bomba de Tiempo" rules={BOMBA_RULES} onClose={() => setShowInfo(false)} />
+        )}
       </div>
     )
   }
@@ -242,17 +289,17 @@ export default function DedoLlagaLobby() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col p-4 sm:p-6 text-black dark:text-white transition-colors">
       <div className="w-full max-w-md mx-auto pt-2 pb-8">
-        <GameHeader title="¿Quién Es Más Probable...?" backTo="/arcade" onInfo={() => setShowInfo(true)} />
+        <GameHeader title="Bomba de Tiempo" backTo="/arcade" onInfo={() => setShowInfo(true)} />
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md mx-auto pb-12 gap-6">
         <CreateRoomButton
-          themeId="dedo"
+          themeId="bomba"
           onClick={handleCreate}
           disabled={!userId}
           loading={loading && phase === 'creating'}
           title="CREAR SALA"
-          subtitle="¿Quien es mas probable que...?"
+          subtitle="Reto a tus amigos: quien no responde, explota"
           icon={<Plus size={24} strokeWidth={2.5} />}
         />
 
@@ -287,7 +334,7 @@ export default function DedoLlagaLobby() {
             <button
               onClick={handleJoin}
               disabled={loading || codeInput.trim().length !== 4 || !userId}
-              className="w-full flex items-center justify-center gap-2 py-4 border-4 border-black dark:border-white bg-fuchsia-400 dark:bg-fuchsia-500 text-black dark:text-gray-900 font-black uppercase tracking-wider text-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 py-4 border-4 border-black dark:border-white bg-red-400 dark:bg-red-500 text-white font-black uppercase tracking-wider text-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <Loader2 size={22} className="animate-spin" strokeWidth={2.5} />
@@ -320,11 +367,7 @@ export default function DedoLlagaLobby() {
       </div>
 
       {showInfo && (
-        <GameInfoModal
-          title="¿Quién Es Más Probable...?"
-          rules={rules}
-          onClose={() => setShowInfo(false)}
-        />
+        <GameInfoModal title="Bomba de Tiempo" rules={BOMBA_RULES} onClose={() => setShowInfo(false)} />
       )}
     </div>
   )

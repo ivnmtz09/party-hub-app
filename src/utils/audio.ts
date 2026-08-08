@@ -323,3 +323,36 @@ export function playSwitchSound(): void {
     osc.stop(ctx.currentTime + 0.05)
   } catch { /* audio no disponible */ }
 }
+
+export function playGlitchSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  try {
+    for (let i = 0; i < 6; i++) {
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.type = i % 2 === 0 ? 'sawtooth' : 'square'
+      const t = ctx.currentTime + i * 0.08
+      const freq = 1200 - i * 170 + Math.random() * 250
+      osc.frequency.setValueAtTime(freq, t)
+      osc.frequency.exponentialRampToValueAtTime(80, t + 0.12)
+      gain.gain.setValueAtTime(0.1, t)
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12)
+      osc.start(t)
+      osc.stop(t + 0.12)
+    }
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.type = 'sawtooth'
+    osc.frequency.setValueAtTime(250, ctx.currentTime)
+    osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.8)
+    gain.gain.setValueAtTime(0.12, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 0.8)
+  } catch { /* audio no disponible */ }
+}

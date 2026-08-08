@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { useNeoToast } from '../../../components/NeoToast'
 import { useAppContent } from '../../../context/ContentContext'
+import { getActividadGradient } from '../../../config/actividades'
 import { playCagadaSound, playCuleadaSound, playGymSound, playMeadaSound, playSuccessSound, playCloseSound, playStarSound, playToggleOffSound } from '../../../utils/audio'
 
 interface Props {
@@ -74,9 +75,9 @@ export default function RecordInlineForm({ onClose, onSave }: Props) {
     <div className="border-4 border-black dark:border-white border-t-0 bg-white dark:bg-gray-800 p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] space-y-3">
       <div className="flex items-center justify-between">
         {selectedCfg ? (
-          <div className={`flex items-center gap-2 py-1.5 px-3 border-2 border-black dark:border-white ${selectedCfg.color} shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}>
+          <div className={`flex items-center gap-2 py-1.5 px-3 border-2 border-black dark:border-white bg-gradient-to-r ${getActividadGradient(selectedCfg.tipo)} shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}>
             <selectedCfg.icon size={14} strokeWidth={2.5} />
-            <span className="text-[11px] font-black uppercase tracking-wider text-black">
+            <span className="text-[11px] font-black uppercase tracking-wider text-white">
               Nuevo Registro - {selectedCfg.label}
             </span>
           </div>
@@ -103,7 +104,7 @@ export default function RecordInlineForm({ onClose, onSave }: Props) {
               <button
                 key={opt.tipo}
                 onClick={() => handleSelectTipo(opt.tipo)}
-                className={`flex items-center gap-3 py-3 px-4 border-4 border-black dark:border-white ${opt.color} text-black font-black uppercase tracking-wider text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all`}
+                className={`flex items-center gap-3 py-3 px-4 border-4 border-black dark:border-white bg-gradient-to-r ${getActividadGradient(opt.tipo)} text-white font-black uppercase tracking-wider text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all`}
               >
                 <Icon size={20} strokeWidth={2.5} />
                 {opt.label}
@@ -193,7 +194,7 @@ export default function RecordInlineForm({ onClose, onSave }: Props) {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 border-4 border-black dark:border-white bg-emerald-300 dark:bg-emerald-500 text-black dark:text-gray-900 font-black uppercase tracking-wider text-xs shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 border-4 border-black dark:border-white bg-gradient-to-r from-emerald-400 to-teal-600 text-white font-black uppercase tracking-wider text-xs shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50"
             >
               <Save size={14} strokeWidth={2.5} />
               {saving ? 'Procesando...' : 'Registrar'}

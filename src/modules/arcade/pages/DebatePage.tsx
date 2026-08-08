@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { Clock, MessageCircle } from 'lucide-react'
 import { useGame } from '../context/GameContext'
 import GameHeader from '../../../components/GameHeader'
+import GameInfoModal from '../../../components/GameInfoModal'
+import { IMPOSTOR_RULES } from '../data/impostorRules'
 
 const DEBATE_SECONDS = 120
 
@@ -9,6 +11,7 @@ export default function DebatePage() {
   const { state, nextPhase } = useGame()
   const [secondsLeft, setSecondsLeft] = useState(DEBATE_SECONDS)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const [showInfo, setShowInfo] = useState(false)
 
   useEffect(() => {
     if (!state || state.phase !== 'Debate') return
@@ -49,7 +52,7 @@ export default function DebatePage() {
 
   return (
     <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col animate-fade-in-up">
-      <GameHeader title="El Impostor" backTo="/arcade" />
+      <GameHeader title="El Impostor" backTo="/arcade" onInfo={() => setShowInfo(true)} />
       <div className="flex-1 flex flex-col items-center justify-center gap-6 max-w-md mx-auto w-full p-4">
         <div className="flex items-center gap-2">
           <MessageCircle size={28} strokeWidth={2.5} className="text-fuchsia-500 dark:text-fuchsia-400" />
@@ -120,6 +123,14 @@ export default function DebatePage() {
           {isOver ? 'Ir a Votacion' : 'Finalizar Debate / Ir a Votacion'}
         </button>
       </div>
+
+      {showInfo && (
+        <GameInfoModal
+          title="El Impostor"
+          rules={IMPOSTOR_RULES}
+          onClose={() => setShowInfo(false)}
+        />
+      )}
     </div>
   )
 }

@@ -2,10 +2,13 @@ import { useState } from 'react'
 import { Check, Vote } from 'lucide-react'
 import { useGame } from '../context/GameContext'
 import GameHeader from '../../../components/GameHeader'
+import GameInfoModal from '../../../components/GameInfoModal'
+import { IMPOSTOR_RULES } from '../data/impostorRules'
 
 export default function VotingPage() {
   const { state, castVote, nextPhase } = useGame()
   const [selected, setSelected] = useState<string | null>(null)
+  const [showInfo, setShowInfo] = useState(false)
 
   if (!state || state.phase !== 'Voting') {
     return (
@@ -23,7 +26,7 @@ export default function VotingPage() {
 
   return (
     <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col animate-fade-in-up">
-      <GameHeader title="El Impostor" backTo="/arcade" />
+      <GameHeader title="El Impostor" backTo="/arcade" onInfo={() => setShowInfo(true)} />
       <div className="flex-1 flex flex-col items-center justify-center gap-8 max-w-md mx-auto w-full p-4">
         <div className="text-center">
           <p className="text-xs font-black uppercase tracking-widest text-fuchsia-500 dark:text-fuchsia-400">
@@ -80,6 +83,14 @@ export default function VotingPage() {
           Confirmar Voto
         </button>
       </div>
+
+      {showInfo && (
+        <GameInfoModal
+          title="El Impostor"
+          rules={IMPOSTOR_RULES}
+          onClose={() => setShowInfo(false)}
+        />
+      )}
     </div>
   )
 }

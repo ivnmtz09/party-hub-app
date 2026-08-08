@@ -17,10 +17,13 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../../../context/AuthContext'
 import GameHeader from '../../../components/GameHeader'
+import GameInfoModal from '../../../components/GameInfoModal'
 import ImpostorCard from '../components/ImpostorCard'
 import { categoryMap } from '../data/words'
+import { IMPOSTOR_RULES } from '../data/impostorRules'
 import { useImpostorOnline } from '../hooks/useImpostorOnline'
 import type { ImpostorPlayer } from '../../../firebase/services'
+import CreateRoomButton from '../components/CreateRoomButton'
 
 function AvatarBox({
   player,
@@ -66,6 +69,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
     () => new Set(categoryMap.map((c) => c.name)),
   )
   const [cluesEnabled, setCluesEnabled] = useState(true)
+  const [showInfo, setShowInfo] = useState(false)
 
   const game = useImpostorOnline({ userId, displayName, avatar, onError: setError })
   const room = game.room
@@ -141,7 +145,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
     return (
       <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col animate-fade-in-up">
         <div className="w-full max-w-md mx-auto p-4">
-          <GameHeader title="El Impostor" backTo="/arcade" />
+          <GameHeader title="El Impostor" backTo="/arcade" onInfo={() => setShowInfo(true)} />
         </div>
         <div className="flex-1 flex flex-col items-center justify-center gap-6 max-w-md mx-auto w-full p-4 pb-12">
           <div className="text-center space-y-2">
@@ -267,20 +271,15 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
             </div>
           ) : (
             <div className="w-full space-y-5">
-              <button
+              <CreateRoomButton
+                themeId="impostor"
                 onClick={() => setPanel('create')}
-                className="w-full flex items-center gap-4 p-5 border-4 border-black bg-fuchsia-300 text-black shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
-              >
-                <div className="w-12 h-12 border-2 border-black bg-white flex items-center justify-center shrink-0">
-                  <Plus size={24} strokeWidth={2.5} />
-                </div>
-                <div className="text-left">
-                  <p className="font-black uppercase tracking-wider text-lg">Crear sala</p>
-                  <p className="text-xs font-bold text-black/70">
-                    Invita a tus amigos con un codigo
-                  </p>
-                </div>
-              </button>
+                disabled={false}
+                loading={false}
+                title="Crear sala"
+                subtitle="Invita a tus amigos con un codigo"
+                icon={<Plus size={24} strokeWidth={2.5} />}
+              />
               <button
                 onClick={() => setPanel('join')}
                 className="w-full flex items-center gap-4 p-5 border-4 border-black bg-cyan-300 text-black shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
@@ -302,9 +301,17 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
             </div>
           )}
         </div>
+
+        {showInfo && (
+          <GameInfoModal
+            title="El Impostor"
+            rules={IMPOSTOR_RULES}
+            onClose={() => setShowInfo(false)}
+          />
+        )}
       </div>
-    )
-  }
+  )
+}
 
   if (!room) {
     return (
@@ -331,7 +338,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
     return (
       <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col animate-fade-in-up">
         <div className="w-full max-w-md mx-auto p-4">
-          <GameHeader title="El Impostor" backTo="/arcade" />
+          <GameHeader title="El Impostor" backTo="/arcade" onInfo={() => setShowInfo(true)} />
         </div>
         <div className="flex-1 w-full max-w-md mx-auto flex flex-col gap-5 p-4 pb-10">
           <div className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-5 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] text-center">
@@ -457,15 +464,23 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
 
           {leaveButton}
         </div>
+
+        {showInfo && (
+          <GameInfoModal
+            title="El Impostor"
+            rules={IMPOSTOR_RULES}
+            onClose={() => setShowInfo(false)}
+          />
+        )}
       </div>
-    )
-  }
+  )
+}
 
   if (room.status === 'PLAYING') {
     return (
       <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col animate-fade-in-up">
         <div className="w-full max-w-md mx-auto p-4">
-          <GameHeader title="El Impostor" backTo="/arcade" />
+          <GameHeader title="El Impostor" backTo="/arcade" onInfo={() => setShowInfo(true)} />
         </div>
         <div className="flex-1 flex flex-col items-center justify-center gap-6 max-w-md mx-auto w-full p-4">
           <div className="text-center">
@@ -526,7 +541,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
     return (
       <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col animate-fade-in-up">
         <div className="w-full max-w-md mx-auto p-4">
-          <GameHeader title="El Impostor" backTo="/arcade" />
+          <GameHeader title="El Impostor" backTo="/arcade" onInfo={() => setShowInfo(true)} />
         </div>
         <div className="flex-1 w-full max-w-md mx-auto flex flex-col gap-5 p-4 pb-10">
           <div className="text-center">
@@ -598,9 +613,17 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
 
           {leaveButton}
         </div>
+
+        {showInfo && (
+          <GameInfoModal
+            title="El Impostor"
+            rules={IMPOSTOR_RULES}
+            onClose={() => setShowInfo(false)}
+          />
+        )}
       </div>
-    )
-  }
+  )
+}
 
   const counts = computeVoteCounts(room.votes)
   const impostorPlayers = room.players.filter((p) => room.impostorIds.includes(p.id))
@@ -635,7 +658,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
   return (
     <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col animate-fade-in-up">
       <div className="w-full max-w-md mx-auto p-4">
-        <GameHeader title="El Impostor" backTo="/arcade" />
+        <GameHeader title="El Impostor" backTo="/arcade" onInfo={() => setShowInfo(true)} />
       </div>
       <div className="flex-1 w-full max-w-md mx-auto flex flex-col gap-5 p-4 pb-10">
         <div className={`w-full border-4 border-black p-6 text-center shadow-[8px_8px_0px_rgba(0,0,0,1)] ${bannerClass}`}>
@@ -714,6 +737,14 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
 
         {leaveButton}
       </div>
+
+      {showInfo && (
+        <GameInfoModal
+          title="El Impostor"
+          rules={IMPOSTOR_RULES}
+          onClose={() => setShowInfo(false)}
+        />
+      )}
     </div>
   )
 }

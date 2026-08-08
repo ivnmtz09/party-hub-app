@@ -81,7 +81,7 @@ export default function RecentActivity({ miembros, userId, groupId, totalEventos
           {shouldShowMore && (
             <button
               onClick={() => { playClickSound(); setVisibleLimit(25) }}
-              className="w-full flex items-center justify-center gap-2 mt-6 py-3 border-4 border-black dark:border-white bg-cyan-300 dark:bg-cyan-500 text-black dark:text-gray-900 font-black uppercase tracking-wider shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
+              className="w-full flex items-center justify-center gap-2 mt-6 py-3 border-4 border-black dark:border-white bg-gradient-to-r from-cyan-400 to-blue-600 text-white font-black uppercase tracking-wider shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
             >
               <ChevronDown size={16} strokeWidth={2.5} />
               Ver mas...
@@ -91,7 +91,7 @@ export default function RecentActivity({ miembros, userId, groupId, totalEventos
           {hasExpandedMore && (
             <Link
               to="/historial"
-              className="w-full mt-4 bg-yellow-400 border-4 border-black text-black font-black uppercase py-3 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all flex items-center justify-center gap-2"
+              className="w-full mt-4 bg-gradient-to-r from-amber-300 to-yellow-500 border-4 border-black text-black font-black uppercase py-3 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all flex items-center justify-center gap-2"
             >
               {totalEventosCount && totalEventosCount >= 300 ? 'VER ÚLTIMOS 300 REGISTROS' : 'VER TODOS LOS REGISTROS'}
             </Link>
