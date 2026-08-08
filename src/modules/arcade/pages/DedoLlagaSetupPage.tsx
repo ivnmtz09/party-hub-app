@@ -99,7 +99,7 @@ export default function DedoLlagaSetupPage() {
                   Jugadores ({names.length})
                 </p>
                 <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400">
-                  Minimo 3 para jugar
+                  Mínimo 3 para jugar
                 </p>
               </div>
             </div>
@@ -183,7 +183,7 @@ export default function DedoLlagaSetupPage() {
           <div className="bg-white dark:bg-gray-800 border-4 border-black dark:border-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] p-8 w-full flex flex-col justify-center items-center text-center rounded-none select-none mb-6">
             <Hand size={40} strokeWidth={2.5} className="mb-6 opacity-40 text-black dark:text-white" />
             <p className="text-sm font-black uppercase tracking-widest text-fuchsia-500 dark:text-fuchsia-400 mb-4">
-              QUIEN ES MAS PROBABLE QUE...
+              ¿QUIÉN ES MÁS PROBABLE QUE...
             </p>
             <p className="text-2xl sm:text-3xl font-black text-black dark:text-white uppercase tracking-tighter leading-tight">
               {cartaActual}

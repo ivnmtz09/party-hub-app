@@ -23,7 +23,7 @@ export default function FlipCard({ flipped, isImpostor, word, hint, ejemplo }: F
             Tu Rol
           </p>
           <p className="text-[10px] sm:text-xs font-bold text-gray-400 dark:text-gray-500 text-center px-4">
-            Toca el boton para revelar
+            Toca el botón para revelar
           </p>
         </div>
 

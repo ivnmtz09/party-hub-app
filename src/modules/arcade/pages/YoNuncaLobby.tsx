@@ -41,12 +41,12 @@ export default function YoNuncaLobby() {
   const [showInfo, setShowInfo] = useState(false)
 
   const rules = [
-    'El anfitrion crea una sala y comparte el codigo de 4 caracteres con sus amigos.',
-    'Cada jugador se une con el codigo y espera en la sala de juego.',
+    'El anfitrión crea una sala y comparte el código de 4 caracteres con sus amigos.',
+    'Cada jugador se une con el código y espera en la sala de juego.',
     'Aparece una carta: "Yo nunca he..." y se lee en voz alta para todos.',
-    'Si lo hiciste: TOMA UN TRAGO. Si no lo hiciste: los demas te levantan la mano.',
-    'El anfitrion avanza a la siguiente carta con el boton SIGUIENTE CARTA.',
-    'El que mas pecados confiese, gana el respeto del grupo.',
+    'Si lo hiciste: TOMA UN TRAGO. Si no lo hiciste: los demás te levantan la mano.',
+    'El anfitrión avanza a la siguiente carta con el botón SIGUIENTE CARTA.',
+    'El que más pecados confiese, gana el respeto del grupo.',
   ]
 
   const userId = user?.uid ?? ''
@@ -145,7 +145,7 @@ export default function YoNuncaLobby() {
 
           <div className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] text-center">
             <p className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
-              Codigo de Sala
+              Código de Sala
             </p>
             <button
               onClick={handleCopyCode}
@@ -164,7 +164,7 @@ export default function YoNuncaLobby() {
               )}
             </button>
             <p className="text-xs font-bold text-gray-500 dark:text-gray-400 mt-3 uppercase tracking-wider">
-              Comparte este codigo con tus amigos
+              Comparte este código con tus amigos
             </p>
           </div>
 
@@ -190,7 +190,7 @@ export default function YoNuncaLobby() {
                     {p.name.split(' ')[0]}
                     {p.id === room.hostId && (
                       <span className="text-[10px] text-violet-500 dark:text-violet-400 ml-2">
-                        (Anfitrion)
+                        (Anfitrión)
                       </span>
                     )}
                   </span>
@@ -216,7 +216,7 @@ export default function YoNuncaLobby() {
             </button>
           ) : (
             <p className="text-xs font-bold text-gray-500 dark:text-gray-400 text-center uppercase tracking-wider">
-              Esperando al anfitrion...
+              Esperando al anfitrión...
             </p>
           )}
 
@@ -251,7 +251,7 @@ export default function YoNuncaLobby() {
           disabled={!userId}
           loading={loading && phase === 'creating'}
           title="CREAR SALA"
-          subtitle="Confiesa tus pecados mas oscuros"
+          subtitle="Confiesa tus pecados más oscuros"
           icon={<Plus size={24} strokeWidth={2.5} />}
         />
 
@@ -261,7 +261,7 @@ export default function YoNuncaLobby() {
               type="text"
               value={codeInput}
               onChange={(e) => setCodeInput(e.target.value.toUpperCase().slice(0, 4))}
-              placeholder="CODIGO"
+              placeholder="CÓDIGO"
               maxLength={4}
               className="w-full text-center py-4 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-700 text-black dark:text-white font-black uppercase tracking-widest text-3xl placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none"
             />
@@ -313,7 +313,7 @@ export default function YoNuncaLobby() {
             className="w-full flex flex-col items-center justify-center gap-4 py-10 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-black uppercase tracking-wider shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
           >
             <LogIn size={28} strokeWidth={2.5} />
-            <span className="text-xl">UNIRSE CON CODIGO</span>
+            <span className="text-xl">UNIRSE CON CÓDIGO</span>
           </button>
         )}
       </div>

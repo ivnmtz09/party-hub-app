@@ -186,22 +186,22 @@ export default function MembersList({ miembros, activeGroup }: Props) {
               <div className="flex flex-col gap-1 mt-2 text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                 {ultimaDepo && (
                   <span className="flex items-center gap-1">
-                    <CagadaIcon size={14} strokeWidth={2.5} className="text-orange-500" /> Ultima {findAct('deposicion')?.label?.toLowerCase() ?? 'cagada'}: {ultimaDepo}
+                    <CagadaIcon size={14} strokeWidth={2.5} className="text-orange-500" /> Última {findAct('deposicion')?.label?.toLowerCase() ?? 'cagada'}: {ultimaDepo}
                   </span>
                 )}
                 {ultimoSexo && (
                   <span className="flex items-center gap-1">
-                    <CuleadaIcon size={14} strokeWidth={2.5} className="text-pink-500" /> Ultima {findAct('acto_sexual')?.label?.toLowerCase() ?? 'culeada'}: {ultimoSexo}
+                    <CuleadaIcon size={14} strokeWidth={2.5} className="text-pink-500" /> Última {findAct('acto_sexual')?.label?.toLowerCase() ?? 'culeada'}: {ultimoSexo}
                   </span>
                 )}
                 {ultimaMeada && (
                   <span className="flex items-center gap-1">
-                    <MeadaIcon size={14} strokeWidth={2.5} className="text-yellow-400" /> Ultima {findAct('meada')?.label?.toLowerCase() ?? 'meada'}: {ultimaMeada}
+                    <MeadaIcon size={14} strokeWidth={2.5} className="text-yellow-400" /> Última {findAct('meada')?.label?.toLowerCase() ?? 'meada'}: {ultimaMeada}
                   </span>
                 )}
                 {ultimoGym && (
                   <span className="flex items-center gap-1">
-                    <GymIcon size={14} strokeWidth={2.5} className="text-blue-500" /> Ultimo dia de {findAct('gym')?.label?.toLowerCase() ?? 'gym'}: {ultimoGym}
+                    <GymIcon size={14} strokeWidth={2.5} className="text-blue-500" /> Último día de {findAct('gym')?.label?.toLowerCase() ?? 'gym'}: {ultimoGym}
                   </span>
                 )}
               </div>

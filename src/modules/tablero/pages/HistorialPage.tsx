@@ -136,7 +136,7 @@ export default function HistorialPage() {
           ) : eventos.length === 0 ? (
             <div className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[4px_4px_0px_rgba(0,0,0,1)]">
               <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center">
-                No hay registros aun
+                No hay registros aún
               </p>
             </div>
           ) : (

@@ -105,7 +105,7 @@ export default function DebatePage() {
                   : 'text-gray-500 dark:text-gray-400'
             }`}
           >
-            {isOver ? 'Tiempo agotado' : isUrgent ? '¡Ultimos segundos!' : 'Tiempo restante'}
+            {isOver ? 'Tiempo agotado' : isUrgent ? '¡Últimos segundos!' : 'Tiempo restante'}
           </p>
         </div>
 
@@ -120,7 +120,7 @@ export default function DebatePage() {
           className="w-full flex items-center justify-center gap-2 py-4 border-4 border-black dark:border-white bg-yellow-300 dark:bg-yellow-400 text-black dark:text-gray-900 font-black uppercase tracking-wider text-base sm:text-lg shadow-brutal dark:shadow-brutal-dark active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
         >
           <MessageCircle size={22} strokeWidth={2.5} />
-          {isOver ? 'Ir a Votacion' : 'Finalizar Debate / Ir a Votacion'}
+          {isOver ? 'Ir a Votación' : 'Finalizar Debate / Ir a Votación'}
         </button>
       </div>
 

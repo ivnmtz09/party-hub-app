@@ -131,11 +131,11 @@ export default function CodigoSecretoLobby() {
   const handleSaveCode = async () => {
     const code = secretDigits.join('')
     if (code.length !== 4) {
-      setError('Ingresa 4 digitos')
+      setError('Ingresa 4 dígitos')
       return
     }
     if (new Set(code).size !== 4) {
-      setError('Los digitos deben ser unicos')
+      setError('Los dígitos deben ser únicos')
       return
     }
     setError('')
@@ -143,7 +143,7 @@ export default function CodigoSecretoLobby() {
     try {
       await guardarCodigoSecreto(roomCode, userId, code)
     } catch {
-      setError('Error al guardar el codigo')
+      setError('Error al guardar el código')
     } finally {
       setLoading(false)
     }
@@ -189,7 +189,7 @@ export default function CodigoSecretoLobby() {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col p-4 sm:p-6 transition-colors">
         <div className="w-full max-w-md mx-auto pt-2 pb-8">
-                   <GameHeader title="Codigo Secreto" backTo="/arcade" onInfo={() => setShowInfo(true)} />
+                   <GameHeader title="Código Secreto" backTo="/arcade" onInfo={() => setShowInfo(true)} />
         </div>
 
         <div className="flex-1 w-full max-w-md mx-auto flex flex-col gap-6">
@@ -206,7 +206,7 @@ export default function CodigoSecretoLobby() {
 
               <div className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] text-center">
                 <p className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
-                  Codigo de Sala
+                  Código de Sala
                 </p>
                 <button
                   onClick={handleCopyCode}
@@ -225,7 +225,7 @@ export default function CodigoSecretoLobby() {
                   )}
                 </button>
                 <p className="text-xs font-bold text-gray-500 dark:text-gray-400 mt-3 uppercase tracking-wider">
-                  Comparte este codigo con un amigo
+                  Comparte este código con un amigo
                 </p>
               </div>
 
@@ -244,7 +244,7 @@ export default function CodigoSecretoLobby() {
                          {p.name.split(' ')[0]}
                          {p.id === room.hostId && (
                            <span className="text-[10px] text-cyan-500 dark:text-cyan-400 ml-2">
-                             (Anfitrion)
+                             (Anfitrión)
                            </span>
                          )}
                        </span>
@@ -276,10 +276,10 @@ export default function CodigoSecretoLobby() {
                   <Lock size={32} strokeWidth={2.5} className="text-black dark:text-gray-900" />
                 </div>
                 <p className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-                  Configura tu codigo secreto
+                  Configura tu código secreto
                 </p>
                 <p className="text-xs font-bold text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-wider">
-                  4 digitos unicos
+                  4 dígitos únicos
                 </p>
               </div>
 
@@ -287,7 +287,7 @@ export default function CodigoSecretoLobby() {
                 <div className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] text-center">
                   <Unlock size={32} strokeWidth={2.5} className="mx-auto mb-3 text-green-500" />
                   <p className="font-black uppercase tracking-wider text-sm text-black dark:text-white">
-                    Codigo guardado
+                    Código guardado
                   </p>
                   <p className="text-xs font-bold text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-wider">
                     Esperando a tu rival...
@@ -296,7 +296,7 @@ export default function CodigoSecretoLobby() {
               ) : (
                 <div className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] space-y-4">
                   <p className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 text-center">
-                    Ingresa tu codigo
+                    Ingresa tu código
                   </p>
 
                   <div className="flex justify-center gap-3">
@@ -339,7 +339,7 @@ export default function CodigoSecretoLobby() {
                     ) : (
                       <Lock size={22} strokeWidth={2.5} />
                     )}
-                    GUARDAR CODIGO
+                    GUARDAR CÓDIGO
                   </button>
                 </div>
               )}
@@ -365,7 +365,7 @@ export default function CodigoSecretoLobby() {
                           {p.name.split(' ')[0]}
                           {p.id === room.hostId && (
                             <span className="text-[10px] text-cyan-500 dark:text-cyan-400 ml-2">
-                              (Anfitrion)
+                              (Anfitrión)
                             </span>
                           )}
                         </span>
@@ -398,7 +398,7 @@ export default function CodigoSecretoLobby() {
           )}
         </div>
 
-        {showInfo && <GameInfoModal title="Codigo Secreto" rules={rules} onClose={() => setShowInfo(false)} />}
+        {showInfo && <GameInfoModal title="Código Secreto" rules={rules} onClose={() => setShowInfo(false)} />}
       </div>
     )
   }
@@ -406,7 +406,7 @@ export default function CodigoSecretoLobby() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col p-4 sm:p-6 text-black dark:text-white transition-colors">
       <div className="w-full max-w-md mx-auto pt-2 pb-8">
-        <GameHeader title="CODIGO SECRETO" backTo="/arcade" onInfo={() => setShowInfo(true)} />
+        <GameHeader title="CÓDIGO SECRETO" backTo="/arcade" onInfo={() => setShowInfo(true)} />
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md mx-auto pb-12 gap-6">
@@ -416,7 +416,7 @@ export default function CodigoSecretoLobby() {
           disabled={!userId}
           loading={loading}
           title="CREAR SALA"
-          subtitle="Descifra el codigo de 4 cifras de tu rival"
+          subtitle="Descifra el código de 4 cifras de tu rival"
           icon={<Plus size={24} strokeWidth={2.5} />}
         />
 
@@ -426,7 +426,7 @@ export default function CodigoSecretoLobby() {
               type="text"
               value={codeInput}
               onChange={(e) => setCodeInput(e.target.value.toUpperCase().slice(0, 4))}
-              placeholder="CODIGO"
+              placeholder="CÓDIGO"
               maxLength={4}
               className="w-full text-center py-4 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-700 text-black dark:text-white font-black uppercase tracking-widest text-3xl placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none"
             />
@@ -467,12 +467,12 @@ export default function CodigoSecretoLobby() {
             className="w-full flex flex-col items-center justify-center gap-4 py-10 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-black uppercase tracking-wider shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
           >
             <LogIn size={28} strokeWidth={2.5} />
-            <span className="text-xl">UNIRSE CON CODIGO</span>
+            <span className="text-xl">UNIRSE CON CÓDIGO</span>
           </button>
         )}
       </div>
 
-      {showInfo && <GameInfoModal title="CODIGO SECRETO" rules={rules} onClose={() => setShowInfo(false)} />}
+      {showInfo && <GameInfoModal title="CÓDIGO SECRETO" rules={rules} onClose={() => setShowInfo(false)} />}
     </div>
   )
 }

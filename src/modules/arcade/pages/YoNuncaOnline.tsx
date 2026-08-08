@@ -37,9 +37,9 @@ export default function YoNuncaOnline({
 
   const rules = [
     'Lee la carta en voz alta: "Yo nunca he..."',
-    'Si lo hiciste: TOMA UN TRAGO. Si no lo hiciste: los demas te levantan la mano.',
+    'Si lo hiciste: TOMA UN TRAGO. Si no lo hiciste: los demás te levantan la mano.',
     'Nada de mentir: el grupo conoce tus pecados.',
-    'El anfitrion avanza a la siguiente carta con SIGUIENTE CARTA.',
+    'El anfitrión avanza a la siguiente carta con SIGUIENTE CARTA.',
   ]
 
   const handleNextCard = async () => {
@@ -81,7 +81,7 @@ export default function YoNuncaOnline({
 
         <div className="w-full border-2 border-black dark:border-white bg-white dark:bg-gray-800 p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] mb-6">
           <p className="text-[11px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 text-center">
-            Si lo hiciste: TOMA UN TRAGO. Si no: los demas levanten la mano
+            Si lo hiciste: TOMA UN TRAGO. Si no: los demás levanten la mano
           </p>
         </div>
 
@@ -96,7 +96,7 @@ export default function YoNuncaOnline({
           <div className="flex flex-col items-center gap-2">
             <Loader2 size={22} className="animate-spin" strokeWidth={2.5} />
             <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-center">
-              Esperando a que el anfitrion avance...
+              Esperando a que el anfitrión avance...
             </p>
           </div>
         )}

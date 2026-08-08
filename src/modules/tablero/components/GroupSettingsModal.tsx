@@ -204,7 +204,7 @@ export default function GroupSettingsModal({
               ) : confirmDelete ? (
                 <>
                   <Trash2 size={20} strokeWidth={2.5} />
-                  CONFIRMAR ELIMINACION
+                  CONFIRMAR ELIMINACIÓN
                 </>
               ) : (
                 <>

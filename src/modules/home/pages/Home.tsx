@@ -80,7 +80,7 @@ export default function Home() {
       setJoinCodigo('')
       setIsJoinDropdownOpen(false)
     } catch {
-      setJoinError('Codigo no encontrado')
+      setJoinError('Código no encontrado')
     } finally {
       setJoinLoading(false)
     }
@@ -125,7 +125,7 @@ export default function Home() {
               type="text"
               value={joinCodigo}
               onChange={(e) => setJoinCodigo(e.target.value.toUpperCase().slice(0, 6))}
-              placeholder="Codigo de 6 caracteres"
+              placeholder="Código de 6 caracteres"
               maxLength={6}
               className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-900 text-black dark:text-white p-3 font-black uppercase placeholder:text-gray-400 focus:outline-none"
             />
@@ -157,7 +157,7 @@ export default function Home() {
         {grupos.length === 0 ? (
           <div className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[4px_4px_0px_rgba(0,0,0,1)]">
             <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center">
-              No tienes grupos. Crea uno o unete.
+              No tienes grupos. Crea uno o únete.
             </p>
           </div>
         ) : (
@@ -213,7 +213,7 @@ export default function Home() {
                 ) : (
                   <>
                     <Copy size={12} strokeWidth={2.5} />
-                    Codigo
+Código
                   </>
                 )}
               </button>

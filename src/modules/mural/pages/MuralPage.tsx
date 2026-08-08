@@ -291,7 +291,7 @@ export default function MuralPage() {
             <Skeleton variant="card" count={1} />
           ) : aguaChartData.length === 0 ? (
             <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center py-4">
-              Aun no hay vasos de agua hoy
+              Aún no hay vasos de agua hoy
             </p>
           ) : (
             <>
@@ -406,7 +406,7 @@ export default function MuralPage() {
           ) : feedEventos.length === 0 ? (
             <div className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[4px_4px_0px_rgba(0,0,0,1)]">
               <p className="text-xs font-black uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center">
-                AUN NO HAY ACTIVIDAD HOY
+                AÚN NO HAY ACTIVIDAD HOY
               </p>
             </div>
           ) : (

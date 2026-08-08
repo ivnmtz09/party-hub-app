@@ -20,7 +20,7 @@ export default function LoginPage() {
     try {
       await loginWithGoogle()
     } catch {
-      setError('No se pudo iniciar sesion con Google. Intenta de nuevo.')
+      setError('No se pudo iniciar sesión con Google. Intenta de nuevo.')
     } finally {
       setBusy(false)
     }
@@ -77,7 +77,7 @@ export default function LoginPage() {
                 className="underline underline-offset-2 text-cyan-700 dark:text-cyan-400 hover:no-underline font-black"
                 type="button"
               >
-                terminos y condiciones
+                términos y condiciones
               </button>{' '}
               de Party Hub
             </span>
@@ -105,7 +105,7 @@ export default function LoginPage() {
           <div className="w-full max-w-md border-4 border-black bg-white dark:bg-gray-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 space-y-4">
             <div className="flex items-center justify-between">
               <p className="text-lg font-black uppercase tracking-tighter text-black dark:text-white">
-                Terminos de Uso
+                Términos de Uso
               </p>
               <button
                 onClick={() => { playCloseSound(); setShowTerminos(false) }}

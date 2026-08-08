@@ -30,13 +30,13 @@ export default function VotingPage() {
       <div className="flex-1 flex flex-col items-center justify-center gap-8 max-w-md mx-auto w-full p-4">
         <div className="text-center">
           <p className="text-xs font-black uppercase tracking-widest text-fuchsia-500 dark:text-fuchsia-400">
-            Fase de Votacion
+            Fase de Votación
           </p>
           <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-widest mt-1">
             Hora de Votar
           </h1>
           <p className="text-xs font-bold text-gray-500 dark:text-gray-400 mt-2">
-            Selecciona a quien crees que es el impostor
+            Selecciona a quién crees que es el impostor
           </p>
         </div>
 

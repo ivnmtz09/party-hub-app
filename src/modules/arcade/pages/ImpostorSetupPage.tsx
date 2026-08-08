@@ -105,7 +105,7 @@ export default function ImpostorSetupPage() {
                 Jugadores ({names.length})
               </p>
               <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400">
-                Minimo 3 para jugar
+                Mínimo 3 para jugar
               </p>
             </div>
           </div>
@@ -159,7 +159,7 @@ export default function ImpostorSetupPage() {
                   Impostores
                 </p>
                 <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400">
-                  Max {MAX_IMPOSTORS}
+                  Máx {MAX_IMPOSTORS}
                 </p>
               </div>
             </div>
@@ -188,7 +188,7 @@ export default function ImpostorSetupPage() {
             </div>
             <div>
               <p className="font-black uppercase tracking-wider text-sm">
-                Categorias
+                Categorías
               </p>
               <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400">
                 Selecciona al menos una
@@ -227,7 +227,7 @@ export default function ImpostorSetupPage() {
                 Habilitar pistas para el impostor
               </p>
               <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400">
-                El impostor vera una pista de la palabra
+                El impostor verá una pista de la palabra
               </p>
             </div>
           </div>

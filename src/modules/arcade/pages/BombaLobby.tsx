@@ -161,7 +161,7 @@ export default function BombaLobby() {
 
           <div className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] text-center">
             <p className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
-              Codigo de Sala
+              Código de Sala
             </p>
             <button
               onClick={handleCopyCode}
@@ -180,7 +180,7 @@ export default function BombaLobby() {
               )}
             </button>
             <p className="text-xs font-bold text-gray-500 dark:text-gray-400 mt-3 uppercase tracking-wider">
-              Comparte este codigo con tus amigos
+              Comparte este código con tus amigos
             </p>
           </div>
 
@@ -206,7 +206,7 @@ export default function BombaLobby() {
                     {p.name.split(' ')[0]}
                     {p.id === room.hostId && (
                       <span className="text-[10px] text-red-500 dark:text-red-400 ml-2">
-                        (Anfitrion)
+                        (Anfitrión)
                       </span>
                     )}
                   </span>
@@ -260,7 +260,7 @@ export default function BombaLobby() {
             </button>
           ) : (
             <p className="text-xs font-bold text-gray-500 dark:text-gray-400 text-center uppercase tracking-wider">
-              Esperando al anfitrion...
+              Esperando al anfitrión...
             </p>
           )}
 
@@ -309,7 +309,7 @@ export default function BombaLobby() {
               type="text"
               value={codeInput}
               onChange={(e) => setCodeInput(e.target.value.toUpperCase().slice(0, 4))}
-              placeholder="CODIGO"
+              placeholder="CÓDIGO"
               maxLength={4}
               className="w-full text-center py-4 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-700 text-black dark:text-white font-black uppercase tracking-widest text-3xl placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none"
             />
@@ -361,7 +361,7 @@ export default function BombaLobby() {
             className="w-full flex flex-col items-center justify-center gap-4 py-10 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-black uppercase tracking-wider shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
           >
             <LogIn size={28} strokeWidth={2.5} />
-            <span className="text-xl">UNIRSE CON CODIGO</span>
+            <span className="text-xl">UNIRSE CON CÓDIGO</span>
           </button>
         )}
       </div>

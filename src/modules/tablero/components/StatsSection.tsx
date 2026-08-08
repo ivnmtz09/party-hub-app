@@ -35,7 +35,7 @@ export default function StatsSection({ miembros, eventos }: Props) {
         onClick={() => { isOpen ? playToggleOffSound() : playToggleOnSound(); setIsOpen(!isOpen) }}
         className="w-full flex items-center justify-between py-3 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-black uppercase tracking-wider shadow-brutal dark:shadow-brutal-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
       >
-        <span>ESTADISTICAS</span>
+        <span>ESTADÍSTICAS</span>
         {isOpen ? (
           <ChevronUp size={20} strokeWidth={2.5} />
         ) : (
@@ -58,26 +58,26 @@ export default function StatsSection({ miembros, eventos }: Props) {
             <div className="grid grid-cols-2 gap-2 text-xs font-bold text-gray-600 dark:text-gray-300">
               <div>
                 <span className="text-amber-600 dark:text-amber-400">
-                  Ultima cagada:
+                  Última cagada:
                 </span>{' '}
                 {tiempoDesde(m.ultimaDeposicion)}
               </div>
               <div>
                 <span className="text-pink-600 dark:text-pink-400">
-                  Ultima culeada:
+                  Última culeada:
                 </span>{' '}
                 {tiempoDesde(m.ultimoActoSexual)}
               </div>
               <div>
                 <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
                   <Dumbbell size={14} strokeWidth={2.5} />
-                  Ultimo gym:
+                  Último gym:
                 </span>{' '}
                 {tiempoDesde(m.ultimoGym)}
               </div>
               {ultimoEvento && 'timestamp' in ultimoEvento && (
                 <div className="col-span-2 text-gray-500 dark:text-gray-500 mt-1">
-                  Ultimo registro:{' '}
+                  Último registro:{' '}
                   {ultimoEvento.timestamp
                     ? tiempoDesde(ultimoEvento.timestamp as Timestamp)
                     : '—'}

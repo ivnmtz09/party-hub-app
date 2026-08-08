@@ -18,7 +18,7 @@ import { Users, Play, Plus, LogIn, Copy, Check, Loader2, X } from 'lucide-react'
 
 function pickRandomCard(deck: DeckContenido | undefined, used: Set<string>): string {
   const cartas = deck?.cartas ?? []
-  const pool = cartas.length > 0 ? cartas : ['¿Quien es mas probable que...?']
+  const pool = cartas.length > 0 ? cartas : ['¿Quién es más probable que...?']
   const available = pool.filter((c) => !used.has(c))
   if (available.length === 0) return pool[Math.floor(Math.random() * pool.length)]!
   return available[Math.floor(Math.random() * available.length)]!
@@ -41,12 +41,12 @@ export default function DedoLlagaLobby() {
   const [showInfo, setShowInfo] = useState(false)
 
   const rules = [
-    'El anfitrion crea una sala y comparte el codigo de 4 caracteres con sus amigos.',
-    'Cada jugador se une con el codigo y espera en la sala de juego.',
-    'Aparece una carta: "¿Quien es mas probable que...?" y todos votan por el jugador que creen que lo haria.',
-    'El jugador mas votado recibe la penitencia: un shot.',
+    'El anfitrión crea una sala y comparte el código de 4 caracteres con sus amigos.',
+    'Cada jugador se une con el código y espera en la sala de juego.',
+    'Aparece una carta: "¿Quién es más probable que...?" y todos votan por el jugador que creen que lo haría.',
+    'El jugador más votado recibe la penitencia: un shot.',
     'En caso de empate, los jugadores empatados se toman un shot.',
-    'El anfitrion avanza a la siguiente carta con el boton SIGUIENTE CARTA.',
+    'El anfitrión avanza a la siguiente carta con el botón SIGUIENTE CARTA.',
   ]
 
   const userId = user?.uid ?? ''
@@ -146,7 +146,7 @@ export default function DedoLlagaLobby() {
 
           <div className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] text-center">
             <p className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
-              Codigo de Sala
+              Código de Sala
             </p>
             <button
               onClick={handleCopyCode}
@@ -165,7 +165,7 @@ export default function DedoLlagaLobby() {
               )}
             </button>
             <p className="text-xs font-bold text-gray-500 dark:text-gray-400 mt-3 uppercase tracking-wider">
-              Comparte este codigo con tus amigos
+              Comparte este código con tus amigos
             </p>
           </div>
 
@@ -191,7 +191,7 @@ export default function DedoLlagaLobby() {
                     {p.name.split(' ')[0]}
                     {p.id === room.hostId && (
                       <span className="text-[10px] text-fuchsia-500 dark:text-fuchsia-400 ml-2">
-                        (Anfitrion)
+                        (Anfitrión)
                       </span>
                     )}
                   </span>
@@ -217,7 +217,7 @@ export default function DedoLlagaLobby() {
             </button>
           ) : (
             <p className="text-xs font-bold text-gray-500 dark:text-gray-400 text-center uppercase tracking-wider">
-              Esperando al anfitrion...
+              Esperando al anfitrión...
             </p>
           )}
 
@@ -252,7 +252,7 @@ export default function DedoLlagaLobby() {
           disabled={!userId}
           loading={loading && phase === 'creating'}
           title="CREAR SALA"
-          subtitle="¿Quien es mas probable que...?"
+          subtitle="¿Quién es más probable que...?"
           icon={<Plus size={24} strokeWidth={2.5} />}
         />
 
@@ -262,7 +262,7 @@ export default function DedoLlagaLobby() {
               type="text"
               value={codeInput}
               onChange={(e) => setCodeInput(e.target.value.toUpperCase().slice(0, 4))}
-              placeholder="CODIGO"
+              placeholder="CÓDIGO"
               maxLength={4}
               className="w-full text-center py-4 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-700 text-black dark:text-white font-black uppercase tracking-widest text-3xl placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none"
             />
@@ -314,7 +314,7 @@ export default function DedoLlagaLobby() {
             className="w-full flex flex-col items-center justify-center gap-4 py-10 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-black uppercase tracking-wider shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
           >
             <LogIn size={28} strokeWidth={2.5} />
-            <span className="text-xl">UNIRSE CON CODIGO</span>
+            <span className="text-xl">UNIRSE CON CÓDIGO</span>
           </button>
         )}
       </div>

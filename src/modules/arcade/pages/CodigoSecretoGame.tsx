@@ -76,11 +76,11 @@ export default function CodigoSecretoGame({ room, userId, roomCode, onReplay, on
   const handleGuess = async () => {
     const guess = digits.join('')
     if (guess.length !== 4) {
-      setError('Ingresa 4 digitos')
+      setError('Ingresa 4 dígitos')
       return
     }
     if (new Set(guess).size !== 4) {
-      setError('Los digitos deben ser unicos')
+      setError('Los dígitos deben ser únicos')
       return
     }
     setError('')
@@ -100,7 +100,7 @@ export default function CodigoSecretoGame({ room, userId, roomCode, onReplay, on
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-black dark:text-white flex flex-col p-4 sm:p-6 transition-colors">
       <div className="w-full max-w-md mx-auto pt-2 pb-4">
-           <GameHeader title="Codigo Secreto" backTo="/arcade" onInfo={() => setShowInfo(true)} />
+           <GameHeader title="Código Secreto" backTo="/arcade" onInfo={() => setShowInfo(true)} />
       </div>
 
       {isFinished && (
@@ -113,7 +113,7 @@ export default function CodigoSecretoGame({ room, userId, roomCode, onReplay, on
                   GANASTE
                 </p>
                 <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-6">
-                  Descifraste el codigo en {myGuesses.length} intentos
+                  Descifraste el código en {myGuesses.length} intentos
                 </p>
               </>
             )}
@@ -124,7 +124,7 @@ export default function CodigoSecretoGame({ room, userId, roomCode, onReplay, on
                   PERDISTE
                 </p>
                 <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-6">
-                  {room.winner === null ? 'Nadie descifro el codigo' : 'Tu rival descifro el codigo primero'}
+                  {room.winner === null ? 'Nadie descifró el código' : 'Tu rival descifró el código primero'}
                 </p>
               </>
             )}
@@ -143,7 +143,7 @@ export default function CodigoSecretoGame({ room, userId, roomCode, onReplay, on
             <div className="flex gap-4 mb-6">
               <div className="flex-1 border-2 border-black dark:border-white bg-gray-50 dark:bg-gray-700 p-3">
                 <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1">
-                  Tu codigo
+                  Tu código
                 </p>
                 <p className="text-xl font-black tracking-widest text-black dark:text-white">
                   {myCode.split('').join(' ')}
@@ -151,7 +151,7 @@ export default function CodigoSecretoGame({ room, userId, roomCode, onReplay, on
               </div>
               <div className="flex-1 border-2 border-black dark:border-white bg-gray-50 dark:bg-gray-700 p-3">
                 <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1">
-                  Codigo rival
+                  Código rival
                 </p>
                 <p className="text-xl font-black tracking-widest text-cyan-500 dark:text-cyan-400">
                   {opponentCode.split('').join(' ')}
@@ -182,7 +182,7 @@ export default function CodigoSecretoGame({ room, userId, roomCode, onReplay, on
           <div className="flex items-center justify-between">
             <div className="border-2 border-black dark:border-white bg-gray-100 dark:bg-gray-800 px-3 py-1.5">
               <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-                Tu codigo:
+                Tu código:
               </span>
               <span className="ml-2 text-sm font-black tracking-widest text-black dark:text-white">
                 {myCode.split('').join(' ')}
@@ -202,7 +202,7 @@ export default function CodigoSecretoGame({ room, userId, roomCode, onReplay, on
         {canGuess ? (
           <div className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] space-y-4">
             <p className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 text-center">
-              Adivina el codigo de {(opponent?.name ?? 'rival').split(' ')[0]}
+              Adivina el código de {(opponent?.name ?? 'rival').split(' ')[0]}
             </p>
 
             <div className="flex justify-center gap-3">
@@ -258,7 +258,7 @@ export default function CodigoSecretoGame({ room, userId, roomCode, onReplay, on
           <div className="p-4">
             {myGuesses.length === 0 ? (
               <p className="text-xs font-bold text-gray-400 dark:text-gray-500 text-center uppercase tracking-wider py-4">
-                Aun no has adivinado
+                Aún no has adivinado
               </p>
             ) : (
               <div className="space-y-2">
@@ -321,7 +321,7 @@ export default function CodigoSecretoGame({ room, userId, roomCode, onReplay, on
         )}
       </div>
 
-      {showInfo && <GameInfoModal title="Codigo Secreto" rules={CODIGO_RULES} onClose={() => setShowInfo(false)} />}
+      {showInfo && <GameInfoModal title="Código Secreto" rules={CODIGO_RULES} onClose={() => setShowInfo(false)} />}
     </div>
   )
 }

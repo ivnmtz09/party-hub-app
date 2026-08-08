@@ -93,7 +93,7 @@ export default function SideDrawer({ open, onClose }: Props) {
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between p-4 border-b-4 border-black dark:border-white bg-gradient-to-r from-yellow-300 to-amber-500 shrink-0">
             <h2 className="text-lg font-black uppercase tracking-wider text-black dark:text-gray-900">
-              Menu
+              Menú
             </h2>
             <button
               onClick={() => {
@@ -150,7 +150,7 @@ export default function SideDrawer({ open, onClose }: Props) {
               className="w-full flex items-center gap-3 px-3 py-3 border-2 border-black dark:border-white bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-500 font-black uppercase tracking-wider text-sm text-gray-900 dark:text-white shadow-brutal-sm dark:shadow-brutal-sm-dark active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
             >
               <HelpCircle size={20} strokeWidth={2.5} />
-              <span className="flex-1 text-left">Como jugar</span>
+              <span className="flex-1 text-left">Cómo jugar</span>
               <ChevronDown
                 size={16}
                 strokeWidth={2.5}
@@ -219,7 +219,7 @@ export default function SideDrawer({ open, onClose }: Props) {
               </span>
               <span className="inline-flex items-center gap-1.5 text-xs font-mono text-gray-600 dark:text-gray-400 uppercase tracking-widest">
                 <Code size={12} strokeWidth={2.5} />
-                Version 1.10.0
+                Versión 1.10.0
               </span>
             </div>
           </div>
@@ -238,7 +238,7 @@ export default function SideDrawer({ open, onClose }: Props) {
               </p>
             </div>
             <p className="text-sm font-bold text-gray-600 dark:text-gray-400">
-              Estas seguro de que quieres cerrar sesión? Tendras que volver a
+              ¿Estás seguro de que quieres cerrar sesión? Tendrás que volver a
               iniciar con Google.
             </p>
             <div className="flex gap-3">

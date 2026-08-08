@@ -20,7 +20,7 @@ export default function CreateRoomButton({
   loading,
   icon,
   title = 'CREAR SALA',
-  subtitle = 'Invita a tus amigos con un codigo',
+  subtitle = 'Invita a tus amigos con un código',
 }: Props) {
   const theme: GameTheme = GAME_THEMES[themeId] ?? GAME_THEMES.impostor!
 

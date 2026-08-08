@@ -121,7 +121,7 @@ export function useImpostorOnline({
       try {
         await actualizarConfigImpostor(roomCode, config)
       } catch {
-        onError?.('Error al actualizar la configuracion')
+        onError?.('Error al actualizar la configuración')
       }
     },
     [roomCode, onError],
@@ -187,7 +187,7 @@ export function useImpostorOnline({
     try {
       await pasarAVotacionImpostor(roomCode)
     } catch {
-      onError?.('Error al pasar a votacion')
+      onError?.('Error al pasar a votación')
     }
   }, [roomCode, onError])
 
@@ -208,7 +208,7 @@ export function useImpostorOnline({
     try {
       await finalizarVotacionImpostor(roomCode)
     } catch {
-      onError?.('Error al cerrar la votacion')
+      onError?.('Error al cerrar la votación')
     }
   }, [roomCode, onError])
 

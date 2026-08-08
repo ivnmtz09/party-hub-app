@@ -41,7 +41,7 @@ export default function ArcadePage() {
         Arcade
       </h2>
       <p className="text-gray-500 dark:text-gray-400 mt-2 mb-6 font-bold uppercase tracking-wider text-sm">
-        Catalogo de juegos
+        Catálogo de juegos
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -89,7 +89,7 @@ export default function ArcadePage() {
               </button>
             ) : (
               <div className="w-full py-3 bg-gray-200 dark:bg-gray-700 border-t-4 border-black dark:border-white text-gray-500 dark:text-gray-400 font-black uppercase tracking-wider text-xs text-center">
-                Proximamente
+                Próximamente
               </div>
             )}
           </div>

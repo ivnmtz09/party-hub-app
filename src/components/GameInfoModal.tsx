@@ -42,7 +42,7 @@ export default function GameInfoModal({ title, rules, onClose }: Props) {
 
         <div className="p-4 sm:p-5 space-y-3">
           <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-            Como Jugar
+            Cómo Jugar
           </p>
           <ol className="space-y-2.5">
             {rules.map((rule, i) => (

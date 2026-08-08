@@ -44,7 +44,7 @@ export default function GlitchOverlay({ title, onComplete }: Props) {
 
       <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
         <p className="font-black uppercase tracking-widest text-[10px] text-cyan-300 mb-6 animate-pulse">
-          CORRUPCION DE DATOS
+          CORRUPCIÓN DE DATOS
         </p>
         <h1
           className="glitch-text text-4xl sm:text-5xl font-black uppercase tracking-tighter text-white"

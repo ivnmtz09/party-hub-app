@@ -29,7 +29,7 @@ import BrandLogo from '../components/BrandLogo'
 /* ─── Tipos de actividad ─── */
 
 const REACTION_CONFIG: Record<ReactionType, { label: string; activeBg: string }> = {
-  heart: { label: 'Corazon', activeBg: 'bg-red-500' },
+  heart: { label: 'Corazón', activeBg: 'bg-red-500' },
   flame: { label: 'Fuego', activeBg: 'bg-orange-500' },
   smile: { label: 'Sonrisa', activeBg: 'bg-yellow-200' },
   skull: { label: 'Calavera', activeBg: 'bg-gray-400' },
@@ -208,7 +208,7 @@ export default function RegistroPage() {
     try {
       await addComment(id, {
         userId: user.uid,
-        nickname: userProfile?.nickname || user.displayName || 'Anonimo',
+        nickname: userProfile?.nickname || user.displayName || 'Anónimo',
         text,
         avatarColor: userProfile?.avatar || '#fbbf24',
         avatarType: userProfile?.avatarType || 'letter',
@@ -267,7 +267,7 @@ export default function RegistroPage() {
             className="bg-white dark:bg-gray-800 border-4 border-black dark:border-white p-3 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none font-black uppercase flex items-center gap-2 transition-all text-black dark:text-white w-fit"
           >
             <ArrowLeft size={20} strokeWidth={2.5} />
-            ATRAS
+            ATRÁS
           </button>
         </div>
 
@@ -276,7 +276,7 @@ export default function RegistroPage() {
             VISTA NO DISPONIBLE
           </p>
           <p className="text-sm sm:text-base font-bold uppercase tracking-wider text-gray-300 leading-relaxed">
-            LA INFORMACION DE ESTE REGISTRO ES MUY ANTIGUA
+            LA INFORMACIÓN DE ESTE REGISTRO ES MUY ANTIGUA
             O EL FORMATO NO ESTA HABILITADO PARA ESTA VISTA.
           </p>
         </div>
@@ -293,13 +293,13 @@ export default function RegistroPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="w-full max-w-2xl mx-auto p-4 sm:p-6 space-y-6">
 
-        {/* ─── Boton ATRAS ─── */}
+        {/* ─── Boton ATRÁS ─── */}
         <button
           onClick={() => navigate(-1)}
           className="bg-white dark:bg-gray-800 border-4 border-black dark:border-white p-3 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none font-black uppercase flex items-center gap-2 w-fit transition-all text-black dark:text-white"
         >
           <ArrowLeft size={20} strokeWidth={2.5} />
-          ATRAS
+          ATRÁS
         </button>
 
         {/* ─── Cabecera con titulo ─── */}
@@ -357,7 +357,7 @@ export default function RegistroPage() {
             <div>
               <div className="flex items-center justify-between mb-3">
                 <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-                  CALIFICACION
+                  CALIFICACIÓN
                 </p>
                 <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
                   {evento.rating ?? 0} / 5
@@ -465,7 +465,7 @@ export default function RegistroPage() {
           <div className="p-4 sm:p-5 space-y-3">
             {comments.length === 0 ? (
               <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 text-center uppercase tracking-wider py-6">
-                AUN NO HAY COMENTARIOS, ANIMATE
+                AÚN NO HAY COMENTARIOS, ANÍMATE
               </p>
             ) : (
               <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
@@ -506,7 +506,7 @@ export default function RegistroPage() {
                 onClick={() => { playClickSound(); setVisibleLimit((prev) => prev + 5) }}
                 className="w-full text-[10px] font-black border-2 border-black dark:border-white bg-gray-200 dark:bg-gray-700 py-2.5 hover:bg-gray-300 dark:hover:bg-gray-600 uppercase tracking-wider transition-colors text-black dark:text-white"
               >
-                VER MAS COMENTARIOS...
+                VER MÁS COMENTARIOS...
               </button>
             )}
 

@@ -23,7 +23,7 @@ interface Props {
 
 function pickRandomCard(deck: DeckContenido | undefined, used: Set<string>): string {
   const cartas = deck?.cartas ?? []
-  const pool = cartas.length > 0 ? cartas : ['¿Quien es mas probable que...?']
+  const pool = cartas.length > 0 ? cartas : ['¿Quién es más probable que...?']
   const available = pool.filter((c) => !used.has(c))
   if (available.length === 0) return pool[Math.floor(Math.random() * pool.length)]!
   return available[Math.floor(Math.random() * available.length)]!
@@ -59,11 +59,11 @@ export default function DedoLlagaOnline({
   const [showInfo, setShowInfo] = useState(false)
 
   const rules = [
-    'Lee la carta en voz alta: "¿Quien es mas probable que...?"',
-    'Cada jugador vota por quien cree que haria lo que dice la carta.',
-    'El mas votado recibe la penitencia: un shot.',
+    'Lee la carta en voz alta: "¿Quién es más probable que...?"',
+    'Cada jugador vota por quien cree que haría lo que dice la carta.',
+    'El más votado recibe la penitencia: un shot.',
     'En caso de empate, los empatados se toman un shot.',
-    'El anfitrion avanza a la siguiente carta con SIGUIENTE CARTA.',
+    'El anfitrión avanza a la siguiente carta con SIGUIENTE CARTA.',
   ]
 
   useEffect(() => {
@@ -197,7 +197,7 @@ export default function DedoLlagaOnline({
 
           {!isHost && (
             <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-center">
-              Esperando a que el anfitrion avance...
+              Esperando a que el anfitrión avance...
             </p>
           )}
         </div>
@@ -236,7 +236,7 @@ export default function DedoLlagaOnline({
           <div className="flex flex-col items-center gap-4 w-full mb-6">
             <Loader2 size={24} className="animate-spin" strokeWidth={2.5} />
             <p className="text-sm font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">
-              ESPERANDO A LOS DEMAS... (Votos: {totalVotes}/{totalPlayers})
+              ESPERANDO A LOS DEMÁS... (Votos: {totalVotes}/{totalPlayers})
             </p>
           </div>
         ) : (

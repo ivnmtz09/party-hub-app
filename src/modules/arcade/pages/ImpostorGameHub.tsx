@@ -68,7 +68,7 @@ function ModeSelection({ onSelect }: { onSelect: (mode: GameMode) => void }) {
             <div className="text-left">
               <p className="font-black uppercase tracking-wider text-lg">Un solo celular</p>
               <p className="text-xs font-bold text-black/70">
-                Pasa el telefono y revela roles uno por uno
+                Pasa el teléfono y revela roles uno por uno
               </p>
             </div>
           </button>
@@ -81,7 +81,7 @@ function ModeSelection({ onSelect }: { onSelect: (mode: GameMode) => void }) {
               <Wifi size={28} strokeWidth={2.5} />
             </div>
 <div className="text-left flex-1">
-              <p className="font-black uppercase tracking-wider text-lg">Sala en linea</p>
+              <p className="font-black uppercase tracking-wider text-lg">Sala en línea</p>
               <p className="text-xs font-bold text-black/70">
                 Crea una sala y juega con otros dispositivos
               </p>

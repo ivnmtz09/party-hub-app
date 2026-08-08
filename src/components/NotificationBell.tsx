@@ -78,12 +78,12 @@ function textoNotificacion(n: Notificacion) {
   const actividad = ACTIVITY_LABEL[n.activityType] ?? n.activityType
   return n.type === 'reaction' ? (
     <span className="text-xs font-bold text-black dark:text-white">
-      <span className="font-black">{n.actorName}</span> reacciono a tu{' '}
+      <span className="font-black">{n.actorName}</span> reaccionó a tu{' '}
       <span className="font-black">{actividad}</span>
     </span>
   ) : (
     <span className="text-xs font-bold text-black dark:text-white">
-      <span className="font-black">{n.actorName}</span> comento en tu{' '}
+      <span className="font-black">{n.actorName}</span> comentó en tu{' '}
       <span className="font-black">{actividad}</span>
     </span>
   )

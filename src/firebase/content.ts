@@ -79,12 +79,12 @@ export interface ManualContenido {
 export const JUEGOS_DEFAULT: JuegoContenido[] = [
   { id: 'impostor', title: 'El Impostor', description: 'Descubre al impostor antes de que sea demasiado tarde', icon: 'UserX', path: '/arcade/impostor', active: true, order: 0 },
   { id: 'dedo', title: 'Quién Es Más Probable...?', description: 'Multijugador: ¿quién es más probable que...?', icon: 'Hand', path: '/arcade/juego', active: true, turbio: true, order: 1 },
-  { id: 'yo-nunca', title: 'Yo Nunca', description: 'Confiesa tus pecados mas oscuros', icon: 'Skull', path: '/arcade/yo-nunca', active: true, turbio: true, order: 2 },
+  { id: 'yo-nunca', title: 'Yo Nunca', description: 'Confiesa tus pecados más oscuros', icon: 'Skull', path: '/arcade/yo-nunca', active: true, turbio: true, order: 2 },
   { id: 'frente', title: 'Frente a Frente', description: 'Charadas en equipo. Adivina famosos con el celular en la frente', icon: 'Users', path: '/arcade/frente-a-frente', active: true, order: 3 },
-  { id: 'bomba', title: 'Bomba de Tiempo', description: 'Responde rapido o la bomba explota', icon: 'Bomb', path: '/arcade/bomba', active: true, turbio: true, order: 4 },
-  { id: 'codigo-secreto', title: 'Codigo Secreto', description: 'Adivina el codigo de 4 cifras de tu rival (1v1)', icon: 'Lock', path: '/arcade/codigo-secreto', active: true, order: 5 },
-  { id: 'ruleta', title: 'Ruleta Personalizada', description: 'Agrega opciones, girala y descubre el resultado', icon: 'RotateCw', path: '/arcade/rouleta', active: true, order: 6 },
-  { id: 'mansion', title: 'Misterio en la Mansion', description: 'Deduccion y thriller psicologico', icon: 'Search', path: '#', active: false, order: 7 },
+  { id: 'bomba', title: 'Bomba de Tiempo', description: 'Responde rápido o la bomba explota', icon: 'Bomb', path: '/arcade/bomba', active: true, turbio: true, order: 4 },
+  { id: 'codigo-secreto', title: 'Código Secreto', description: 'Adivina el código de 4 cifras de tu rival (1v1)', icon: 'Lock', path: '/arcade/codigo-secreto', active: true, order: 5 },
+  { id: 'ruleta', title: 'Ruleta Personalizada', description: 'Agrega opciones, gírala y descubre el resultado', icon: 'RotateCw', path: '/arcade/rouleta', active: true, order: 6 },
+  { id: 'mansion', title: 'Misterio en la Mansión', description: 'Deducción y thriller psicológico', icon: 'Search', path: '#', active: false, order: 7 },
 ]
 
 export const SUCESOS_DEFAULT: SucesoContenido[] = [
@@ -163,10 +163,10 @@ function mapIconActividad(tipo: string): string {
 
 export const LOGIN_DEFAULT = {
   terminos: [
-    '1. PRIVACIDAD: Tu cuenta de Google solo se usa para autenticacion y gestion de perfil. No vendemos tus datos.',
-    '2. RESPONSABILIDAD: Esta es una aplicacion de entretenimiento. El contenido generado (juegos, votaciones, registros) es responsabilidad absoluta de los usuarios.',
-    '3. COMPORTAMIENTO: Se prohibe el uso de la plataforma para acoso, bullying o difusion de contenido ilegal. El incumplimiento causara la expulsion inmediata del grupo.',
-    '4. NATURALEZA DEL JUEGO: Al aceptar, reconoces que los juegos son de caracter recreativo y pueden incluir temas personales o sensibles. Juega con criterio.',
+    '1. PRIVACIDAD: Tu cuenta de Google solo se usa para autenticación y gestión de perfil. No vendemos tus datos.',
+    '2. RESPONSABILIDAD: Esta es una aplicación de entretenimiento. El contenido generado (juegos, votaciones, registros) es responsabilidad absoluta de los usuarios.',
+    '3. COMPORTAMIENTO: Se prohíbe el uso de la plataforma para acoso, bullying o difusión de contenido ilegal. El incumplimiento causará la expulsión inmediata del grupo.',
+    '4. NATURALEZA DEL JUEGO: Al aceptar, reconoces que los juegos son de carácter recreativo y pueden incluir temas personales o sensibles. Juega con criterio.',
   ],
   features: [
     { text: 'Destruye amistades en el Arcade con Yo Nunca y el Dedo en la Llaga.', icon: 'Swords' },
@@ -178,22 +178,22 @@ export const LOGIN_DEFAULT = {
 export const MANUAL_DEFAULT: ManualContenido[] = [
   {
     title: 'Inicio',
-    desc: 'Administras tus grupos. Ves los codigos de invitacion y las tarjetas de estadisticas de cada miembro (conteo y ultima vez de Cagadas, Culeadas, Meadas y dias de Gym).',
+    desc: 'Administras tus grupos. Ves los códigos de invitación y las tarjetas de estadísticas de cada miembro (conteo y última vez de Cagadas, Culeadas, Meadas y días de Gym).',
     icon: 'Home',
   },
   {
     title: 'Tablero',
-    desc: 'Es el registro de eventos principales. Publicas tus Cagadas, Culeadas, Meadas y Gym. Puedes reaccionar y comentar las publicaciones de tus amigos y ver graficos estadisticos mensuales.',
+    desc: 'Es el registro de eventos principales. Publicas tus Cagadas, Culeadas, Meadas y Gym. Puedes reaccionar y comentar las publicaciones de tus amigos y ver gráficos estadísticos mensuales.',
     icon: 'ClipboardList',
   },
   {
-    title: 'Mural (Gamificacion)',
-    desc: 'Panel de habitos diarios. Registra acciones rapidas para ganar Puntos de Experiencia (XP). Habitos buenos suman +1 XP, habitos malos restan -1 XP. El peso (subir/bajar) es neutro (0 XP). Cada vaso de agua de 200ml suma +0.2 XP. El feed se limpia cada medianoche, pero el XP se acumula todo el mes para el ranking del grupo.',
+    title: 'Mural (Gamificación)',
+    desc: 'Panel de hábitos diarios. Registra acciones rápidas para ganar Puntos de Experiencia (XP). Hábitos buenos suman +1 XP, hábitos malos restan -1 XP. El peso (subir/bajar) es neutro (0 XP). Cada vaso de agua de 200ml suma +0.2 XP. El feed se limpia cada medianoche, pero el XP se acumula todo el mes para el ranking del grupo.',
     icon: 'Star',
   },
   {
     title: 'Arcade',
-    desc: 'Catalogo de minijuegos multijugador para pasar el rato con tu grupo: Impostor, Bomba de Tiempo, Ruleta, Dedo en la Llaga, Codigo Secreto y Frente a Frente.',
+    desc: 'Catálogo de minijuegos multijugador para pasar el rato con tu grupo: Impostor, Bomba de Tiempo, Ruleta, Dedo en la Llaga, Código Secreto y Frente a Frente.',
     icon: 'Gamepad2',
   },
 ]

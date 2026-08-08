@@ -125,7 +125,7 @@ export async function unirseGrupo(codigo: string, user: User): Promise<string> {
   const snapshot = await getDocs(q)
 
   if (snapshot.empty) {
-    throw new Error('Codigo no encontrado')
+    throw new Error('Código no encontrado')
   }
 
   const grupoDoc = snapshot.docs[0]!
@@ -682,7 +682,7 @@ export async function unirseSala(
   if (!snap.exists()) throw new Error('Sala no encontrada')
 
   const data = snap.data() as Sala
-  if (data.status !== 'LOBBY') throw new Error('La partida ya empezo')
+  if (data.status !== 'LOBBY') throw new Error('La partida ya empezó')
 
   const exists = data.players.some((p) => p.id === userId)
   if (!exists) {
@@ -848,7 +848,7 @@ export async function unirseSalaDedo(
   if (!snap.exists()) throw new Error('Sala no encontrada')
 
   const data = snap.data() as DedoRoom
-  if (data.phase !== 'lobby') throw new Error('La partida ya empezo')
+  if (data.phase !== 'lobby') throw new Error('La partida ya empezó')
 
   const exists = data.players.some((p) => p.id === userId)
   if (!exists) {
@@ -978,7 +978,7 @@ export async function unirseSalaYoNunca(
 
   const data = snap.data() as YoNuncaRoom
   if (data.game !== 'yo_nunca') throw new Error('La sala no es de Yo Nunca')
-  if (data.phase !== 'lobby') throw new Error('La partida ya empezo')
+  if (data.phase !== 'lobby') throw new Error('La partida ya empezó')
 
   const exists = data.players.some((p) => p.id === userId)
   if (!exists) {
@@ -1114,7 +1114,7 @@ export async function unirseSalaCodigo(
   if (!snap.exists()) throw new Error('Sala no encontrada')
 
   const data = snap.data() as CodigoRoom
-  if (data.phase !== 'lobby') throw new Error('La partida ya empezo')
+  if (data.phase !== 'lobby') throw new Error('La partida ya empezó')
   if (data.players.length >= 2) throw new Error('Sala llena')
 
   const exists = data.players.some((p) => p.id === userId)
@@ -1310,7 +1310,7 @@ export async function unirseSalaFrente(
   if (!snap.exists()) throw new Error('Sala no encontrada')
 
   const data = snap.data() as FrenteRoom
-  if (data.phase !== 'lobby') throw new Error('La partida ya empezo')
+  if (data.phase !== 'lobby') throw new Error('La partida ya empezó')
 
   const exists = data.players.some((p) => p.id === userId)
   if (!exists) {
@@ -1607,7 +1607,7 @@ export async function unirseSalaImpostor(
   if (!snap.exists()) throw new Error('Sala no encontrada')
 
   const data = snap.data() as ImpostorRoom
-  if (data.status !== 'LOBBY') throw new Error('La partida ya empezo')
+  if (data.status !== 'LOBBY') throw new Error('La partida ya empezó')
 
   const existing = data.players.find((p) => p.id === userId)
   if (existing) {
@@ -1793,8 +1793,8 @@ export async function unirseSalaBomba(
   if (!snap.exists()) throw new Error('Sala no encontrada')
 
   const data = snap.data() as BombaRoom
-  if (data.game !== 'bomba') throw new Error('El codigo no corresponde a una sala de Bomba')
-  if (data.phase !== 'lobby') throw new Error('La partida ya empezo')
+  if (data.game !== 'bomba') throw new Error('El código no corresponde a una sala de Bomba')
+  if (data.phase !== 'lobby') throw new Error('La partida ya empezó')
 
   const exists = data.players.some((p) => p.id === userId)
   if (!exists) {

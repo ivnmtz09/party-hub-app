@@ -110,7 +110,7 @@ export default function ResultsPage() {
           ) : (
             <>
               <p className="font-black uppercase tracking-wider text-sm text-center text-red-600 dark:text-red-400">
-                El impostor logro escapar
+                El impostor logró escapar
               </p>
               <div className="border-t-2 border-black dark:border-white pt-4">
                 <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">

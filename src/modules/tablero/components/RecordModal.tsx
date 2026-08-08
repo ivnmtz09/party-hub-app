@@ -250,7 +250,7 @@ export default function RecordModal(props: Props) {
           <div className="space-y-4">
             <div className="border-4 border-black dark:border-white p-4 bg-gray-50 dark:bg-gray-700">
               <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
-                Calificacion
+                Calificación
               </p>
               {renderStars(rating, true)}
             </div>
@@ -287,7 +287,7 @@ export default function RecordModal(props: Props) {
                   className="flex-1 flex items-center justify-center gap-2 py-3 px-4 border-4 border-black dark:border-white bg-gray-300 dark:bg-gray-700 text-black dark:text-white font-bold text-xs uppercase tracking-wider cursor-not-allowed opacity-70 transition-colors"
                 >
                   <Edit size={16} strokeWidth={2.5} />
-                  Galeria
+                  Galería
                 </button>
               </div>
               {photoUrl && (
@@ -340,7 +340,7 @@ export default function RecordModal(props: Props) {
           <div className="space-y-4">
             <div className="border-4 border-black dark:border-white p-4 bg-gray-50 dark:bg-gray-700">
               <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
-                Calificacion
+                Calificación
               </p>
               {renderStars(rating)}
             </div>

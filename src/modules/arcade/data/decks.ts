@@ -168,7 +168,7 @@ export const decks: GameDeck[] = [
   {
     id: 'yo-nunca',
     titulo: 'Yo Nunca',
-    descripcion: 'Confiesa tus pecados mas oscuros',
+    descripcion: 'Confiesa tus pecados más oscuros',
     esTurbio: true,
     cartas: [
       'He tirado un pedo y culpado al perro en una cita',

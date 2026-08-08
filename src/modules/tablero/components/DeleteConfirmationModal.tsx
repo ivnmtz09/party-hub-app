@@ -37,7 +37,7 @@ export default function DeleteConfirmationModal({
         </div>
 
         <p className="text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400">
-          Esta accion descontara el registro del marcador del usuario.
+          Esta acción descontará el registro del marcador del usuario.
         </p>
 
         <div className="flex gap-3">

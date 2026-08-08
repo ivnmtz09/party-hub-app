@@ -38,10 +38,10 @@ export default function RoleRevealPage() {
       <div className="flex-1 flex flex-col items-center justify-center gap-6 max-w-md mx-auto w-full p-4">
         <div className="text-center">
           <p className="text-xs font-black uppercase tracking-widest text-fuchsia-500 dark:text-fuchsia-400">
-            Revelacion de roles
+            Revelación de roles
           </p>
           <h1 className="text-xl sm:text-2xl font-black uppercase tracking-wider mt-1">
-            Pasa el telefono a{' '}
+            Pasa el teléfono a{' '}
             <span className="text-fuchsia-600 dark:text-fuchsia-400">
               {currentPlayer.name.split(' ')[0]}
             </span>
@@ -62,7 +62,7 @@ export default function RoleRevealPage() {
         />
 
         <p className="text-[10px] sm:text-xs font-bold text-gray-400 dark:text-gray-500 text-center max-w-xs">
-          Asegurate de que los demas jugadores no vean la pantalla en el momento de tu rol
+          Asegúrate de que los demás jugadores no vean la pantalla en el momento de tu rol
         </p>
       </div>
 

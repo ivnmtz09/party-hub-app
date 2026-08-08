@@ -50,7 +50,7 @@ export default function CardGameEngine({ deck }: Props) {
           <Hand size={40} strokeWidth={2.5} className="mb-6 opacity-40 text-black dark:text-white" />
           {isDedoEnLaLlaga && (
             <p className="text-sm font-black uppercase tracking-widest text-fuchsia-500 dark:text-fuchsia-400 mb-4">
-              ¿QUIEN ES MAS PROBABLE QUE...
+              ¿QUIÉN ES MÁS PROBABLE QUE...
             </p>
           )}
           <p className="text-2xl sm:text-3xl font-black text-black dark:text-white uppercase tracking-tighter leading-tight">

@@ -83,7 +83,7 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
     try {
       await addComment(evento.id, {
         userId: currentUserId,
-        nickname: userProfile?.nickname || user?.displayName || 'Anonimo',
+        nickname: userProfile?.nickname || user?.displayName || 'Anónimo',
         text,
         avatarColor: userProfile?.avatar || '#fbbf24',
         avatarType: userProfile?.avatarType || 'letter',
@@ -169,7 +169,7 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
 
         <div>
           <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1">
-            Calificacion
+            Calificación
           </p>
           {renderStars(rating)}
         </div>
@@ -252,7 +252,7 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
             </h4>
             {reactionUsers.length === 0 ? (
               <p className="font-bold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                Aun no hay reacciones
+                Aún no hay reacciones
               </p>
             ) : (
               <div>
@@ -305,7 +305,7 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
               onClick={() => setVisibleCommentsLimit((prev) => prev + 5)}
               className="w-full mt-2 text-sm font-black border-2 border-black bg-gray-200 py-1 hover:bg-gray-300 uppercase tracking-wider text-[10px]"
             >
-              VER MAS COMENTARIOS...
+              VER MÁS COMENTARIOS...
             </button>
           )}
 
@@ -352,7 +352,7 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
 
       <div>
         <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1">
-          Calificacion
+          Calificación
         </p>
         {renderStars(rating, true)}
       </div>
@@ -381,7 +381,7 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
             className="flex-1 flex items-center justify-center gap-1 py-2 px-3 border-2 border-black dark:border-white bg-gray-300 dark:bg-gray-700 text-black dark:text-white font-bold text-[10px] uppercase tracking-wider cursor-not-allowed opacity-70 transition-colors"
           >
             <Camera size={12} strokeWidth={2.5} />
-            Camara
+            Cámara
           </button>
           <button
             type="button"
@@ -389,7 +389,7 @@ export default function ActivityDetailOrEdit({ evento, groupId, isOwner, onClose
             className="flex-1 flex items-center justify-center gap-1 py-2 px-3 border-2 border-black dark:border-white bg-gray-300 dark:bg-gray-700 text-black dark:text-white font-bold text-[10px] uppercase tracking-wider cursor-not-allowed opacity-70 transition-colors"
           >
             <Edit size={12} strokeWidth={2.5} />
-            Galeria
+            Galería
           </button>
         </div>
         {photoUrl && (

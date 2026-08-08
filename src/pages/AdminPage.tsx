@@ -43,7 +43,7 @@ export default function AdminPage() {
           className="bg-white dark:bg-gray-800 border-4 border-black dark:border-white p-3 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none font-black uppercase flex items-center gap-2 w-fit transition-all text-black dark:text-white"
         >
           <ArrowLeft size={20} strokeWidth={2.5} />
-          ATRAS
+          ATRÁS
         </button>
 
         <div className="border-4 border-black dark:border-white bg-yellow-300 dark:bg-yellow-400 p-5 shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden">

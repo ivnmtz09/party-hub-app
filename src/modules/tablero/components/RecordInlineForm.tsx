@@ -22,7 +22,7 @@ interface Props {
   onSave: (tipo: 'deposicion' | 'acto_sexual' | 'gym' | 'meada', data: { rating: number; note: string; photoUrl: string }) => Promise<void>
 }
 
-const PHOTO_DISABLED_MESSAGE = 'SUBIDA DE IMAGENES TEMPORALMENTE DESHABILITADA'
+const PHOTO_DISABLED_MESSAGE = 'SUBIDA DE IMÁGENES TEMPORALMENTE DESHABILITADA'
 
 export default function RecordInlineForm({ onClose, onSave }: Props) {
   const { showToast } = useNeoToast()
@@ -123,7 +123,7 @@ export default function RecordInlineForm({ onClose, onSave }: Props) {
 
           <div className="border-4 border-black dark:border-white p-3 bg-gray-50 dark:bg-gray-700">
             <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
-              Calificacion
+              Calificación
             </p>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((n) => (
@@ -171,7 +171,7 @@ export default function RecordInlineForm({ onClose, onSave }: Props) {
                 className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 border-4 border-black dark:border-white bg-gray-300 dark:bg-gray-700 text-black dark:text-white font-bold text-[10px] uppercase tracking-wider cursor-not-allowed opacity-70 transition-colors"
               >
                 <Camera size={14} strokeWidth={2.5} />
-                Camara
+                Cámara
               </button>
               <button
                 type="button"
@@ -179,7 +179,7 @@ export default function RecordInlineForm({ onClose, onSave }: Props) {
                 className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 border-4 border-black dark:border-white bg-gray-300 dark:bg-gray-700 text-black dark:text-white font-bold text-[10px] uppercase tracking-wider cursor-not-allowed opacity-70 transition-colors"
               >
                 <Edit size={14} strokeWidth={2.5} />
-                Galeria
+                Galería
               </button>
             </div>
           </div>

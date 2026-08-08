@@ -98,7 +98,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
     setError('')
     const code = codeInput.trim().toUpperCase()
     if (code.length < 5) {
-      setError('Ingresa el codigo de la sala')
+      setError('Ingresa el código de la sala')
       return
     }
     const ok = await game.joinRoom(code)
@@ -150,7 +150,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
         <div className="flex-1 flex flex-col items-center justify-center gap-6 max-w-md mx-auto w-full p-4 pb-12">
           <div className="text-center space-y-2">
             <p className="text-xs font-black uppercase tracking-widest text-fuchsia-500 dark:text-fuchsia-400">
-              Sala en linea
+              Sala en línea
             </p>
             <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-wider">
               Juega con amigos
@@ -167,7 +167,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
             <div className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-5 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] space-y-4">
               <div>
                 <p className="font-black uppercase tracking-wider text-sm mb-2">
-                  Categorias
+                  Categorías
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   {categoryMap.map(({ name, icon: Icon }) => {
@@ -235,7 +235,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
           ) : panel === 'join' ? (
             <div className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] space-y-4">
               <p className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 text-center">
-                Ingresa el codigo de 5 o 6 letras
+                Ingresa el código de 5 o 6 letras
               </p>
               <input
                 type="text"
@@ -277,7 +277,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
                 disabled={false}
                 loading={false}
                 title="Crear sala"
-                subtitle="Invita a tus amigos con un codigo"
+                subtitle="Invita a tus amigos con un código"
                 icon={<Plus size={24} strokeWidth={2.5} />}
               />
               <button
@@ -288,7 +288,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
                   <LogIn size={24} strokeWidth={2.5} />
                 </div>
                 <div className="text-left">
-                  <p className="font-black uppercase tracking-wider text-lg">Unirse con codigo</p>
+                  <p className="font-black uppercase tracking-wider text-lg">Unirse con código</p>
                   <p className="text-xs font-bold text-black/70">Entra a la sala de un amigo</p>
                 </div>
               </button>
@@ -296,7 +296,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
                 onClick={onExit}
                 className="w-full py-3 border-2 border-black bg-white text-gray-500 font-black uppercase tracking-wider text-xs active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
               >
-                Volver al menu de modos
+                Volver al menú de modos
               </button>
             </div>
           )}
@@ -343,7 +343,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
         <div className="flex-1 w-full max-w-md mx-auto flex flex-col gap-5 p-4 pb-10">
           <div className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-5 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] text-center">
             <p className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
-              Codigo de sala
+              Código de sala
             </p>
             <button
               onClick={handleCopy}
@@ -353,7 +353,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
               {room.code}
             </button>
             <p className="text-xs font-bold text-gray-500 dark:text-gray-400 mt-3 uppercase tracking-wider">
-              Comparte este codigo con tus amigos
+              Comparte este código con tus amigos
             </p>
           </div>
 
@@ -375,7 +375,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
                   {p.id === room.hostId && (
                     <span className="ml-auto flex items-center gap-1 border-2 border-black bg-yellow-300 text-black text-[10px] font-black uppercase tracking-widest px-2 py-0.5">
                       <Crown size={12} strokeWidth={2.5} />
-                      Anfitrion
+                      Anfitrión
                     </span>
                   )}
                 </div>
@@ -393,7 +393,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
             <>
               <div className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] space-y-3">
                 <p className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-                  Configuracion
+                  Configuración
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   {categoryMap.map(({ name, icon: Icon }) => {
@@ -457,7 +457,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
           ) : (
             <div className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-5 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] text-center">
               <p className="font-black uppercase tracking-wider text-sm text-gray-500 dark:text-gray-400">
-                Esperando al anfitrion para iniciar...
+                Esperando al anfitrión para iniciar...
               </p>
             </div>
           )}
@@ -519,12 +519,12 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
               className="w-full flex items-center justify-center gap-2 py-4 border-4 border-black bg-cyan-300 text-black font-black uppercase tracking-wider text-lg shadow-[8px_8px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
             >
               <Vote size={22} strokeWidth={2.5} />
-              Pasar a votacion
+              Pasar a votación
             </button>
           ) : (
             <div className="w-full border-2 border-dashed border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 p-4 text-center">
               <p className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-                Esperando a que el anfitrion inicie la votacion...
+                Esperando a que el anfitrión inicie la votación...
               </p>
             </div>
           )}
@@ -548,11 +548,11 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
             <p className="text-xs font-black uppercase tracking-widest text-fuchsia-500 dark:text-fuchsia-400">
               Ronda {room.rounds}
             </p>
-            <h1 className="text-2xl font-black uppercase tracking-wider mt-1">Votacion</h1>
+            <h1 className="text-2xl font-black uppercase tracking-wider mt-1">Votación</h1>
             <p className="text-xs font-bold text-gray-500 dark:text-gray-400 mt-1">
               {myVote
-                ? 'Voto registrado. Espera a los demas...'
-                : 'Elige a quien crees que es el impostor'}
+                ? 'Voto registrado. Espera a los demás...'
+                : 'Elige a quién crees que es el impostor'}
             </p>
           </div>
 
@@ -606,7 +606,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
                 className="w-full flex items-center justify-center gap-2 py-4 border-4 border-black bg-cyan-300 text-black font-black uppercase tracking-wider text-lg shadow-[8px_8px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
               >
                 <Check size={22} strokeWidth={2.5} />
-                Cerrar votacion
+                Cerrar votación
               </button>
             )
           )}
@@ -730,7 +730,7 @@ export default function ImpostorOnlinePage({ onExit }: ImpostorOnlinePageProps) 
         ) : (
           <div className="w-full border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] text-center">
             <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              El anfitrion iniciara la siguiente partida...
+              El anfitrión iniciará la siguiente partida...
             </p>
           </div>
         )}

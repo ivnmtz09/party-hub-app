@@ -90,13 +90,13 @@ export default function RouletaPage() {
       <div className="flex-1 w-full max-w-lg mx-auto p-4 space-y-5">
         <GameHeader title="Ruleta" backTo="/arcade" />
         <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center">
-          Personaliza tu ruleta y girala
+          Personaliza tu ruleta y gírala
         </p>
 
           <div className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-4 shadow-brutal dark:shadow-brutal-dark space-y-3">
             <div className="flex items-center justify-between">
               <p className="font-black uppercase tracking-wider text-xs text-black dark:text-white">
-                Elementos (uno por linea o separados por comas)
+                Elementos (uno por línea o separados por comas)
               </p>
               {items.length === 0 && inputText.trim() && (
                 <button
@@ -110,7 +110,7 @@ export default function RouletaPage() {
             <textarea
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="Ej: Opcion 1, Opcion 2, Opcion 3"
+              placeholder="Ej: Opción 1, Opción 2, Opción 3"
               rows={4}
               className="w-full border-4 border-black dark:border-white bg-gray-50 dark:bg-gray-700 text-black dark:text-white font-bold text-sm p-3 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-0 resize-none"
             />

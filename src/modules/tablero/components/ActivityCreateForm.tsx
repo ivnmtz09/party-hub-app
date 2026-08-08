@@ -103,7 +103,7 @@ const OPCIONES = [
 
       <div>
         <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1">
-          Calificacion
+          Calificación
         </p>
         {renderStars(rating, true)}
       </div>
@@ -132,7 +132,7 @@ const OPCIONES = [
             className="flex-1 flex items-center justify-center gap-1 py-2 px-3 border-2 border-black dark:border-white bg-gray-300 dark:bg-gray-700 text-black dark:text-white font-bold text-[10px] uppercase tracking-wider cursor-not-allowed opacity-70 transition-colors"
           >
             <Camera size={12} strokeWidth={2.5} />
-            Camara
+            Cámara
           </button>
           <button
             type="button"
@@ -140,7 +140,7 @@ const OPCIONES = [
             className="flex-1 flex items-center justify-center gap-1 py-2 px-3 border-2 border-black dark:border-white bg-gray-300 dark:bg-gray-700 text-black dark:text-white font-bold text-[10px] uppercase tracking-wider cursor-not-allowed opacity-70 transition-colors"
           >
             <Edit size={12} strokeWidth={2.5} />
-            Galeria
+            Galería
           </button>
         </div>
         {photoUrl && (

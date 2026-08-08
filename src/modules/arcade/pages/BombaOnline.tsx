@@ -163,7 +163,7 @@ export default function BombaOnline({ sala, userId, isHost, roomCode, preguntas,
           </p>
           <div className="space-y-3">
             <p className="text-2xl sm:text-3xl font-black uppercase tracking-wider">
-              EXPLOTO EN LAS MANOS DE
+              EXPLOTÓ EN LAS MANOS DE
             </p>
             <p className="text-5xl sm:text-6xl font-black uppercase tracking-tighter text-yellow-300">
               {loser}

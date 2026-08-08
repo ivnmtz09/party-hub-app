@@ -27,7 +27,7 @@ export default function JoinGroupModal({ open, onClose }: Props) {
       setCodigo('')
       onClose()
     } catch {
-      setError('Codigo no encontrado')
+      setError('Código no encontrado')
     } finally {
       setLoading(false)
     }
@@ -57,7 +57,7 @@ export default function JoinGroupModal({ open, onClose }: Props) {
           type="text"
           value={codigo}
           onChange={(e) => setCodigo(e.target.value.toUpperCase().slice(0, 6))}
-          placeholder="Codigo de 6 caracteres"
+          placeholder="Código de 6 caracteres"
           maxLength={6}
           className="w-full py-3 px-4 border-4 border-black dark:border-white bg-white dark:bg-gray-800 text-black dark:text-white font-bold uppercase tracking-widest text-center text-2xl placeholder:text-gray-400 focus:outline-none focus:ring-0 mb-4 text-base"
         />

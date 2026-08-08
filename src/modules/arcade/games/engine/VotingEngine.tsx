@@ -75,13 +75,13 @@ export default function VotingEngine({
               className="w-full flex items-center justify-center gap-2 py-4 border-4 border-yellow-400 bg-yellow-400 text-black font-black uppercase tracking-wider text-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
             >
               <Vote size={22} strokeWidth={2.5} />
-              CONTINUAR A VOTACION
+              CONTINUAR A VOTACIÓN
             </button>
           )}
 
           {!isHost && (
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-              Esperando al anfitrion...
+              Esperando al anfitrión...
             </p>
           )}
         </div>
@@ -95,7 +95,7 @@ export default function VotingEngine({
         <div className="w-full max-w-md mx-auto p-4 flex-1 flex flex-col gap-6">
           <div className="text-center">
             <p className="text-xs font-black uppercase tracking-widest text-yellow-400 mb-1">
-              Ronda {sala.currentRound} - Votacion
+              Ronda {sala.currentRound} - Votación
             </p>
             <p className="font-black uppercase tracking-tighter text-lg text-white/60">
               {currentCard}
@@ -177,7 +177,7 @@ export default function VotingEngine({
             <div className="w-full border-4 border-yellow-400 bg-yellow-400 p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-center">
               <Trophy size={40} strokeWidth={2.5} className="mx-auto mb-3 text-black" />
               <p className="font-black uppercase tracking-tighter text-2xl text-black">
-                EL MAS PROBABLE ES:
+                EL MÁS PROBABLE ES:
               </p>
               <p className="font-black uppercase tracking-tighter text-3xl text-black mt-2">
                 {winner.displayName.split(' ')[0]}
@@ -189,7 +189,7 @@ export default function VotingEngine({
           ) : (
             <div className="w-full border-4 border-gray-600 bg-gray-800 p-8 shadow-[8px_8px_0px_0px_rgba(75,85,99,1)] text-center">
               <p className="font-black uppercase tracking-tighter text-xl text-gray-400">
-                Nadie recibio votos
+                Nadie recibió votos
               </p>
             </div>
           )}
@@ -232,7 +232,7 @@ export default function VotingEngine({
 
           {!isHost && (
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-              Esperando al anfitrion...
+              Esperando al anfitrión...
             </p>
           )}
         </div>

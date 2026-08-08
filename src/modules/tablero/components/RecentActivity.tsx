@@ -63,7 +63,7 @@ export default function RecentActivity({ miembros, userId, groupId, totalEventos
       ) : eventos.length === 0 ? (
         <div className="border-4 border-black dark:border-white bg-white dark:bg-gray-800 p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
           <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-center">
-            No hay registros aun
+            No hay registros aún
           </p>
         </div>
       ) : (
@@ -84,7 +84,7 @@ export default function RecentActivity({ miembros, userId, groupId, totalEventos
               className="w-full flex items-center justify-center gap-2 mt-6 py-3 border-4 border-black dark:border-white bg-gradient-to-r from-cyan-400 to-blue-600 text-white font-black uppercase tracking-wider shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
             >
               <ChevronDown size={16} strokeWidth={2.5} />
-              Ver mas...
+              Ver más...
             </button>
           )}
 

@@ -89,7 +89,7 @@ export default function GameLobbyPage() {
 
           <div className="w-full border-4 border-white bg-black p-6 shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] text-center">
             <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
-              Codigo de Sala
+              Código de Sala
             </p>
             <button
               onClick={handleCopyCode}
@@ -108,7 +108,7 @@ export default function GameLobbyPage() {
               )}
             </button>
             <p className="text-xs font-bold text-gray-500 mt-3 uppercase tracking-wider">
-              Comparte este codigo con tus amigos
+              Comparte este código con tus amigos
             </p>
           </div>
 
@@ -129,7 +129,7 @@ export default function GameLobbyPage() {
                     {p.displayName.split(' ')[0]}
                     {p.id === gameRoom.sala?.hostId && (
                       <span className="text-[10px] text-yellow-400 ml-2">
-                        (Anfitrion)
+                        (Anfitrión)
                       </span>
                     )}
                   </span>
@@ -159,7 +159,7 @@ export default function GameLobbyPage() {
             </button>
           ) : (
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-              Esperando al anfitrion...
+              Esperando al anfitrión...
             </p>
           )}
         </div>
@@ -217,7 +217,7 @@ export default function GameLobbyPage() {
                   Unirse a Sala
                 </p>
                 <p className="text-xs font-bold text-gray-500 mt-1 uppercase tracking-wider">
-                  Ingresa el codigo de 4 caracteres
+                  Ingresa el código de 4 caracteres
                 </p>
               </div>
 
